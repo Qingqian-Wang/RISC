@@ -1,2 +1,2 @@
 # RISC
-The group project for ece651
+The group project for sde
