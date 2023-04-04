@@ -41,6 +41,7 @@ public class Territory implements Serializable {
         this.units = num;
     }
 
+    // based on territory id, find its name in hashmap
     private int getIDByName(Territory t){
         for(Map.Entry<Integer,ArrayList<String>> e: neighbor.entrySet()){
             if(e.getValue().contains(t.getName())){
