@@ -1,8 +1,9 @@
+package edu.duke.zj82.Territory;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 public class Territory implements Serializable {
     private final String name;
@@ -33,11 +34,11 @@ public class Territory implements Serializable {
         return this.neighbor;
     }
 
-    protected void setOwnID(int id) {
+    public void setOwnID(int id) {
         this.ownID = id;
     }
 
-    protected void setUnits(int num) {
+    public void setUnits(int num) {
         this.units = num;
     }
 
