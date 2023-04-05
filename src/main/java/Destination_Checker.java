@@ -22,8 +22,6 @@ public class Destination_Checker extends Basic_Checker {
             if (starterID != behavior_DestinationID){
                 return "you are moving, input a place belong to you!";
             }
-        } else {
-            return "wrong type in behavior";
         }
         return null;
     }
