@@ -1,7 +1,9 @@
 import edu.duke.zj82.Territory.Territory;
 
+import java.io.Serializable;
 
-public class Behavior {
+
+public class Behavior implements Serializable {
     Territory origin;
     Territory destination;
     int units;
