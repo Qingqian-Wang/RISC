@@ -1,10 +1,11 @@
 import java.io.BufferedReader;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 public class Player {
-    public socket clientSocket(){}
+    public socket clientSocket;
 
-    public int playerID(){}
+    public int playerID;
 
     public int status;
 
@@ -12,13 +13,35 @@ public class Player {
 
     private PrintWriter out;
 
-    private BehaviorRuleChecker attackRuleChecker(){}
+    private BasicChecker attackRuleChecker;
 
-    private BehaviorRuleChecker moveRuleChecker(){}
+    private BasicChecker moveRuleChecker;
 
-    public socket getSocket(){}
+    public socket getSocket() {
+        return clientSocket;
+    }
 
-    public int getID(){}
+    public int getID() {
+        return playerID;
+    }
 
+    public int getStatus() {
+        return status;
+    }
 
+    public BufferedReader getIn() {
+        return in;
+    }
+
+    public PrintWriter getOut() {
+        return out;
+    }
+
+    public void setID(int playerID) {
+        this.playerID = playerID;
+    }
+
+    private void playOneTurn(){}
+
+    private void checkBehavior(ArrayList<Behavior> list){}
 }
