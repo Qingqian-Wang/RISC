@@ -11,7 +11,7 @@ public class TerritoryTest {
         Territory t = new Territory("PlaceA", 1);
         assertEquals("PlaceA", t.getName());
         assertEquals(1, t.getOwnID());
-        assertEquals(0, t.getUnits());
+        assertEquals(0, t.getUnit());
         assertEquals(0, t.getNeighbor().size());
     }
 
@@ -26,12 +26,12 @@ public class TerritoryTest {
     @Test
     public void test_set_units() {
         Territory t = new Territory("PlaceA", 1);
-        t.setUnits(10);
-        assertNotEquals(0, t.getUnits());
-        assertEquals(10, t.getUnits());
-        t.setUnits(20);
-        assertNotEquals(10, t.getUnits());
-        assertEquals(20, t.getUnits());
+        t.setUnit(10);
+        assertNotEquals(0, t.getUnit());
+        assertEquals(10, t.getUnit());
+        t.setUnit(20);
+        assertNotEquals(10, t.getUnit());
+        assertEquals(20, t.getUnit());
     }
 
     @Test

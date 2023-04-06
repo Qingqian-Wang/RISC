@@ -1,12 +1,12 @@
 import java.util.ArrayList;
 //改！！！！
-public class Origin_Checker extends Basic_Checker {
-    public Origin_Checker(Basic_Checker next) {
+public class Origin_Checker extends BasicChecker {
+    public Origin_Checker(BasicChecker next) {
         super(next);
     }
 
     @Override
-    protected String checkMyRule(Bahavior my_behavior, ArrayList<Territory> t) {
+    protected String checkMyRule(Behavior my_behavior, ArrayList<Territory> t) {
         int starterID = my_behavior.getOwnID();
         int behavior_OriginID =  my_behavior.getOrigin().getOwnID();
 //        int behavior_DestinationID = my_behavior.getDestination().getOwnID();
