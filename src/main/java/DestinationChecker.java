@@ -28,7 +28,6 @@ public class DestinationChecker extends BasicChecker {
                     }
                 }
             }
-
             if(!adjacent){
                 return "Enemy not adjacent to you";
             }
