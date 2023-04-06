@@ -1,3 +1,12 @@
+import java.net.ServerSocket;
+import java.util.ArrayList;
+
 public class server {
-    int name;
+    ArrayList<Player> playerList;
+    ArrayList<Territory> map;
+    int port;
+    ServerSocket serverSocket;
+
+
+
 }
