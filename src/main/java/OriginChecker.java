@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 //改！！！！
-public class Origin_Checker extends Basic_Checker {
-    public Origin_Checker(Basic_Checker next) {
+public class OriginChecker extends BasicChecker {
+    public OriginChecker(BasicChecker next) {
         super(next);
     }
 

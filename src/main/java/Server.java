@@ -1,7 +1,7 @@
 import java.net.ServerSocket;
 import java.util.ArrayList;
 
-public class server {
+public class Server {
     ArrayList<Player> playerList;
     ArrayList<Territory> map;
     int port;
