@@ -52,7 +52,7 @@ public class Server {
 
     public void playTurn(){}
 
-    private void checkBehavior(ArrayList<Behavior>){}
+    //private void checkBehavior(ArrayList<Behavior>){}
 
     public void sendPlayerStatus(){}
 
