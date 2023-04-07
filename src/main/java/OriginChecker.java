@@ -11,7 +11,7 @@ public class OriginChecker extends BasicChecker {
         int behavior_OriginID =  my_behavior.getOrigin().getOwnID();
 //        int behavior_DestinationID = my_behavior.getDestination().getOwnID();
         int use_Unit = my_behavior.getUnit();
-        int exist_Unit = my_behavior.getOrigin().getUnits();
+        int exist_Unit = my_behavior.getOrigin().getUnit();
         // check the starter is right
         if (starterID != behavior_OriginID){
             return "the origin territory is not belong to player" + starterID;
