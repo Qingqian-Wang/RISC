@@ -1,4 +1,6 @@
+import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -9,10 +11,26 @@ public class Server {
     public ArrayList<Territory> map;
     public int port;
     public ServerSocket serverSocket;
-    private BasicChecker attackRuleChecker;
-    private BasicChecker moveRuleChecker;
-
-    public void acceptPlayer(){}
+    private BasicChecker ruleChecker;
+    public Server(int port) throws IOException {
+        playerList = new ArrayList<>();
+        map = new ArrayList<>();
+        this.port = port;
+        serverSocket = new ServerSocket(this.port);
+        ruleChecker = new OriginChecker(new DestinationChecker(null));
+    }
+    public void acceptPlayer(int playerNum) throws IOException {
+        for(int i = 0; i < playerNum; i++){
+            Player p = new Player(port, i+1);
+            p.connectToServer();
+            Socket playerSocket = serverSocket.accept();
+            System.out.println("Accept new connection from " + playerSocket.getInetAddress());
+            playerList.add(p);
+            System.out.println("Added player"+p.getID()+" to list");
+            Thread playerThread = new Thread(p);
+            playerThread.start();
+        }
+    }
 
     public void gameStart(){}
 
