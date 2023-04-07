@@ -1,9 +1,10 @@
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class GlobalMap {
+public class GlobalMap implements NetworkObject, Serializable {
     private ArrayList<Territory> mapArrayList;
 
     public ArrayList<Territory> getMapArrayList() {
@@ -15,9 +16,9 @@ public class GlobalMap {
         out.writeObject(this);
     }
 
-    public static GlobalMap receiveList(Socket socket) throws Exception{
+    public void receiveList(Socket socket) throws Exception{
         ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
         GlobalMap globalMap = (GlobalMap) in.readObject();
-        return globalMap;
+        this.mapArrayList = globalMap.getMapArrayList();
     }
 }

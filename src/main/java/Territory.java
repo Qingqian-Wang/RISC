@@ -24,7 +24,7 @@ public class Territory implements Serializable {
         return this.ownID;
     }
 
-    public int getUnits() {
+    public int getUnit() {
         return this.units;
     }
 
@@ -36,7 +36,7 @@ public class Territory implements Serializable {
         this.ownID = id;
     }
 
-    public void setUnits(int num) {
+    public void setUnit(int num) {
         this.units = num;
     }
 
