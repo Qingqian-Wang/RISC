@@ -1,7 +1,20 @@
 package yz803;
 
 
-import java.net.Socket;
+import java.security.PublicKey;
+import java.util.ArrayList;
+public class behaviorList {
+	private ArrayList<Behavior> moveList;
+	private ArrayList<Behavior> attackList;
+	private int playerID;
+	public ArrayList<Behavior> getMoveList() {
+		return moveList;
+	}
+
+	public ArrayList<Behavior> getAttackList() {
+		return attackList;
+	}
+
 
 public class behaviorList {
 //	private ArrayList<Behavior> moveList;
