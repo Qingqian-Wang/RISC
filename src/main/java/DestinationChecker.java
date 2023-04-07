@@ -27,7 +27,9 @@ public class DestinationChecker extends BasicChecker {
                         return true;
                     } else {
                         Territory newTerritory = findTerritory(str, t);
-                        return findPath(newTerritory,destination, t);
+                        if (findPath(newTerritory,destination, t)) {
+                            return true;
+                        }
                     }
                 }
             }
