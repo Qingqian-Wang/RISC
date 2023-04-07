@@ -87,6 +87,21 @@ public class Server {
             map.add(new Territory("Duke", -1));
         }
 
+        int[] territoryOwner;
+        if (playerList.size() == 2) {
+            territoryOwner = new int[]{1, 1, 1, 1, 1, 2, 2, 2, 2, 2};
+        } else if (playerList.size() == 3) {
+            territoryOwner = new int[]{1, 1, 1, 2, 2, 2, 3, 3, 3};
+        } else if (playerList.size() == 4) {
+            territoryOwner = new int[]{1, 1, 2, 2, 3, 3, 4, 4};
+        } else {
+            territoryOwner = new int[]{1, 1, 2, 2, 3, 3, 4, 4, 5, 5};
+        }
+
+        for (int i = 0; i < playerNum; i++) {
+            map.get(i).setOwnID(territoryOwner[i]);
+        }
+
 
 
 
