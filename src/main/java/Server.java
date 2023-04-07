@@ -2,6 +2,7 @@ import java.net.ServerSocket;
 import java.util.ArrayList;
 
 public class Server {
+
     public ArrayList<Player> playerList;
     public ArrayList<Territory> map;
     public int port;
@@ -22,6 +23,7 @@ public class Server {
     public void sendPlayerStatus(){}
 
     public void gameOver(){}
+
 
 
 
