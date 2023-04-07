@@ -19,6 +19,9 @@ public class Server {
 
     }
 
+
+    ArrayList<>;
+
     public void initialzeMap(){
         int playerNum = playerList.size();
         if(playerNum == 2){
