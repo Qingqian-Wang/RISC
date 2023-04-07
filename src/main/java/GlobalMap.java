@@ -7,6 +7,13 @@ import java.util.ArrayList;
 public class GlobalMap implements NetworkObject, Serializable {
     private ArrayList<Territory> mapArrayList;
 
+    public GlobalMap(ArrayList<Territory> mapArrayList) {
+        this.mapArrayList = mapArrayList;
+    }
+    public GlobalMap() {
+        this.mapArrayList = new ArrayList<>();
+    }
+
     public ArrayList<Territory> getMapArrayList() {
         return mapArrayList;
     }
