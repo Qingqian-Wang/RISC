@@ -66,13 +66,9 @@ public class Server {
     }
 
 
-
-
-
-
     ArrayList<Map.Entry<String, Integer>> mapInfo;
 
-    public void initialzeMap(){
+    public void initialzeMap() {
         int playerNum = playerList.size();
         map.add(new Territory("Narnia", -1));
         map.add(new Territory("Midkemia", -1));
@@ -82,10 +78,10 @@ public class Server {
         map.add(new Territory("Scadrial", -1));
         map.add(new Territory("Roshar", -1));
         map.add(new Territory("Hogwarts", -1));
-        if(playerNum != 3 || playerNum != 4){
+        if (playerNum != 3 || playerNum != 4) {
             map.add(new Territory("Mordor", -1));
         }
-        if(playerNum != 4){
+        if (playerNum != 4) {
             map.add(new Territory("Duke", -1));
         }
 
@@ -108,61 +104,61 @@ public class Server {
 
     public void initialzeMapHelper() {
         int playerNum = playerList.size();
-        map.get(0).updateNeighbor(map. get(1));
-        map. get(0).updateNeighbor(map. get(3));
+        map.get(0).updateNeighbor(map.get(1));
+        map.get(0).updateNeighbor(map.get(3));
 
-        map. get(1).updateNeighbor(map. get(0));
-        map. get(1).updateNeighbor(map. get(2));
-        map. get(1).updateNeighbor(map. get(4));
+        map.get(1).updateNeighbor(map.get(0));
+        map.get(1).updateNeighbor(map.get(2));
+        map.get(1).updateNeighbor(map.get(4));
 
-        map. get(2).updateNeighbor(map. get(1));
-        map. get(2).updateNeighbor(map. get(5));
+        map.get(2).updateNeighbor(map.get(1));
+        map.get(2).updateNeighbor(map.get(5));
 
-        map. get(3).updateNeighbor(map. get(0));
-        map. get(3).updateNeighbor(map. get(4));
-        map. get(3).updateNeighbor(map. get(6));
-        map. get(3).updateNeighbor(map. get(7));
+        map.get(3).updateNeighbor(map.get(0));
+        map.get(3).updateNeighbor(map.get(4));
+        map.get(3).updateNeighbor(map.get(6));
+        map.get(3).updateNeighbor(map.get(7));
 
-        map. get(4).updateNeighbor(map. get(1));
-        map. get(4).updateNeighbor(map. get(3));
-        map. get(4).updateNeighbor(map. get(5));
-        map. get(4).updateNeighbor(map. get(7));
+        map.get(4).updateNeighbor(map.get(1));
+        map.get(4).updateNeighbor(map.get(3));
+        map.get(4).updateNeighbor(map.get(5));
+        map.get(4).updateNeighbor(map.get(7));
         if (playerNum != 4) {
-            map. get(4).updateNeighbor(map. get(8));
+            map.get(4).updateNeighbor(map.get(8));
         }
 
-        map. get(5).updateNeighbor(map. get(3));
-        map. get(5).updateNeighbor(map. get(4));
+        map.get(5).updateNeighbor(map.get(3));
+        map.get(5).updateNeighbor(map.get(4));
         if (playerNum != 4) {
-            map. get(5).updateNeighbor(map. get(8));
+            map.get(5).updateNeighbor(map.get(8));
         }
         if (playerNum != 3 || playerNum != 4) {
-            map. get(5).updateNeighbor(map. get(9));
+            map.get(5).updateNeighbor(map.get(9));
         }
 
-        map. get(6).updateNeighbor(map. get(3));
-        map. get(6).updateNeighbor(map. get(7));
+        map.get(6).updateNeighbor(map.get(3));
+        map.get(6).updateNeighbor(map.get(7));
 
 
-        map. get(7).updateNeighbor(map. get(3));
-        map. get(7).updateNeighbor(map. get(4));
-        map. get(7).updateNeighbor(map. get(6));
+        map.get(7).updateNeighbor(map.get(3));
+        map.get(7).updateNeighbor(map.get(4));
+        map.get(7).updateNeighbor(map.get(6));
         if (playerNum != 4) {
-            map. get(7).updateNeighbor(map. get(8));
+            map.get(7).updateNeighbor(map.get(8));
         }
 
-        if(playerNum != 4){
-            map. get(8).updateNeighbor(map. get(4));
-            map. get(8).updateNeighbor(map. get(5));
-            map. get(8).updateNeighbor(map. get(7));
+        if (playerNum != 4) {
+            map.get(8).updateNeighbor(map.get(4));
+            map.get(8).updateNeighbor(map.get(5));
+            map.get(8).updateNeighbor(map.get(7));
             if (playerNum != 3) {
-                map. get(8).updateNeighbor(map. get(9));
+                map.get(8).updateNeighbor(map.get(9));
             }
         }
 
         if (playerNum != 3 || playerNum != 4) {
-            map. get(9).updateNeighbor(map. get(5));
-            map. get(9).updateNeighbor(map. get(8));
+            map.get(9).updateNeighbor(map.get(5));
+            map.get(9).updateNeighbor(map.get(8));
         }
 
     }
@@ -177,11 +173,11 @@ public class Server {
     }
 
     public boolean gameOver() {
-        int ownID = -1;
+        int ownID = 0;
         for (Territory t : map) {
-            if (ownID == -1) {
+            if (ownID == 0) {
                 ownID = t.getOwnID();
-            } else if (ownID != t.getOwnID()) {
+            } else if (ownID != t.getOwnID() && t.getOwnID() != -1) {
                 return false;
             }
         }
