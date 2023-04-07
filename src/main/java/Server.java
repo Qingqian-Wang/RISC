@@ -1,5 +1,7 @@
 import java.net.ServerSocket;
 import java.util.ArrayList;
+import java.util.Map;
+
 
 public class Server {
 
@@ -20,10 +22,27 @@ public class Server {
     }
 
 
-    ArrayList<>;
+    ArrayList<Map.Entry<String, Integer>> mapInfo;
 
     public void initialzeMap(){
         int playerNum = playerList.size();
+        map.add(new Territory("Narnia", -1));
+        map.add(new Territory("Narnia", -1));
+        map.add(new Territory("Narnia", -1));
+        map.add(new Territory("Narnia", -1));
+        map.add(new Territory("Narnia", -1));
+        map.add(new Territory("Narnia", -1));
+        map.add(new Territory("Narnia", -1));
+        map.add(new Territory("Narnia", -1));
+        if(playerNum != 3 || playerNum != 4){
+            map.add(new Territory("Narnia", -1));
+        }
+        if(playerNum != 4){
+            map.add(new Territory("Narnia", -1));
+        }
+
+
+
         if(playerNum == 2){
 
         }else if(playerNum == 3){
