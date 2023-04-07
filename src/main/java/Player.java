@@ -1,9 +1,10 @@
 import java.io.BufferedReader;
 import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.ArrayList;
 
 public class Player {
-    public socket clientSocket;
+    public Socket clientSocket;
 
     public int playerID;
 
@@ -17,7 +18,7 @@ public class Player {
 
     private BasicChecker moveRuleChecker;
 
-    public socket getSocket() {
+    public Socket getSocket() {
         return clientSocket;
     }
 
@@ -45,5 +46,7 @@ public class Player {
 
     private void checkBehavior(ArrayList<Behavior> list){}
 
-    public socket attendTheGame(){}
+    public Socket attendTheGame(){
+        return null;
+    }
 }
