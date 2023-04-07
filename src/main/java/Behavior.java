@@ -1,5 +1,3 @@
-import edu.duke.zj82.Territory.Territory;
-
 import java.io.Serializable;
 
 
@@ -9,6 +7,14 @@ public class Behavior implements Serializable {
     int units;
     int playerID;
     String type;
+
+    public Behavior(Territory origin, Territory destination, int units, int playerID, String type) {
+        this.origin = origin;
+        this.destination = destination;
+        this.units = units;
+        this.playerID = playerID;
+        this.type = type;
+    }
 
     public Territory getOrigin() {
         return origin;
