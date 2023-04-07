@@ -6,8 +6,8 @@ public class Server {
     public ArrayList<Territory> map;
     public int port;
     public ServerSocket serverSocket;
-    private BehaviorRuleChecker attackRuleChecker;
-    private BehaviorRuleChecker moveRuleChecker;
+    private BasicChecker attackRuleChecker;
+    private BasicChecker moveRuleChecker;
 
     public void acceptPlayer(){}
 

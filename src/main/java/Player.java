@@ -44,4 +44,6 @@ public class Player {
     private void playOneTurn(){}
 
     private void checkBehavior(ArrayList<Behavior> list){}
+
+    public socket attendTheGame(){}
 }
