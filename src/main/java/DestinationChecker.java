@@ -66,7 +66,8 @@ public class DestinationChecker extends BasicChecker {
                 return "you are moving, input a place belong to you!";
             }
             //find path
-            boolean res = findPath(my_behavior.getOrigin(), my_behavior.getDestination());
+
+            boolean res = findPath(my_behavior.getOrigin(), my_behavior.getDestination().getName(), t);
                 return "connect to the places not connected";
             }
 
