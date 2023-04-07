@@ -1,6 +1,8 @@
+import java.io.*;
+import java.net.Socket;
 import java.util.ArrayList;
 
-public class behaviorList {
+public class BehaviorList implements Serializable {
 	private ArrayList<Behavior> moveList;
 	private ArrayList<Behavior> attackList;
 	private int playerID;
@@ -17,11 +19,14 @@ public class behaviorList {
 		return playerID;
 	}
 
-	public void sendList(socket) {
-
+	public void sendList(Socket socket) throws Exception {
+		ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+		out.writeObject(this);
 	}
-	
-	public void receiveList(socket) {
 
+	public static BehaviorList receiveList(Socket socket) throws Exception{
+		ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+		BehaviorList behaviorList = (BehaviorList) in.readObject();
+		return behaviorList;
 	}
 }
