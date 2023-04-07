@@ -132,7 +132,7 @@ public class Server {
         if (playerNum != 4) {
             map. get(5).updateNeighbor(map. get(8));
         }
-        if (playerNum != 3 || playerNum != 4) {
+        if (playerNum != 3 && playerNum != 4) {
             map. get(5).updateNeighbor(map. get(9));
         }
 
@@ -156,7 +156,7 @@ public class Server {
             }
         }
 
-        if (playerNum != 3 || playerNum != 4) {
+        if (playerNum != 3 && playerNum != 4) {
             map. get(9).updateNeighbor(map. get(5));
             map. get(9).updateNeighbor(map. get(8));
         }
