@@ -18,13 +18,12 @@ public class Player implements Runnable{
 
     private PrintWriter out;
 
-    private BasicChecker attackRuleChecker;
-
-    private BasicChecker moveRuleChecker;
+    private BasicChecker ruleChecker;
 
     public Player(int serverPort, int id) {
         this.serverPort = serverPort;
         this.playerID = id;
+        ruleChecker = new OriginChecker(null);
     }
 
     public Socket getSocket() {
@@ -55,9 +54,6 @@ public class Player implements Runnable{
 
     private void checkBehavior(ArrayList<Behavior> list){}
 
-    public Socket attendTheGame(){
-        return null;
-    }
 
     public void connectToServer() throws IOException {
         this.clientSocket = new Socket("localhost",serverPort);
