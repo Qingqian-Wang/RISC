@@ -1,3 +1,4 @@
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -21,7 +22,7 @@ public class Server {
 
     public void acceptPlayer(int playerNum) throws IOException {
         for (int i = 0; i < playerNum; i++) {
-            Player p = new Player(port, i + 1);
+            Player p = new Player(port, i + 1, playerNum);
             p.connectToServer();
             Socket playerSocket = serverSocket.accept();
             System.out.println("Accept new connection from " + playerSocket.getInetAddress());
@@ -46,6 +47,9 @@ public class Server {
         }
         for (Player player : playerList) {
             player.getOut().println("Game Start");
+            DataOutputStream dataOut = new DataOutputStream(player.getSocket().getOutputStream());
+            int totalUnit = 50;
+            dataOut.writeInt(totalUnit);
             String unitInfo = player.getIn().readLine();
             String[] tokens = unitInfo.split(" ");
             for (int i = 0; i < tokens.length; i++) {
