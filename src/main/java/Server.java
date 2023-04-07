@@ -2,8 +2,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Map;
+import java.util.*;
 
 
 public class Server {
@@ -35,7 +34,7 @@ public class Server {
         }
     }
 
-    public void gameStart() throws IOException {
+    public void gameStart() throws Exception {
         initialzeMap();
         int[][] territoryOwner;
         if (playerList.size() == 2) {
@@ -78,7 +77,7 @@ public class Server {
         map.add(new Territory("Scadrial", -1));
         map.add(new Territory("Roshar", -1));
         map.add(new Territory("Hogwarts", -1));
-        if (playerNum != 3 || playerNum != 4) {
+        if (playerNum != 3 && playerNum != 4) {
             map.add(new Territory("Mordor", -1));
         }
         if (playerNum != 4) {
@@ -166,10 +165,122 @@ public class Server {
 
     }
 
-    public void playTurn() {
+    public void playTurn() throws Exception {
+        List<Integer> orders = new ArrayList<>();
+        for(int i = 1; i <= playerList.size(); i++){
+            orders.add(i);
+        }
+        Random rand = new Random();
+        HashMap<Integer, BehaviorList> orderMap = new HashMap<>();
+        ArrayList<Behavior> attackList = new ArrayList<>();
+        ArrayList<Behavior> moveList = new ArrayList<>();
+        for (Player player : playerList) {
+            player.getOut().println("Turn Start");
+            GlobalMap current = new GlobalMap(map);
+            current.sendList(player.getSocket());
+            BehaviorList behaviorList = new BehaviorList(player.getID());
+            behaviorList.receiveList(player.getSocket());
+            int index = rand.nextInt(orders.size());
+            orderMap.put(orders.get(index),behaviorList);
+            orders.remove(index);
+        }
+        for(int i = 1; i <= playerList.size();i++){
+            attackList.addAll(orderMap.get(i).getAttackList());
+            moveList.addAll(orderMap.get(i).getMoveList());
+        }
+        checkAndExecuteMoveBehavior(moveList);
+        checkAndExecuteAttackBehavior(attackList);
+        //need check all player status by using map
+        //need increase unit of each territory
+    }
+    private void executeMoveBehavior(Behavior b){
+        String sourceName = b.getOrigin().getName();
+        String destName = b.getDestination().getName();
+        int unit = b.getUnit();
+        for(int i = 0; i < map.size(); i++){
+            if(sourceName.equals(map.get(i).getName())){
+                map.get(i).setUnit(map.get(i).getUnit()-unit);
+                break;
+            }
+        }
+        for(int i = 0; i < map.size(); i++){
+            if(destName.equals(map.get(i).getName())){
+                map.get(i).setUnit(map.get(i).getUnit()+unit);
+                break;
+            }
+        }
     }
 
-    private void checkBehavior(ArrayList<Behavior>) {
+    private void checkAndExecuteMoveBehavior(ArrayList<Behavior> behaviorArrayList) {
+        for(Behavior b:behaviorArrayList){
+            if(ruleChecker.checkBehavior(b,map)==null){
+                executeMoveBehavior(b);
+            }
+        }
+    }
+
+    private void moveUnitCuzAttack(Behavior b){
+        String sourceName = b.getOrigin().getName();
+        int unit = b.getUnit();
+        for(int i = 0; i < map.size(); i++){
+            if(sourceName.equals(map.get(i).getName())){
+                map.get(i).setUnit(map.get(i).getUnit()-unit);
+                break;
+            }
+        }
+    }
+
+    private boolean getAttackResult(){
+        Random rand = new Random();
+        int attacker = rand.nextInt(20)+1;
+        int defender = rand.nextInt(20)+1;
+        return attacker > defender;
+    }
+
+    private void updateAllNeighbor(Territory t){
+        for(int i = 0; i < map.size(); i++){
+            for(Map.Entry<Integer,ArrayList<String>> e:map.get(i).getNeighbor().entrySet()){
+                if(e.getValue().contains(t.getName())){
+                    map.get(i).updateNeighbor(t);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void executeAttackBehavior(Behavior b){
+        String destName = b.getDestination().getName();
+        int unit = b.getUnit();
+        for(int i = 0; i < map.size(); i++){
+            if(destName.equals(map.get(i).getName())){
+                while(unit!=0&&map.get(i).getUnit()!=0){
+                    if(getAttackResult()){
+                        map.get(i).setUnit(map.get(i).getUnit()-1);
+                    } else {
+                        unit--;
+                    }
+                }
+                if(unit!=0){
+                    map.get(i).setOwnID(b.getOwnID());
+                    map.get(i).setUnit(unit);
+                    updateAllNeighbor(map.get(i));
+                }
+                break;
+            }
+        }
+    }
+
+    private void checkAndExecuteAttackBehavior(ArrayList<Behavior> behaviorArrayList){
+        for(Behavior b:behaviorArrayList){
+            if(ruleChecker.checkBehavior(b,map)==null){
+                moveUnitCuzAttack(b);
+            }
+        }
+        for(Behavior b:behaviorArrayList){
+            if(ruleChecker.checkBehavior(b,map)==null){
+                executeAttackBehavior(b);
+            }
+        }
     }
 
     public void sendPlayerStatus() {

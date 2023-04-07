@@ -7,8 +7,20 @@ public class BehaviorList implements NetworkObject, Serializable {
     private ArrayList<Behavior> attackList;
     private int playerID;
 
+    public BehaviorList(int playerID) {
+        this.playerID = playerID;
+        moveList = new ArrayList<>();
+        attackList = new ArrayList<>();
+    }
+
     public ArrayList<Behavior> getMoveList() {
         return moveList;
+    }
+    public void addToMoveList(Behavior b){
+        this.moveList.add(b);
+    }
+    public void addToAttackList(Behavior b){
+        this.attackList.add(b);
     }
 
     public ArrayList<Behavior> getAttackList() {
