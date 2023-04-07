@@ -1,5 +1,7 @@
-public interface networkObject {
-	public void sendList(socket);
+import java.net.Socket;
 
-	public void receiveList(socket);
+public interface NetworkObject {
+    public void sendList(Socket socket);
+
+    public void receiveList(Socket socket);
 }

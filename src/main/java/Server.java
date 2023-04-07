@@ -14,7 +14,23 @@ public class Server {
 
     public void gameStart(){}
 
-    public void initialzeMap(){}
+
+    public void initialzeMapHelper(){
+
+    }
+
+    public void initialzeMap(){
+        int playerNum = playerList.size();
+        if(playerNum == 2){
+
+        }else if(playerNum == 3){
+
+        }else if(playerNum == 4){
+
+        }else if(playerNum == 5){
+
+        }
+    }
 
     public void playTurn(){}
 
