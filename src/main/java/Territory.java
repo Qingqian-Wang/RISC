@@ -49,6 +49,7 @@ public class Territory implements Serializable {
         }
         return -1;
     }
+
     public void updateNeighbor(Territory t){
         // check the reason of update: if exist a key that contains it, that means this territory's own is changed
         // else: initializing the map
