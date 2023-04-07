@@ -1,14 +1,18 @@
 import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class Player {
+public class Player implements Runnable{
     public Socket clientSocket;
 
     public int playerID;
 
     public int status;
+
+    public int serverPort;
 
     private BufferedReader in;
 
@@ -17,6 +21,11 @@ public class Player {
     private BasicChecker attackRuleChecker;
 
     private BasicChecker moveRuleChecker;
+
+    public Player(int serverPort, int id) {
+        this.serverPort = serverPort;
+        this.playerID = id;
+    }
 
     public Socket getSocket() {
         return clientSocket;
@@ -48,5 +57,16 @@ public class Player {
 
     public Socket attendTheGame(){
         return null;
+    }
+
+    public void connectToServer() throws IOException {
+        this.clientSocket = new Socket("localhost",serverPort);
+        this.in = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
+        this.out = new PrintWriter(this.clientSocket.getOutputStream(), true);
+    }
+
+    @Override
+    public void run() {
+
     }
 }
