@@ -45,19 +45,22 @@ public class Server {
     public void initialzeMap(){
         int playerNum = playerList.size();
         map.add(new Territory("Narnia", -1));
-        map.add(new Territory("Narnia", -1));
-        map.add(new Territory("Narnia", -1));
-        map.add(new Territory("Narnia", -1));
-        map.add(new Territory("Narnia", -1));
-        map.add(new Territory("Narnia", -1));
-        map.add(new Territory("Narnia", -1));
-        map.add(new Territory("Narnia", -1));
+        map.add(new Territory("Midkemia", -1));
+        map.add(new Territory("Oz", -1));
+        map.add(new Territory("Gondor", -1));
+        map.add(new Territory("Elantris", -1));
+        map.add(new Territory("Scadrial", -1));
+        map.add(new Territory("Roshar", -1));
+        map.add(new Territory("Hogwarts", -1));
         if(playerNum != 3 || playerNum != 4){
-            map.add(new Territory("Narnia", -1));
+            map.add(new Territory("Mordor", -1));
         }
         if(playerNum != 4){
-            map.add(new Territory("Narnia", -1));
+            map.add(new Territory("Duke", -1));
         }
+
+
+
 
 
 
