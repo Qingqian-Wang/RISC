@@ -150,7 +150,6 @@ public class Player implements Runnable {
                     }
                     out.println(response);
                 } else if (inputLine.equals("Turn Start")) {
-
                     updateStatus();
                     if(status == 0 && watchingPattern == 0){
                         System.out.println("you lose the game, do you want to watch the rest of the game? enter yes to watch");
@@ -177,7 +176,7 @@ public class Player implements Runnable {
                                     for (Map.Entry<Integer, ArrayList<String>> e : currentMap.get(j).getNeighbor().entrySet()) {
                                         for (int x = 0; x < e.getValue().size(); x++) {
                                             neighborName.add(e.getValue().get(x));
-                                        
+                                        }
                                     }
                                     for (int x = 0; x < neighborName.size(); i++) {
                                         System.out.print(" " + neighborName.get(x));
@@ -190,21 +189,21 @@ public class Player implements Runnable {
                                 }
                             }
                         }
-                        BehaviorList behaviorList = new BehaviorList(playerID);
+                        BehaviorList behaviorList = new BehaviorList(playerID, status);
                         if(watchingPattern == 1){   // if the player is in the watching pattern then don't add any order
                             behaviorList.sendList(clientSocket);
                         }else {
-                            while (true) {
-                                System.out.println("You are player " + playerID + ", what would you like to do?");
-                                System.out.println("(M)ove");
-                                System.out.println("(A)ttack");
-                                System.out.println("(D)one");
-                                InputStreamReader sr = new InputStreamReader(System.in);
-                                BufferedReader bf = new BufferedReader(sr);
-                                String response = bf.readLine();
-                                while (response.length() != 1 || (response.toUpperCase().charAt(0) != 'M'
-                                        && response.toUpperCase().charAt(0) != 'A' && response.toUpperCase().charAt(0) != 'D')) {
-                                    System.out.println("Your input is not in correct format, try again");
+                        while (true) {
+                            System.out.println("You are player " + playerID + ", what would you like to do?");
+                            System.out.println("(M)ove");
+                            System.out.println("(A)ttack");
+                            System.out.println("(D)one");
+                            InputStreamReader sr = new InputStreamReader(System.in);
+                            BufferedReader bf = new BufferedReader(sr);
+                            String response = bf.readLine();
+                            while (response.length() != 1 || (response.toUpperCase().charAt(0) != 'M'
+                                    && response.toUpperCase().charAt(0) != 'A' && response.toUpperCase().charAt(0) != 'D')) {
+                                System.out.println("Your input is not in correct format, try again");
                                     System.out.println("You are player " + playerID + ", what would you like to do?");
                                     System.out.println("(M)ove");
                                     System.out.println("(A)ttack");
