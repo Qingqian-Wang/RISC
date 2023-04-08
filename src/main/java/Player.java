@@ -193,17 +193,17 @@ public class Player implements Runnable {
                         if(watchingPattern == 1){   // if the player is in the watching pattern then don't add any order
                             behaviorList.sendList(clientSocket);
                         }else {
-                        while (true) {
-                            System.out.println("You are player " + playerID + ", what would you like to do?");
-                            System.out.println("(M)ove");
-                            System.out.println("(A)ttack");
-                            System.out.println("(D)one");
-                            InputStreamReader sr = new InputStreamReader(System.in);
-                            BufferedReader bf = new BufferedReader(sr);
-                            String response = bf.readLine();
-                            while (response.length() != 1 || (response.toUpperCase().charAt(0) != 'M'
-                                    && response.toUpperCase().charAt(0) != 'A' && response.toUpperCase().charAt(0) != 'D')) {
-                                System.out.println("Your input is not in correct format, try again");
+                            while (true) {
+                                System.out.println("You are player " + playerID + ", what would you like to do?");
+                                System.out.println("(M)ove");
+                                System.out.println("(A)ttack");
+                                System.out.println("(D)one");
+                                InputStreamReader sr = new InputStreamReader(System.in);
+                                BufferedReader bf = new BufferedReader(sr);
+                                String response = bf.readLine();
+                                while (response.length() != 1 || (response.toUpperCase().charAt(0) != 'M'
+                                        && response.toUpperCase().charAt(0) != 'A' && response.toUpperCase().charAt(0) != 'D')) {
+                                    System.out.println("Your input is not in correct format, try again");
                                     System.out.println("You are player " + playerID + ", what would you like to do?");
                                     System.out.println("(M)ove");
                                     System.out.println("(A)ttack");
