@@ -21,7 +21,7 @@ public class GlobalMapTest {
         GlobalMap gm = new GlobalMap(map);
         assertEquals(5, gm.getMapArrayList().size());
         for(int i = 1; i <= 5; i++){
-            assertEquals(i,gm.getMapArrayList().get(i).getOwnID());
+            assertEquals(i,gm.getMapArrayList().get(i-1).getOwnID());
         }
         GlobalMap gm1 = new GlobalMap();
         assertEquals(0, gm1.getMapArrayList().size());
