@@ -27,6 +27,7 @@ public class Player implements Runnable {
     public Player(int serverPort, int id, int totalNumPlayer) {
         this.serverPort = serverPort;
         this.playerID = id;
+        this.status = 1;
         this.totalNumPlayer = totalNumPlayer;
         ruleChecker = new OriginChecker(null);
     }
@@ -61,10 +62,16 @@ public class Player implements Runnable {
     private void checkBehavior(ArrayList<Behavior> list) {
     }
 
+    public void updateStatus() throws IOException {
+        DataInputStream dataIn = new DataInputStream(clientSocket.getInputStream());
+        status = dataIn.readInt();
+    }
     public void connectToServer() throws IOException {
         this.clientSocket = new Socket("localhost", serverPort);
         this.in = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
         this.out = new PrintWriter(this.clientSocket.getOutputStream(), true);
+        DataInputStream dataIn = new DataInputStream(clientSocket.getInputStream());
+        setID(dataIn.readInt());
     }
 
     private boolean checkBehaviorInputFormatHelper(String name, ArrayList<Territory> map) {
