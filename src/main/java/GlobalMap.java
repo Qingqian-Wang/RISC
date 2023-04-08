@@ -1,11 +1,11 @@
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.net.Socket;
 import java.util.ArrayList;
 
+//This class implements the NetworkObject and Serializable interfaces
 public class GlobalMap implements NetworkObject, Serializable {
-    private ArrayList<Territory> mapArrayList;
+	private ArrayList<Territory> mapArrayList; // A list of all the territories in the game map
 
     public GlobalMap(ArrayList<Territory> mapArrayList) {
         this.mapArrayList = mapArrayList;
@@ -18,13 +18,15 @@ public class GlobalMap implements NetworkObject, Serializable {
         return mapArrayList;
     }
 
-    public void sendList(Socket socket) throws Exception{
-        ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+	@Override
+	public void sendList(ObjectOutputStream out) throws Exception {
         out.writeObject(this);
     }
 
-    public void receiveList(Socket socket) throws Exception{
-        ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+	@Override
+	public void receiveList(ObjectInputStream in) throws Exception {
+		// Reads a GlobalMap object from the provided input stream and assigns its list
+		// of territories to the current object's list
         GlobalMap globalMap = (GlobalMap) in.readObject();
         this.mapArrayList = globalMap.getMapArrayList();
     }
