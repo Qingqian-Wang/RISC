@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-public class Player implements Runnable {
+public class Player{
     public Socket clientSocket;
 
     public int playerID;
@@ -109,8 +109,8 @@ public class Player implements Runnable {
         return null;
     }
 
-    @Override
-    public void run() {
+
+    public void playGame() {
         try {
             String inputLine;
             while (true) {
@@ -151,6 +151,33 @@ public class Player implements Runnable {
                     out.println(response);
                 } else if (inputLine.equals("Turn Start")) {
                     updateStatus();
+                    // add an if-else to check current status, use it to determine what it needs to print
+                    GlobalMap current = new GlobalMap();
+                    current.receiveList(clientSocket);
+                    ArrayList<Territory> currentMap = current.getMapArrayList();
+                    for (int i = 1; i <= totalNumPlayer; i++) {
+                        System.out.println("Player " + i + ":");
+                        for (int j = 0; j < currentMap.size(); j++) {
+                            if (currentMap.get(j).getOwnID() == i) {
+                                System.out.print(currentMap.get(j).getUnit() + " units in " + currentMap.get(j).getName() +
+                                        "(next to:");
+                                ArrayList<String> neighborName = new ArrayList<>();
+                                for (Map.Entry<Integer, ArrayList<String>> e : currentMap.get(j).getNeighbor().entrySet()) {
+                                    for (int x = 0; x < e.getValue().size(); x++) {
+                                        neighborName.add(e.getValue().get(x));
+                                    }
+                                }
+                                for (int x = 0; x < neighborName.size(); i++) {
+                                    System.out.print(" " + neighborName.get(x));
+                                    if (x != neighborName.size() - 1) {
+                                        System.out.print(",");
+                                    } else {
+                                        System.out.println(")");
+                                    }
+                                }
+                            }
+                        }
+                    }
                     if(status == 0 && watchingPattern == 0){
                         System.out.println("you lose the game, do you want to watch the rest of the game? enter yes to watch");
                         InputStreamReader sr = new InputStreamReader(System.in);
@@ -160,88 +187,61 @@ public class Player implements Runnable {
                             watchingPattern = 1;
                         }else{
                             BehaviorList behaviorList = new BehaviorList(playerID, -1);
+                            behaviorList.sendList(clientSocket);
                             break;
                         }
+                    }
+                    BehaviorList behaviorList = new BehaviorList(playerID, status);
+                    if(watchingPattern == 1){   // if the player is in the watching pattern then don't add any order
+                        behaviorList.sendList(clientSocket);
                     }else {
-                        // add an if-else to check current status, use it to determine what it needs to print
-                        GlobalMap current = new GlobalMap();
-                        current.receiveList(clientSocket);
-                        ArrayList<Territory> currentMap = current.getMapArrayList();
-                        for (int i = 1; i <= totalNumPlayer; i++) {
-                            System.out.println("Player " + i + ":");
-                            for (int j = 0; j < currentMap.size(); j++) {
-                                if (currentMap.get(j).getOwnID() == i) {
-                                    System.out.print(currentMap.get(j).getUnit() + " units in " + currentMap.get(j).getName() +
-                                            "(next to:");
-                                    ArrayList<String> neighborName = new ArrayList<>();
-                                    for (Map.Entry<Integer, ArrayList<String>> e : currentMap.get(j).getNeighbor().entrySet()) {
-                                        for (int x = 0; x < e.getValue().size(); x++) {
-                                            neighborName.add(e.getValue().get(x));
-                                        }
-                                    }
-                                    for (int x = 0; x < neighborName.size(); i++) {
-                                        System.out.print(" " + neighborName.get(x));
-                                        if (x != neighborName.size() - 1) {
-                                            System.out.print(",");
-                                        } else {
-                                            System.out.println(")");
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        BehaviorList behaviorList = new BehaviorList(playerID, status);
-                        if(watchingPattern == 1){   // if the player is in the watching pattern then don't add any order
-                            behaviorList.sendList(clientSocket);
-                        }else {
-                            while (true) {
+                        while (true) {
+                            System.out.println("You are player " + playerID + ", what would you like to do?");
+                            System.out.println("(M)ove");
+                            System.out.println("(A)ttack");
+                            System.out.println("(D)one");
+                            InputStreamReader sr = new InputStreamReader(System.in);
+                            BufferedReader bf = new BufferedReader(sr);
+                            String response = bf.readLine();
+                            while (response.length() != 1 || (response.toUpperCase().charAt(0) != 'M'
+                                    && response.toUpperCase().charAt(0) != 'A' && response.toUpperCase().charAt(0) != 'D')) {
+                                System.out.println("Your input is not in correct format, try again");
                                 System.out.println("You are player " + playerID + ", what would you like to do?");
                                 System.out.println("(M)ove");
                                 System.out.println("(A)ttack");
                                 System.out.println("(D)one");
-                                InputStreamReader sr = new InputStreamReader(System.in);
-                                BufferedReader bf = new BufferedReader(sr);
-                                String response = bf.readLine();
-                                while (response.length() != 1 || (response.toUpperCase().charAt(0) != 'M'
-                                        && response.toUpperCase().charAt(0) != 'A' && response.toUpperCase().charAt(0) != 'D')) {
-                                    System.out.println("Your input is not in correct format, try again");
-                                    System.out.println("You are player " + playerID + ", what would you like to do?");
-                                    System.out.println("(M)ove");
-                                    System.out.println("(A)ttack");
-                                    System.out.println("(D)one");
-                                    response = bf.readLine();
-                                }
-                                if (response.toUpperCase().charAt(0) == 'M' || response.toUpperCase().charAt(0) == 'A') {
-                                    Behavior behavior = null;
-                                    while (behavior == null) {
+                                response = bf.readLine();
+                            }
+                            if (response.toUpperCase().charAt(0) == 'M' || response.toUpperCase().charAt(0) == 'A') {
+                                Behavior behavior = null;
+                                while (behavior == null) {
+                                    System.out.println("Please entry your behavior in this format:Unit SourceTerritory DestinationTerritory");
+                                    String behaviorInfo = bf.readLine();
+                                    while (!checkBehaviorInputFormat(behaviorInfo, currentMap)) {
+                                        System.out.println("Your input is not in correct format, please " +
+                                                "check your unit, SourceTerritory, and DestinationTerritory and try again");
                                         System.out.println("Please entry your behavior in this format:Unit SourceTerritory DestinationTerritory");
-                                        String behaviorInfo = bf.readLine();
-                                        while (!checkBehaviorInputFormat(behaviorInfo, currentMap)) {
-                                            System.out.println("Your input is not in correct format, please " +
-                                                    "check your unit, SourceTerritory, and DestinationTerritory and try again");
-                                            System.out.println("Please entry your behavior in this format:Unit SourceTerritory DestinationTerritory");
-                                            behaviorInfo = bf.readLine();
-                                        }
-                                        String[] tokens = behaviorInfo.split(" ");
-                                        if (response.toUpperCase().charAt(0) == 'M') {
-                                            behavior = new Behavior(getTerritoryByName(tokens[1], currentMap), getTerritoryByName(tokens[2], currentMap), Integer.parseInt(tokens[0]), playerID, "Move");
-                                        } else {
-                                            behavior = new Behavior(getTerritoryByName(tokens[1], currentMap), getTerritoryByName(tokens[2], currentMap), Integer.parseInt(tokens[0]), playerID, "Attack");
-                                        }
-                                        if (ruleChecker.checkBehavior(behavior, currentMap) != null) {
-                                            System.out.println(ruleChecker.checkBehavior(behavior, currentMap));
-                                            behavior = null;
-                                        }
+                                        behaviorInfo = bf.readLine();
                                     }
+                                    String[] tokens = behaviorInfo.split(" ");
                                     if (response.toUpperCase().charAt(0) == 'M') {
-                                        behaviorList.addToMoveList(behavior);
+                                        behavior = new Behavior(getTerritoryByName(tokens[1], currentMap), getTerritoryByName(tokens[2], currentMap), Integer.parseInt(tokens[0]), playerID, "Move");
                                     } else {
-                                        behaviorList.addToAttackList(behavior);
+                                        behavior = new Behavior(getTerritoryByName(tokens[1], currentMap), getTerritoryByName(tokens[2], currentMap), Integer.parseInt(tokens[0]), playerID, "Attack");
                                     }
-                                } else if (response.toUpperCase().charAt(0) == 'D') {
-                                    behaviorList.sendList(clientSocket);
-                                    break;
+                                    if (ruleChecker.checkBehavior(behavior, currentMap) != null) {
+                                        System.out.println(ruleChecker.checkBehavior(behavior, currentMap));
+                                        behavior = null;
+                                    }
                                 }
+                                if (response.toUpperCase().charAt(0) == 'M') {
+                                    behaviorList.addToMoveList(behavior);
+                                } else {
+                                    behaviorList.addToAttackList(behavior);
+                                }
+                            } else if (response.toUpperCase().charAt(0) == 'D') {
+                                behaviorList.sendList(clientSocket);
+                                break;
                             }
                         }
                     }
