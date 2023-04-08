@@ -16,9 +16,9 @@ public class Player {
 
     public int totalNumPlayer;
 
-    private BufferedReader in;
+    private ObjectInputStream in;
 
-    private PrintWriter out;
+    private ObjectOutputStream out;
 
     private BasicChecker ruleChecker;
 
@@ -30,14 +30,13 @@ public class Player {
         ruleChecker = new OriginChecker(null);
     }
 
-    public void updateStatus() throws IOException {
-        DataInputStream dataIn = new DataInputStream(clientSocket.getInputStream());
-        status = dataIn.readInt();
+    public void updateStatus() throws IOException, ClassNotFoundException {
+        status = Integer.parseInt(in.readObject().toString());
     }
     public void connectToServer() throws IOException {
         this.clientSocket = new Socket("localhost", serverPort);
-        this.in = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
-        this.out = new PrintWriter(this.clientSocket.getOutputStream(), true);
+        this.in = new ObjectInputStream(clientSocket.getInputStream());
+        this.out = new ObjectOutputStream(clientSocket.getOutputStream());
         DataInputStream dataIn = new DataInputStream(clientSocket.getInputStream());
         this.playerID = dataIn.readInt();
         this.totalNumPlayer = dataIn.readInt();
@@ -82,18 +81,19 @@ public class Player {
         try {
             String inputLine;
             while (true) {
-                inputLine = in.readLine();
+                inputLine = in.readObject().toString();
                 System.out.println(inputLine);
                 // handle game start situation
                 if (inputLine.equals("Game Start")) {
-                    DataInputStream dataIn = new DataInputStream(clientSocket.getInputStream());
-                    int totalUnit = dataIn.readInt();
+//                    DataInputStream dataIn = new DataInputStream(clientSocket.getInputStream());
+//                    int totalUnit = dataIn.readInt();
+                    int totalUnit = Integer.parseInt(in.readObject().toString());
                     String response = null;
                     int[] numbers = null;
                     Scanner scanner = new Scanner(System.in);
                     while (numbers == null) {
                         System.out.println("The total number of unit you can use in your territory is " + totalUnit);
-                        System.out.print("Enter a string of space-separated numbers where the sum of them is " + totalUnit);
+                        System.out.println("Enter a string of space-separated numbers where the sum of them is " + totalUnit);
                         response = scanner.nextLine();
                         String[] tokens = response.split(" ");
                         numbers = new int[tokens.length];
@@ -116,12 +116,15 @@ public class Player {
                             }
                         }
                     }
-                    out.println(response);
+                    out.writeObject(response);
                 } else if (inputLine.equals("Turn Start")) {
                     updateStatus();
                     // add an if-else to check current status, use it to determine what it needs to print
                     GlobalMap current = new GlobalMap();
-                    current.receiveList(clientSocket);
+                    current.receiveList(in);
+                    if(current.getMapArrayList().size()!=0){
+                        System.out.println("Receive successfully");
+                    }
                     ArrayList<Territory> currentMap = current.getMapArrayList();
                     for (int i = 1; i <= totalNumPlayer; i++) {
                         System.out.println("Player " + i + ":");
@@ -135,7 +138,7 @@ public class Player {
                                         neighborName.add(e.getValue().get(x));
                                     }
                                 }
-                                for (int x = 0; x < neighborName.size(); i++) {
+                                for (int x = 0; x < neighborName.size(); x++) {
                                     System.out.print(" " + neighborName.get(x));
                                     if (x != neighborName.size() - 1) {
                                         System.out.print(",");
@@ -155,13 +158,13 @@ public class Player {
                             watchingPattern = 1;
                         }else{
                             BehaviorList behaviorList = new BehaviorList(playerID, -1);
-                            behaviorList.sendList(clientSocket);
+                            behaviorList.sendList(out);
                             break;
                         }
                     }
                     BehaviorList behaviorList = new BehaviorList(playerID, status);
                     if(watchingPattern == 1){   // if the player is in the watching pattern then don't add any order
-                        behaviorList.sendList(clientSocket);
+                        behaviorList.sendList(out);
                     }else {
                         while (true) {
                             System.out.println("You are player " + playerID + ", what would you like to do?");
@@ -208,7 +211,7 @@ public class Player {
                                     behaviorList.addToAttackList(behavior);
                                 }
                             } else if (response.toUpperCase().charAt(0) == 'D') {
-                                behaviorList.sendList(clientSocket);
+                                behaviorList.sendList(out);
                                 break;
                             }
                         }
