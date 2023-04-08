@@ -8,7 +8,9 @@ import java.util.*;
 
 public class Server {
 
+
     public ArrayList<PlayerInfo> playerInfoList;
+
     public ArrayList<Territory> map;
     public int port;
     public ServerSocket serverSocket;
@@ -99,7 +101,7 @@ public class Server {
             territoryOwner = new int[]{1, 1, 2, 2, 3, 3, 4, 4, 5, 5};
         }
 
-        for (int i = 0; i < playerNum; i++) {
+        for (int i = 0; i < map.size(); i++) {
             map.get(i).setOwnID(territoryOwner[i]);
         }
         initialzeMapHelper();
