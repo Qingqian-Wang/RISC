@@ -150,7 +150,6 @@ public class Player implements Runnable {
                     }
                     out.println(response);
                 } else if (inputLine.equals("Turn Start")) {
-
                     updateStatus();
                     if(status == 0 && watchingPattern == 0){
                         System.out.println("you lose the game, do you want to watch the rest of the game? enter yes to watch");
@@ -163,8 +162,6 @@ public class Player implements Runnable {
                             closeTheConnection();
                         }
                     }else {
-
-
                         // add an if-else to check current status, use it to determine what it needs to print
                         GlobalMap current = new GlobalMap();
                         current.receiveList(clientSocket);
@@ -179,7 +176,7 @@ public class Player implements Runnable {
                                     for (Map.Entry<Integer, ArrayList<String>> e : currentMap.get(j).getNeighbor().entrySet()) {
                                         for (int x = 0; x < e.getValue().size(); x++) {
                                             neighborName.add(e.getValue().get(x));
-                                        
+                                        }
                                     }
                                     for (int x = 0; x < neighborName.size(); i++) {
                                         System.out.print(" " + neighborName.get(x));
@@ -192,7 +189,7 @@ public class Player implements Runnable {
                                 }
                             }
                         }
-                        BehaviorList behaviorList = new BehaviorList(playerID);
+                        BehaviorList behaviorList = new BehaviorList(playerID, status);
                         while (true) {
                             System.out.println("You are player " + playerID + ", what would you like to do?");
                             System.out.println("(M)ove");

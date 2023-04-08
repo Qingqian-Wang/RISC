@@ -6,13 +6,14 @@ public class BehaviorList implements NetworkObject, Serializable {
     private ArrayList<Behavior> moveList;
     private ArrayList<Behavior> attackList;
     private int playerID;
-
     public int status; // -1 means disconnect; 0 means dead; 1 means live
 
-    public BehaviorList(int playerID) {
+
+    public BehaviorList(int playerID, int status) {
         this.playerID = playerID;
         moveList = new ArrayList<>();
         attackList = new ArrayList<>();
+        this.status = status;
     }
 
     public ArrayList<Behavior> getMoveList() {
@@ -44,5 +45,6 @@ public class BehaviorList implements NetworkObject, Serializable {
         this.moveList = behaviorList.getMoveList();
 		this.attackList = behaviorList.getAttackList();
 		this.playerID = behaviorList.getPlayerID();
+        this.status = behaviorList.status;
     }
 }

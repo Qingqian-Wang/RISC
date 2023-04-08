@@ -185,7 +185,7 @@ public class Server {
             sendPlayerStatus(playerInfo);
             GlobalMap current = new GlobalMap(map);
             current.sendList(playerInfo.getPlayerSocket());
-            BehaviorList behaviorList = new BehaviorList(playerInfo.getPlayerID());
+            BehaviorList behaviorList = new BehaviorList(playerInfo.getPlayerID(), 1);
             behaviorList.receiveList(playerInfo.getPlayerSocket());
             int index = rand.nextInt(orders.size());
             orderMap.put(orders.get(index), behaviorList);
