@@ -149,6 +149,7 @@ public class Player implements Runnable {
                     out.println(response);
                 } else if (inputLine.equals("Turn Start")) {
                     // add an if-else to check current status, use it to determine what it needs to print
+                    updateStatus();
                     GlobalMap current = new GlobalMap();
                     current.receiveList(clientSocket);
                     ArrayList<Territory> currentMap = current.getMapArrayList();
