@@ -34,13 +34,13 @@ public class BehaviorList implements NetworkObject, Serializable {
         return playerID;
     }
 
-    public void sendList(Socket socket) throws Exception {
-        ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+    public void sendList(ObjectOutputStream out) throws Exception {
+        out.flush();
         out.writeObject(this);
+        out.flush();
     }
 
-    public void receiveList(Socket socket) throws Exception{
-        ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+    public void receiveList(ObjectInputStream in) throws Exception{
         BehaviorList behaviorList = (BehaviorList) in.readObject();
         this.moveList = behaviorList.getMoveList();
 		this.attackList = behaviorList.getAttackList();

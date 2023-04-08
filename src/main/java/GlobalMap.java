@@ -18,13 +18,15 @@ public class GlobalMap implements NetworkObject, Serializable {
         return mapArrayList;
     }
 
-    public void sendList(Socket socket) throws Exception{
-        ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+    @Override
+    public void sendList(ObjectOutputStream out) throws Exception {
+        out.flush();
         out.writeObject(this);
+        out.flush();
     }
 
-    public void receiveList(Socket socket) throws Exception{
-        ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+    @Override
+    public void receiveList(ObjectInputStream in) throws Exception {
         GlobalMap globalMap = (GlobalMap) in.readObject();
         this.mapArrayList = globalMap.getMapArrayList();
     }

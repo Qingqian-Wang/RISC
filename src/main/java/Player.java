@@ -16,9 +16,9 @@ public class Player {
 
     public int totalNumPlayer;
 
-    private BufferedReader in;
+    private ObjectInputStream in;
 
-    private PrintWriter out;
+    private ObjectOutputStream out;
 
     private BasicChecker ruleChecker;
 
@@ -30,14 +30,13 @@ public class Player {
         ruleChecker = new OriginChecker(null);
     }
 
-    public void updateStatus() throws IOException {
-        DataInputStream dataIn = new DataInputStream(clientSocket.getInputStream());
-        status = dataIn.readInt();
+    public void updateStatus() throws IOException, ClassNotFoundException {
+        status = Integer.parseInt(in.readObject().toString());
     }
     public void connectToServer() throws IOException {
         this.clientSocket = new Socket("localhost", serverPort);
-        this.in = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
-        this.out = new PrintWriter(this.clientSocket.getOutputStream(), true);
+        this.in = new ObjectInputStream(clientSocket.getInputStream());
+        this.out = new ObjectOutputStream(clientSocket.getOutputStream());
         DataInputStream dataIn = new DataInputStream(clientSocket.getInputStream());
         this.playerID = dataIn.readInt();
         this.totalNumPlayer = dataIn.readInt();
@@ -78,22 +77,31 @@ public class Player {
         return null;
     }
 
+    private void updateMap(GlobalMap gm, ArrayList<Integer> ownID, ArrayList<Integer> UnitInfo){
+
+        for(int i = 0; i < ownID.size(); i++){
+            gm.getMapArrayList().get(i).setOwnID(ownID.get(i));
+            gm.getMapArrayList().get(i).setUnit(UnitInfo.get(i));
+        }
+    }
+
     public void playGame() {
         try {
             String inputLine;
             while (true) {
-                inputLine = in.readLine();
+                inputLine = in.readObject().toString();
                 System.out.println(inputLine);
                 // handle game start situation
                 if (inputLine.equals("Game Start")) {
-                    DataInputStream dataIn = new DataInputStream(clientSocket.getInputStream());
-                    int totalUnit = dataIn.readInt();
+//                    DataInputStream dataIn = new DataInputStream(clientSocket.getInputStream());
+//                    int totalUnit = dataIn.readInt();
+                    int totalUnit = Integer.parseInt(in.readObject().toString());
                     String response = null;
                     int[] numbers = null;
                     Scanner scanner = new Scanner(System.in);
                     while (numbers == null) {
                         System.out.println("The total number of unit you can use in your territory is " + totalUnit);
-                        System.out.print("Enter a string of space-separated numbers where the sum of them is " + totalUnit);
+                        System.out.println("Enter a string of space-separated numbers where the sum of them is " + totalUnit);
                         response = scanner.nextLine();
                         String[] tokens = response.split(" ");
                         numbers = new int[tokens.length];
@@ -116,18 +124,22 @@ public class Player {
                             }
                         }
                     }
-                    out.println(response);
+                    out.writeObject(response);
                 } else if (inputLine.equals("Turn Start")) {
                     updateStatus();
                     // add an if-else to check current status, use it to determine what it needs to print
-                    GlobalMap current = new GlobalMap();
-                    current.receiveList(clientSocket);
+                    GlobalMap current = (GlobalMap) in.readObject();
+                    ArrayList<Integer> ownIDInfo = (ArrayList<Integer>) in.readObject();
+                    ArrayList<Integer> UnitInfo = (ArrayList<Integer>) in.readObject();
+                    updateMap(current,ownIDInfo,UnitInfo);
+//                    current.receiveList(in);
                     ArrayList<Territory> currentMap = current.getMapArrayList();
+                    StringBuilder sb = new StringBuilder();
                     for (int i = 1; i <= totalNumPlayer; i++) {
-                        System.out.println("Player " + i + ":");
+                        sb.append("Player").append(i).append(":").append(System.lineSeparator());
                         for (int j = 0; j < currentMap.size(); j++) {
                             if (currentMap.get(j).getOwnID() == i) {
-                                System.out.print(currentMap.get(j).getUnit() + " units in " + currentMap.get(j).getName() +
+                                sb.append(currentMap.get(j).getUnit() + " units in " + currentMap.get(j).getName() +
                                         "(next to:");
                                 ArrayList<String> neighborName = new ArrayList<>();
                                 for (Map.Entry<Integer, ArrayList<String>> e : currentMap.get(j).getNeighbor().entrySet()) {
@@ -135,33 +147,34 @@ public class Player {
                                         neighborName.add(e.getValue().get(x));
                                     }
                                 }
-                                for (int x = 0; x < neighborName.size(); i++) {
-                                    System.out.print(" " + neighborName.get(x));
+                                for (int x = 0; x < neighborName.size(); x++) {
+                                    sb.append(" " + neighborName.get(x));
                                     if (x != neighborName.size() - 1) {
-                                        System.out.print(",");
+                                        sb.append(",");
                                     } else {
-                                        System.out.println(")");
+                                        sb.append(")").append(System.lineSeparator());
                                     }
                                 }
                             }
                         }
                     }
+                    System.out.println(sb.toString());
                     if(status == 0 && watchingPattern == 0){
                         System.out.println("you lose the game, do you want to watch the rest of the game? enter yes to watch");
                         InputStreamReader sr = new InputStreamReader(System.in);
                         BufferedReader bf = new BufferedReader(sr);
                         String response = bf.readLine();
-                        if(response == "yes"){
+                        if(response.equals("yes")){
                             watchingPattern = 1;
                         }else{
                             BehaviorList behaviorList = new BehaviorList(playerID, -1);
-                            behaviorList.sendList(clientSocket);
+                            behaviorList.sendList(out);
                             break;
                         }
                     }
                     BehaviorList behaviorList = new BehaviorList(playerID, status);
                     if(watchingPattern == 1){   // if the player is in the watching pattern then don't add any order
-                        behaviorList.sendList(clientSocket);
+                        behaviorList.sendList(out);
                     }else {
                         while (true) {
                             System.out.println("You are player " + playerID + ", what would you like to do?");
@@ -208,7 +221,7 @@ public class Player {
                                     behaviorList.addToAttackList(behavior);
                                 }
                             } else if (response.toUpperCase().charAt(0) == 'D') {
-                                behaviorList.sendList(clientSocket);
+                                behaviorList.sendList(out);
                                 break;
                             }
                         }

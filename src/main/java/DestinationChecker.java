@@ -7,9 +7,9 @@ public class DestinationChecker extends BasicChecker {
         super(next);
     }
 
-    Territory findTerritory (String str, ArrayList<Territory> t) {
-        for (Territory territory: t){
-            if (territory.getName().equals(str)){
+    Territory findTerritory(String str, ArrayList<Territory> t) {
+        for (Territory territory : t) {
+            if (territory.getName().equals(str)) {
                 return territory;
             }
         }
@@ -17,17 +17,21 @@ public class DestinationChecker extends BasicChecker {
     }
 
 
-    public boolean findPath(Territory A, String destination,  ArrayList<Territory> t ) {
+    public boolean findPath(Territory A, String destination, ArrayList<Territory> t, ArrayList<String> visited) {
         String origin = A.getName();
-        for (Map.Entry<Integer,ArrayList<String>> e: A.getNeighbor().entrySet()){
-            if (e.getKey() == A.getOwnID()){
+        visited.add(origin);
+        for (Map.Entry<Integer, ArrayList<String>> e : A.getNeighbor().entrySet()) {
+            if (e.getKey() == A.getOwnID()) {
                 ArrayList<String> temp = e.getValue();
-                for (String str : temp){
-                    if (str.equals(destination)){
+                for (String str : temp) {
+                    if(visited.contains(str)){
+                        continue;
+                    }
+                    if (str.equals(destination)) {
                         return true;
                     } else {
                         Territory newTerritory = findTerritory(str, t);
-                        if (findPath(newTerritory,destination, t)) {
+                        if (findPath(newTerritory, destination, t, visited)) {
                             return true;
                         }
                     }
@@ -36,6 +40,7 @@ public class DestinationChecker extends BasicChecker {
         }
         return false;
     }
+
     @Override
     protected String checkMyRule(Behavior my_behavior, ArrayList<Territory> t) {
         // move or attack?
@@ -44,34 +49,36 @@ public class DestinationChecker extends BasicChecker {
 
         if (Objects.equals(type, "Attack")) {
             int enemyID = my_behavior.getDestination().getOwnID();
-            if (starterID == enemyID){
+            if (starterID == enemyID) {
                 return "you are attacking you own place!";
             }
             //check if neighbor adjacent to it
             boolean adjacent = false;
             String enemyName = my_behavior.getDestination().getName();
-            if(my_behavior.getOrigin().getNeighbor().containsKey(enemyID)) {
-                for(int i = 0; i < my_behavior.getOrigin().getNeighbor().get(enemyID).size(); i++){
-                    if(enemyName.equals(my_behavior.getOrigin().getNeighbor().get(enemyID).get(i))){
+            if (my_behavior.getOrigin().getNeighbor().containsKey(enemyID)) {
+                for (int i = 0; i < my_behavior.getOrigin().getNeighbor().get(enemyID).size(); i++) {
+                    if (enemyName.equals(my_behavior.getOrigin().getNeighbor().get(enemyID).get(i))) {
                         adjacent = true;
                         break;
                     }
                 }
             }
-            if(!adjacent){
+            if (!adjacent) {
                 return "Enemy not adjacent to you";
             }
 
-        } else if (Objects.equals(type, "Move")){
+        } else if (Objects.equals(type, "Move")) {
             int behavior_DestinationID = my_behavior.getDestination().getOwnID();
-            if (starterID != behavior_DestinationID){
+            if (starterID != behavior_DestinationID) {
                 return "you are moving, input a place belong to you!";
             }
             //find path
-
-            boolean res = findPath(my_behavior.getOrigin(), my_behavior.getDestination().getName(), t);
+            ArrayList<String> visited = new ArrayList<>();
+            boolean res = findPath(my_behavior.getOrigin(), my_behavior.getDestination().getName(), t, visited);
+            if (!res) {
                 return "connect to the places not connected";
             }
+        }
 
 
         return null;
