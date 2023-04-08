@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-public class Player{
+public class Player {
     public Socket clientSocket;
 
     public int playerID;
@@ -108,7 +108,6 @@ public class Player{
         }
         return null;
     }
-
 
     public void playGame() {
         try {
