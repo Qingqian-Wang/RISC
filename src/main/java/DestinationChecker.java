@@ -3,10 +3,12 @@ import java.util.Map;
 import java.util.Objects;
 
 
+
 /*
  * This class is a subclass of BasicChecker, and it checks whether
  * a behavior's destination is valid.
  * */
+
 public class DestinationChecker extends BasicChecker {
     public DestinationChecker(BasicChecker next) {
         super(next);
@@ -33,6 +35,7 @@ public class DestinationChecker extends BasicChecker {
      *
      * @return the territory object with the given name, or null if not found.
      */
+
     public boolean findPath(Territory A, String destination, ArrayList<Territory> t, ArrayList<String> visited) {
         String origin = A.getName();
         visited.add(origin);
@@ -58,6 +61,7 @@ public class DestinationChecker extends BasicChecker {
     }
 
 
+
     /*
      * Recursively finds a path from a territory to a destination territory using
      * depth-first search.
@@ -73,6 +77,7 @@ public class DestinationChecker extends BasicChecker {
      * @return true if a path to the destination territory is found, false
      * otherwise.
      */
+
 
     @Override
     protected String checkMyRule(Behavior my_behavior, ArrayList<Territory> t) {
