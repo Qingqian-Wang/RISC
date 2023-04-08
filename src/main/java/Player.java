@@ -24,15 +24,18 @@ public class Player {
 
     public int watchingPattern = 0;
 
+    // initialize  player by server port number
     public Player(int serverPort) {
         this.serverPort = serverPort;
         this.status = 1;
         ruleChecker = new OriginChecker(null);
     }
 
+    // receive player status from server
     public void updateStatus() throws IOException, ClassNotFoundException {
         status = Integer.parseInt(in.readObject().toString());
     }
+    // create socket to connect with server
     public void connectToServer() throws IOException {
         this.clientSocket = new Socket("localhost", serverPort);
         this.in = new ObjectInputStream(clientSocket.getInputStream());
@@ -42,6 +45,7 @@ public class Player {
         this.totalNumPlayer = dataIn.readInt();
     }
 
+    // check if the name exist in the map
     private boolean checkBehaviorInputFormatHelper(String name, ArrayList<Territory> map) {
         for (Territory t : map) {
             if (t.getName().equals(name)) {
@@ -51,6 +55,7 @@ public class Player {
         return false;
     }
 
+    // check if the format of input for creating behavior is correct
     private boolean checkBehaviorInputFormat(String s, ArrayList<Territory> map) {
         String[] tokens = s.split(" ");
         if (tokens.length != 3) {
@@ -68,6 +73,7 @@ public class Player {
                 && (!tokens[1].equals(tokens[2]));
     }
 
+    // get Territory object based on name
     private Territory getTerritoryByName(String s, ArrayList<Territory> map) {
         for (Territory t : map) {
             if (t.getName().equals(s)) {
@@ -77,6 +83,7 @@ public class Player {
         return null;
     }
 
+    // use the info of OwnID and Unit to update GlobalMap object
     private void updateMap(GlobalMap gm, ArrayList<Integer> ownID, ArrayList<Integer> UnitInfo){
 
         for(int i = 0; i < ownID.size(); i++){
@@ -85,8 +92,10 @@ public class Player {
         }
     }
 
+    // the game play function
     public void playGame() {
         try {
+            // continuous receive message from server
             String inputLine;
             while (true) {
                 inputLine = in.readObject().toString();
@@ -99,6 +108,7 @@ public class Player {
                     String response = null;
                     int[] numbers = null;
                     Scanner scanner = new Scanner(System.in);
+                    // make sure the input has correct format, if not, let user retry
                     while (numbers == null) {
                         System.out.println("The total number of unit you can use in your territory is " + totalUnit);
                         System.out.println("Enter a string of space-separated numbers where the sum of them is " + totalUnit);
@@ -124,16 +134,18 @@ public class Player {
                             }
                         }
                     }
+                    // send unit information for territory back to server
                     out.writeObject(response);
                 } else if (inputLine.equals("Turn Start")) {
                     updateStatus();
-                    // add an if-else to check current status, use it to determine what it needs to print
+                    // get GlobalMap object from server
                     GlobalMap current = (GlobalMap) in.readObject();
                     ArrayList<Integer> ownIDInfo = (ArrayList<Integer>) in.readObject();
                     ArrayList<Integer> UnitInfo = (ArrayList<Integer>) in.readObject();
                     updateMap(current,ownIDInfo,UnitInfo);
 //                    current.receiveList(in);
                     ArrayList<Territory> currentMap = current.getMapArrayList();
+                    // print the current map information
                     StringBuilder sb = new StringBuilder();
                     for (int i = 1; i <= totalNumPlayer; i++) {
                         sb.append("Player").append(i).append(":").append(System.lineSeparator());
@@ -159,6 +171,7 @@ public class Player {
                         }
                     }
                     System.out.println(sb.toString());
+                    // if the player has no territory, ask if the user want to stay
                     if(status == 0 && watchingPattern == 0){
                         System.out.println("you lose the game, do you want to watch the rest of the game? enter yes to watch");
                         InputStreamReader sr = new InputStreamReader(System.in);
@@ -176,6 +189,7 @@ public class Player {
                     if(watchingPattern == 1){   // if the player is in the watching pattern then don't add any order
                         behaviorList.sendList(out);
                     }else {
+                        // if the player has some territory
                         while (true) {
                             System.out.println("You are player " + playerID + ", what would you like to do?");
                             System.out.println("(M)ove");
@@ -193,6 +207,7 @@ public class Player {
                                 System.out.println("(D)one");
                                 response = bf.readLine();
                             }
+                            // get behavior type
                             if (response.toUpperCase().charAt(0) == 'M' || response.toUpperCase().charAt(0) == 'A') {
                                 Behavior behavior = null;
                                 while (behavior == null) {
@@ -205,28 +220,30 @@ public class Player {
                                         behaviorInfo = bf.readLine();
                                     }
                                     String[] tokens = behaviorInfo.split(" ");
-                                    if (response.toUpperCase().charAt(0) == 'M') {
+                                    if (response.toUpperCase().charAt(0) == 'M') {// move behavior initialize
                                         behavior = new Behavior(getTerritoryByName(tokens[1], currentMap), getTerritoryByName(tokens[2], currentMap), Integer.parseInt(tokens[0]), playerID, "Move");
-                                    } else {
+                                    } else {// attack behavior initialize
                                         behavior = new Behavior(getTerritoryByName(tokens[1], currentMap), getTerritoryByName(tokens[2], currentMap), Integer.parseInt(tokens[0]), playerID, "Attack");
                                     }
+                                    // check if the unit and source is correct for the behavior
                                     if (ruleChecker.checkBehavior(behavior, currentMap) != null) {
                                         System.out.println(ruleChecker.checkBehavior(behavior, currentMap));
                                         behavior = null;
                                     }
                                 }
+                                // add to arraylist based on the type of behavior
                                 if (response.toUpperCase().charAt(0) == 'M') {
                                     behaviorList.addToMoveList(behavior);
                                 } else {
                                     behaviorList.addToAttackList(behavior);
                                 }
-                            } else if (response.toUpperCase().charAt(0) == 'D') {
+                            } else if (response.toUpperCase().charAt(0) == 'D') {// end turn
                                 behaviorList.sendList(out);
                                 break;
                             }
                         }
                     }
-                } else if (inputLine.equals("Game Over")) {
+                } else if (inputLine.equals("Game Over")) {// if game is over, quit
                     break;
                 }
             }
