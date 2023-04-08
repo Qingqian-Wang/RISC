@@ -237,4 +237,7 @@ public class Player implements Runnable {
             }
         }
     }
+    public static void main(String[] args) {
+
+    }
 }

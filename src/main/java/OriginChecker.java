@@ -1,5 +1,5 @@
 import java.util.ArrayList;
-//改！！！！
+
 public class OriginChecker extends BasicChecker {
     public OriginChecker(BasicChecker next) {
         super(next);
