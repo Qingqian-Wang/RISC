@@ -1,4 +1,3 @@
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -30,6 +29,7 @@ public class Server {
             PlayerInfo p = new PlayerInfo(playerSocket, i + 1);
             DataOutputStream dataOut = new DataOutputStream(p.getPlayerSocket().getOutputStream());
             dataOut.writeInt(i + 1);
+            dataOut.writeInt(playerNum);
             System.out.println("Accept new connection from " + playerSocket.getInetAddress());
             playerInfoList.add(p);
             System.out.println("Added player" + p.getPlayerID() + " to list");
@@ -37,7 +37,7 @@ public class Server {
     }
 
     public void gameStart() throws Exception {
-        initialzeMap();
+        initializeMap();
         int[][] territoryOwner;
         if (playerInfoList.size() == 2) {
             territoryOwner = new int[][]{{0, 1, 2, 3, 4}, {5, 6, 7, 8, 9}};
@@ -60,10 +60,16 @@ public class Server {
                 temp.setUnit(Integer.parseInt(tokens[i]));
                 map.set(territoryOwner[playerInfo.getPlayerID() - 1][i], temp);
             }
+            dataOut.close();
         }
         while (!gameOver()) {
             playTurn();
         }
+        for(PlayerInfo playerInfo:playerInfoList){
+            playerInfo.getOut().println("Game Over");
+            playerInfo.disconnect();
+        }
+        serverSocket.close();
     }
     private void addOneUnit(){
         for (int i = 0; i < map.size(); i++) {
@@ -73,7 +79,7 @@ public class Server {
     }
 
 
-    public void initialzeMap() {
+    public void initializeMap() {
         int playerNum = playerInfoList.size();
         map.add(new Territory("Narnia", -1));
         map.add(new Territory("Midkemia", -1));
@@ -104,10 +110,10 @@ public class Server {
         for (int i = 0; i < map.size(); i++) {
             map.get(i).setOwnID(territoryOwner[i]);
         }
-        initialzeMapHelper();
+        initializeMapHelper();
     }
 
-    public void initialzeMapHelper() {
+    public void initializeMapHelper() {
         int playerNum = playerInfoList.size();
         map.get(0).updateNeighbor(map.get(1));
         map.get(0).updateNeighbor(map.get(3));
@@ -304,6 +310,7 @@ public class Server {
             }
         }
         dataOut.writeInt(count);
+        dataOut.close();
     }
 
     public boolean gameOver() {
@@ -318,8 +325,21 @@ public class Server {
         return true;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        if(args.length!=2){
+            System.out.println("Invalid input");
+        } else {
+            int serverPort = Integer.parseInt(args[0]);
+            Server s = new Server(serverPort);
+            int totalPlayerNum = Integer.parseInt(args[1]);
+            if(totalPlayerNum<2||totalPlayerNum>5){
+                System.out.println("The total number of players should be between 2 and 5, but it is "+args[1]);
+            } else {
+                s.acceptPlayer(totalPlayerNum);
+                s.gameStart();
+            }
 
+        }
     }
 
 }
