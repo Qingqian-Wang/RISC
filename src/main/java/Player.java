@@ -150,6 +150,7 @@ public class Player implements Runnable {
                     }
                     out.println(response);
                 } else if (inputLine.equals("Turn Start")) {
+
                     updateStatus();
                     if(status == 0 && watchingPattern == 0){
                         System.out.println("you lose the game, do you want to watch the rest of the game? enter yes to watch");
@@ -178,7 +179,7 @@ public class Player implements Runnable {
                                     for (Map.Entry<Integer, ArrayList<String>> e : currentMap.get(j).getNeighbor().entrySet()) {
                                         for (int x = 0; x < e.getValue().size(); x++) {
                                             neighborName.add(e.getValue().get(x));
-                                        }
+                                        
                                     }
                                     for (int x = 0; x < neighborName.size(); i++) {
                                         System.out.print(" " + neighborName.get(x));

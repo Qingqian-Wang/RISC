@@ -65,10 +65,10 @@ public class Server {
             playTurn();
         }
     }
-    private void addoneUnit(){
-        for (Territory t : map) {
-            int unit = t.getUnit() + 1;
-            t.setUnit(unit);
+    private void addOneUnit(){
+        for (int i = 0; i < map.size(); i++) {
+            int unit = map.get(i).getUnit() + 1;
+            map.get(i).setUnit(unit);
          }
     }
 
@@ -182,6 +182,7 @@ public class Server {
         ArrayList<Behavior> moveList = new ArrayList<>();
         for (PlayerInfo playerInfo : playerInfoList) {
             playerInfo.getOut().println("Turn Start");
+            sendPlayerStatus(playerInfo);
             GlobalMap current = new GlobalMap(map);
             current.sendList(playerInfo.getPlayerSocket());
             BehaviorList behaviorList = new BehaviorList(playerInfo.getPlayerID());
@@ -196,9 +197,7 @@ public class Server {
         }
         checkAndExecuteMoveBehavior(moveList);
         checkAndExecuteAttackBehavior(attackList);
-        //need check all player status by using map
-
-        //need increase unit of each territory
+        addOneUnit();
     }
 
     private void executeMoveBehavior(Behavior b) {
