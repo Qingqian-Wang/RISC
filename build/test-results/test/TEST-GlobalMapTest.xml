@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="GlobalMapTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2023-04-08T08:22:45" hostname="DESKTOP-ACI8IL8" time="0.011">
-  <properties/>
-  <testcase name="test_constructor()" classname="GlobalMapTest" time="0.011"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

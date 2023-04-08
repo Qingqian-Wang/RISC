@@ -17,7 +17,7 @@ public class OriginChecker extends BasicChecker {
             return "the origin territory is not belong to player" + starterID;
         }
         if (use_Unit > exist_Unit){
-            return "use Unit larger than it has! it has" + exist_Unit + "but use" + use_Unit;
+            return "use Unit larger than it has! it has " + exist_Unit + " but use " + use_Unit;
         }
         return null;
     }
