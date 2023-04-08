@@ -187,6 +187,10 @@ public class Server {
             current.sendList(playerInfo.getPlayerSocket());
             BehaviorList behaviorList = new BehaviorList(playerInfo.getPlayerID(), 1);
             behaviorList.receiveList(playerInfo.getPlayerSocket());
+            if(behaviorList.status==-1){
+                playerInfo.disconnect();
+                playerInfoList.remove(playerInfo);
+            }
             int index = rand.nextInt(orders.size());
             orderMap.put(orders.get(index), behaviorList);
             orders.remove(index);
