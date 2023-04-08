@@ -1,7 +1,12 @@
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
-
+/*
+This class is used to check everything about the destination,
+First, it will check the behavior belongs to move or attack,
+if it belongs to move, it will use find path to see whether the origin and destination are connected,
+if it belongs to attack, it will check whether the origin and destination are adjacent
+ */
 public class DestinationChecker extends BasicChecker {
     public DestinationChecker(BasicChecker next) {
         super(next);
@@ -16,7 +21,10 @@ public class DestinationChecker extends BasicChecker {
         return null;
     }
 
-
+/*
+it uses DFS algorithm to see whether two places are connected to each other. if it is ,return true,
+Otherwise, return false.
+ */
     public boolean findPath(Territory A, String destination, ArrayList<Territory> t, ArrayList<String> visited) {
         String origin = A.getName();
         visited.add(origin);
@@ -40,7 +48,9 @@ public class DestinationChecker extends BasicChecker {
         }
         return false;
     }
-
+/*
+In this function, in the attack time, it will check whether origin and destination are connected.
+ */
     @Override
     protected String checkMyRule(Behavior my_behavior, ArrayList<Territory> t) {
         // move or attack?

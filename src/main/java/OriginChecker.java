@@ -1,5 +1,9 @@
 import java.util.ArrayList;
-
+/*
+This class is used to check whether Origin place is right. First, it will check the Origin place is
+belong to player or not. Second, it will check whether the unit player use is larger than the territory
+it has.
+ */
 public class OriginChecker extends BasicChecker {
     public OriginChecker(BasicChecker next) {
         super(next);
