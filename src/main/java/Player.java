@@ -24,42 +24,10 @@ public class Player {
 
     public int watchingPattern = 0;
 
-    public Player(int serverPort, int id, int totalNumPlayer) {
+    public Player(int serverPort) {
         this.serverPort = serverPort;
-        this.playerID = id;
         this.status = 1;
-        this.totalNumPlayer = totalNumPlayer;
         ruleChecker = new OriginChecker(null);
-    }
-
-    public Socket getSocket() {
-        return clientSocket;
-    }
-
-    public int getID() {
-        return playerID;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public BufferedReader getIn() {
-        return in;
-    }
-
-    public PrintWriter getOut() {
-        return out;
-    }
-
-    public void setID(int playerID) {
-        this.playerID = playerID;
-    }
-
-    private void playOneTurn() {
-    }
-
-    private void checkBehavior(ArrayList<Behavior> list) {
     }
 
     public void updateStatus() throws IOException {
@@ -71,7 +39,8 @@ public class Player {
         this.in = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
         this.out = new PrintWriter(this.clientSocket.getOutputStream(), true);
         DataInputStream dataIn = new DataInputStream(clientSocket.getInputStream());
-        setID(dataIn.readInt());
+        this.playerID = dataIn.readInt();
+        this.totalNumPlayer = dataIn.readInt();
     }
 
     private boolean checkBehaviorInputFormatHelper(String name, ArrayList<Territory> map) {
@@ -263,7 +232,14 @@ public class Player {
             }
         }
     }
-    public static void main(String[] args) {
-
+    public static void main(String[] args) throws IOException {
+        if(args.length!=1){
+            System.out.println("Invalid input");
+        } else {
+            int serverPort = Integer.parseInt(args[0]);
+            Player p1 = new Player(serverPort);
+            p1.connectToServer();
+            p1.playGame();
+        }
     }
 }

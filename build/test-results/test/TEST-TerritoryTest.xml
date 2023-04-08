@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="TerritoryTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2023-04-08T08:40:15" hostname="DESKTOP-ACI8IL8" time="0.015">
+  <properties/>
+  <testcase name="test_constructor()" classname="TerritoryTest" time="0.012"/>
+  <testcase name="test_updateNeighbor_initializing()" classname="TerritoryTest" time="0.0"/>
+  <testcase name="test_set_id()" classname="TerritoryTest" time="0.001"/>
+  <testcase name="test_updateNeighbor_changeID()" classname="TerritoryTest" time="0.0"/>
+  <testcase name="test_set_units()" classname="TerritoryTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
