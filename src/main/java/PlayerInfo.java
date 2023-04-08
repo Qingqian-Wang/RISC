@@ -12,8 +12,9 @@ public class PlayerInfo {
     public PlayerInfo(Socket playerSocket, int playerID) throws IOException {
         this.playerSocket = playerSocket;
         this.playerID = playerID;
-        in = new ObjectInputStream(playerSocket.getInputStream());
         out = new ObjectOutputStream(playerSocket.getOutputStream());
+        in = new ObjectInputStream(playerSocket.getInputStream());
+
     }
 
     public Socket getPlayerSocket() {
