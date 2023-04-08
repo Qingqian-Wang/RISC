@@ -77,6 +77,14 @@ public class Player {
         return null;
     }
 
+    private void updateMap(GlobalMap gm, ArrayList<Integer> ownID, ArrayList<Integer> UnitInfo){
+
+        for(int i = 0; i < ownID.size(); i++){
+            gm.getMapArrayList().get(i).setOwnID(ownID.get(i));
+            gm.getMapArrayList().get(i).setUnit(UnitInfo.get(i));
+        }
+    }
+
     public void playGame() {
         try {
             String inputLine;
@@ -120,17 +128,18 @@ public class Player {
                 } else if (inputLine.equals("Turn Start")) {
                     updateStatus();
                     // add an if-else to check current status, use it to determine what it needs to print
-                    GlobalMap current = new GlobalMap();
-                    current.receiveList(in);
-                    if(current.getMapArrayList().size()!=0){
-                        System.out.println("Receive successfully");
-                    }
+                    GlobalMap current = (GlobalMap) in.readObject();
+                    ArrayList<Integer> ownIDInfo = (ArrayList<Integer>) in.readObject();
+                    ArrayList<Integer> UnitInfo = (ArrayList<Integer>) in.readObject();
+                    updateMap(current,ownIDInfo,UnitInfo);
+//                    current.receiveList(in);
                     ArrayList<Territory> currentMap = current.getMapArrayList();
+                    StringBuilder sb = new StringBuilder();
                     for (int i = 1; i <= totalNumPlayer; i++) {
-                        System.out.println("Player " + i + ":");
+                        sb.append("Player").append(i).append(":").append(System.lineSeparator());
                         for (int j = 0; j < currentMap.size(); j++) {
                             if (currentMap.get(j).getOwnID() == i) {
-                                System.out.print(currentMap.get(j).getUnit() + " units in " + currentMap.get(j).getName() +
+                                sb.append(currentMap.get(j).getUnit() + " units in " + currentMap.get(j).getName() +
                                         "(next to:");
                                 ArrayList<String> neighborName = new ArrayList<>();
                                 for (Map.Entry<Integer, ArrayList<String>> e : currentMap.get(j).getNeighbor().entrySet()) {
@@ -139,22 +148,23 @@ public class Player {
                                     }
                                 }
                                 for (int x = 0; x < neighborName.size(); x++) {
-                                    System.out.print(" " + neighborName.get(x));
+                                    sb.append(" " + neighborName.get(x));
                                     if (x != neighborName.size() - 1) {
-                                        System.out.print(",");
+                                        sb.append(",");
                                     } else {
-                                        System.out.println(")");
+                                        sb.append(")").append(System.lineSeparator());
                                     }
                                 }
                             }
                         }
                     }
+                    System.out.println(sb.toString());
                     if(status == 0 && watchingPattern == 0){
                         System.out.println("you lose the game, do you want to watch the rest of the game? enter yes to watch");
                         InputStreamReader sr = new InputStreamReader(System.in);
                         BufferedReader bf = new BufferedReader(sr);
                         String response = bf.readLine();
-                        if(response == "yes"){
+                        if(response.equals("yes")){
                             watchingPattern = 1;
                         }else{
                             BehaviorList behaviorList = new BehaviorList(playerID, -1);

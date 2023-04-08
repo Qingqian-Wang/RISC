@@ -35,7 +35,9 @@ public class BehaviorList implements NetworkObject, Serializable {
     }
 
     public void sendList(ObjectOutputStream out) throws Exception {
+        out.flush();
         out.writeObject(this);
+        out.flush();
     }
 
     public void receiveList(ObjectInputStream in) throws Exception{

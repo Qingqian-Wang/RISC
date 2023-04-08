@@ -36,5 +36,7 @@ public class PlayerInfo {
     public void disconnect() throws IOException {
         in.close();
         out.close();
+        playerSocket.close();
     }
+
 }

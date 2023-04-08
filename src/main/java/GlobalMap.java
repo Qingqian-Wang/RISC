@@ -20,7 +20,9 @@ public class GlobalMap implements NetworkObject, Serializable {
 
     @Override
     public void sendList(ObjectOutputStream out) throws Exception {
+        out.flush();
         out.writeObject(this);
+        out.flush();
     }
 
     @Override
