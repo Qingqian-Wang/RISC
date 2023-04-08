@@ -159,7 +159,8 @@ public class Player implements Runnable {
                         if(response == "yes"){
                             watchingPattern = 1;
                         }else{
-                            closeTheConnection();
+                            BehaviorList behaviorList = new BehaviorList(playerID, -1);
+                            break;
                         }
                     }else {
                         // add an if-else to check current status, use it to determine what it needs to print
