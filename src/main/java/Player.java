@@ -150,6 +150,7 @@ public class Player implements Runnable {
                     }
                     out.println(response);
                 } else if (inputLine.equals("Turn Start")) {
+                    updateStatus();
                     if(status == 0 && watchingPattern == 0){
                         System.out.println("you lose the game, do you want to watch the rest of the game? enter yes to watch");
                         InputStreamReader sr = new InputStreamReader(System.in);
