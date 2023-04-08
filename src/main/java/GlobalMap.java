@@ -1,9 +1,9 @@
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.net.Socket;
 import java.util.ArrayList;
 
+//This class implements the NetworkObject and Serializable interfaces
 public class GlobalMap implements NetworkObject, Serializable {
     private ArrayList<Territory> mapArrayList;
 
@@ -25,6 +25,8 @@ public class GlobalMap implements NetworkObject, Serializable {
         out.flush();
     }
 
+	// Reads a GlobalMap object from the provided input stream and assigns its list
+	// of territories to the current object's list
     @Override
     public void receiveList(ObjectInputStream in) throws Exception {
         GlobalMap globalMap = (GlobalMap) in.readObject();
