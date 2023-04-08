@@ -1,3 +1,4 @@
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -62,11 +63,6 @@ public class Server {
             playTurn();
         }
     }
-
-
-    //private void checkBehavior(ArrayList<Behavior>){}
-
-    ArrayList<Map.Entry<String, Integer>> mapInfo;
     private void addoneUnit(){
         for (Territory t : map) {
             int unit = t.getUnit() + 1;
@@ -199,6 +195,7 @@ public class Server {
         checkAndExecuteMoveBehavior(moveList);
         checkAndExecuteAttackBehavior(attackList);
         //need check all player status by using map
+
         //need increase unit of each territory
     }
 
@@ -292,7 +289,16 @@ public class Server {
         }
     }
 
-    public void sendPlayerStatus() {
+    public void sendPlayerStatus(PlayerInfo playerInfo) throws IOException {
+        DataOutputStream dataOut = new DataOutputStream(playerInfo.getPlayerSocket().getOutputStream());
+        int count = 0;
+        for(Territory t:map){
+            if(t.getOwnID()==playerInfo.getPlayerID()){
+                count++;
+                break;
+            }
+        }
+        dataOut.writeInt(count);
     }
 
     public boolean gameOver() {
