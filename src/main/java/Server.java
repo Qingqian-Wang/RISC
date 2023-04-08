@@ -63,6 +63,18 @@ public class Server {
         }
     }
 
+
+    //private void checkBehavior(ArrayList<Behavior>){}
+
+    ArrayList<Map.Entry<String, Integer>> mapInfo;
+    private void addoneUnit(){
+        for (Territory t : map) {
+            int unit = t.getUnit() + 1;
+            t.setUnit(unit);
+         }
+    }
+
+
     public void initialzeMap() {
         int playerNum = playerInfoList.size();
         map.add(new Territory("Narnia", -1));
@@ -295,5 +307,8 @@ public class Server {
         return true;
     }
 
+    public static void main(String[] args) {
+
+    }
 
 }

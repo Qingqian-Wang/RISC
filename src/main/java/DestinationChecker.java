@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Objects;
 
 public class DestinationChecker extends BasicChecker {
@@ -6,6 +7,35 @@ public class DestinationChecker extends BasicChecker {
         super(next);
     }
 
+    Territory findTerritory (String str, ArrayList<Territory> t) {
+        for (Territory territory: t){
+            if (territory.getName().equals(str)){
+                return territory;
+            }
+        }
+        return null;
+    }
+
+
+    public boolean findPath(Territory A, String destination,  ArrayList<Territory> t ) {
+        String origin = A.getName();
+        for (Map.Entry<Integer,ArrayList<String>> e: A.getNeighbor().entrySet()){
+            if (e.getKey() == A.getOwnID()){
+                ArrayList<String> temp = e.getValue();
+                for (String str : temp){
+                    if (str.equals(destination)){
+                        return true;
+                    } else {
+                        Territory newTerritory = findTerritory(str, t);
+                        if (findPath(newTerritory,destination, t)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
     @Override
     protected String checkMyRule(Behavior my_behavior, ArrayList<Territory> t) {
         // move or attack?
@@ -38,10 +68,17 @@ public class DestinationChecker extends BasicChecker {
                 return "you are moving, input a place belong to you!";
             }
             //find path
-        }
+
+            boolean res = findPath(my_behavior.getOrigin(), my_behavior.getDestination().getName(), t);
+                return "connect to the places not connected";
+            }
+
+
         return null;
     }
     //find path method
+
+
 }
 
 
