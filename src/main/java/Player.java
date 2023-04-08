@@ -63,6 +63,8 @@ public class Player implements Runnable {
         this.clientSocket = new Socket("localhost", serverPort);
         this.in = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
         this.out = new PrintWriter(this.clientSocket.getOutputStream(), true);
+        DataInputStream dataIn = new DataInputStream(clientSocket.getInputStream());
+        setID(dataIn.readInt());
     }
 
     private boolean checkBehaviorInputFormatHelper(String name, ArrayList<Territory> map) {
