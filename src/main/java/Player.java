@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-public class Player implements Runnable {
+public class Player {
     public Socket clientSocket;
 
     public int playerID;
@@ -109,8 +109,7 @@ public class Player implements Runnable {
         return null;
     }
 
-    @Override
-    public void run() {
+    public void playGame() {
         try {
             String inputLine;
             while (true) {

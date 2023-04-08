@@ -1,6 +1,5 @@
 import static org.junit.jupiter.api.Assertions.*;
 
-import edu.duke.zj82.Territory.Territory;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
