@@ -1,6 +1,12 @@
 import java.io.*;
 import java.net.Socket;
 
+
+/*
+ * This class represents a player in a networked game
+ * It contains information about the player's socket, input and output streams, and ID
+ */
+
 public class PlayerInfo {
     private final Socket playerSocket;
 

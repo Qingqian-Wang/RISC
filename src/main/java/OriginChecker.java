@@ -5,6 +5,9 @@ public class OriginChecker extends BasicChecker {
         super(next);
     }
 
+    // Check if the origin territory belongs to the player and has enough units to
+    // carry out the behavior
+
     @Override
     protected String checkMyRule(Behavior my_behavior, ArrayList<Territory> t) {
         int starterID = my_behavior.getOwnID();

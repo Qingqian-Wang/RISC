@@ -2,10 +2,15 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 
+/*
+ * This class represents a list of behaviors performed by a player during a game.
+ * It implements the NetworkObject interface and Serializable interface to allow
+ * for network communication and object serialization.
+ * */
 public class BehaviorList implements NetworkObject, Serializable {
-    private ArrayList<Behavior> moveList;
-    private ArrayList<Behavior> attackList;
-    private int playerID;
+    private ArrayList<Behavior> moveList;// A list of behaviors related to move
+    private ArrayList<Behavior> attackList;// A list of behaviors related to attack
+    private int playerID;// The ID of the player who performed the behaviors
     public int status; // -1 means disconnect; 0 means dead; 1 means live
 
 
@@ -34,11 +39,27 @@ public class BehaviorList implements NetworkObject, Serializable {
         return playerID;
     }
 
+    /*
+     * Sends the BehaviorList object over an ObjectOutputStream.
+     *
+     * @param out The ObjectOutputStream used for network communication
+     * @throws Exception If there is an error with the ObjectOutputStream
+     */
     public void sendList(ObjectOutputStream out) throws Exception {
         out.flush();
         out.writeObject(this);
         out.flush();
     }
+
+
+    /*
+     * Receives a BehaviorList object over an ObjectInputStream and updates the
+     * instance variables.
+     *
+     * @param in The ObjectInputStream used for network communication
+     *
+     * @throws Exception If there is an error with the ObjectInputStream
+     */
 
     public void receiveList(ObjectInputStream in) throws Exception{
         BehaviorList behaviorList = (BehaviorList) in.readObject();

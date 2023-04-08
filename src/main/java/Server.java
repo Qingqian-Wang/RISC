@@ -14,7 +14,14 @@ public class Server {
     public int port;
     public ServerSocket serverSocket;
     private BasicChecker ruleChecker;
-
+    /*
+     * Constructor to create a Server object
+     *
+     * @param port the port number on which the server will listen for incoming
+     * connections
+     *
+     * @throws IOException if an I/O error occurs when opening the server socket
+     */
     public Server(int port) throws IOException {
         playerInfoList = new ArrayList<>();
         map = new ArrayList<>();
@@ -22,7 +29,13 @@ public class Server {
         serverSocket = new ServerSocket(this.port);
         ruleChecker = new OriginChecker(new DestinationChecker(null));
     }
-
+    /*
+     * Accepts players to the game
+     *
+     * @param playerNum the number of players that will be accepted
+     *
+     * @throws IOException if an I/O error occurs when waiting for a connection
+     */
     public void acceptPlayer(int playerNum) throws IOException {
         for (int i = 0; i < playerNum; i++) {
             Socket playerSocket = serverSocket.accept();
@@ -35,6 +48,11 @@ public class Server {
             System.out.println("Added player" + p.getPlayerID() + " to list");
         }
     }
+    /*
+     * Starts the game
+     *
+     * @throws Exception if any error occurs during game execution
+     */
 
     public void gameStart() throws Exception {
         initializeMap();
@@ -48,6 +66,7 @@ public class Server {
         } else {
             territoryOwner = new int[][]{{0, 1}, {2, 5}, {3, 4}, {6, 7}, {8, 9}};
         }
+        // Send game start message to all players and initialize their units
         for (PlayerInfo playerInfo : playerInfoList) {
             playerInfo.getOut().writeObject("Game Start");
             playerInfo.getOut().writeObject("50");
@@ -66,12 +85,17 @@ public class Server {
         while (!gameOver()) {
             playTurn();
         }
+        // Send game over message to all players and disconnect them
         for(PlayerInfo playerInfo:playerInfoList){
             playerInfo.getOut().writeObject("Game Over");
             playerInfo.disconnect();
         }
         serverSocket.close();
     }
+    /*
+     *
+     * Increases the unit count of each territory by one.
+     */
     private void addOneUnit(){
         for (int i = 0; i < map.size(); i++) {
             int unit = map.get(i).getUnit() + 1;
@@ -80,6 +104,12 @@ public class Server {
     }
 
 
+    /*
+     * Starts the game by initializing the map and territory ownership, and then
+     * begins the game loop of player turns until the game is over.
+     *
+     * @throws Exception Throws an exception if there is an error in the game.
+     */
     public void initializeMap() {
         int playerNum = playerInfoList.size();
         map.add(new Territory("Narnia", -1));

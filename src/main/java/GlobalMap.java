@@ -3,7 +3,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
 import java.util.ArrayList;
-
+//This class implements the NetworkObject and Serializable interfaces
 public class GlobalMap implements NetworkObject, Serializable {
     private ArrayList<Territory> mapArrayList;
 
