@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="GlobalMapTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2023-04-08T09:32:37" hostname="DESKTOP-QG2IHPB" time="0.026">
+<testsuite name="GlobalMapTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2023-04-15T09:59:12" hostname="DESKTOP-QG2IHPB" time="0.017">
   <properties/>
-  <testcase name="test_constructor()" classname="GlobalMapTest" time="0.026"/>
+  <testcase name="test_constructor()" classname="GlobalMapTest" time="0.017"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

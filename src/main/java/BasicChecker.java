@@ -30,4 +30,5 @@ public abstract class BasicChecker {
         //if there are no more rules, then the placement is legal
         return null;
     }
+
 }
