@@ -19,7 +19,7 @@ public class Player {
     private ObjectInputStream in;
 
     private ObjectOutputStream out;
-
+    public ArrayList<GameInfo> gameList;
     private BasicChecker ruleChecker;
 
     public int watchingPattern = 0;
