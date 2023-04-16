@@ -1,3 +1,5 @@
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -6,8 +8,6 @@ import java.util.*;
 
 
 public class Server {
-
-
     public ArrayList<PlayerInfo> playerInfoList;
 
     public ArrayList<Territory> map;
@@ -68,12 +68,12 @@ public class Server {
         }
         // Send game start message to all players and initialize their units
         for (PlayerInfo playerInfo : playerInfoList) {
-            playerInfo.getOut().writeObject("Game Start");
-            playerInfo.getOut().writeObject("50");
+            playerInfo.getOut().println("Game Start");
+            playerInfo.getOut().println("50");
 //            DataOutputStream dataOut = new DataOutputStream(playerInfo.getPlayerSocket().getOutputStream());
 //            int totalUnit = 50;
 //            dataOut.writeInt(totalUnit);
-            String unitInfo = playerInfo.getIn().readObject().toString();
+            String unitInfo = playerInfo.getIn().readLine();
             String[] tokens = unitInfo.split(" ");
             for (int i = 0; i < tokens.length; i++) {
                 Territory temp = map.get(territoryOwner[playerInfo.getPlayerID() - 1][i]);
@@ -87,7 +87,7 @@ public class Server {
         }
         // Send game over message to all players and disconnect them
         for(PlayerInfo playerInfo:playerInfoList){
-            playerInfo.getOut().writeObject("Game Over");
+            playerInfo.getOut().println("Game Over");
             playerInfo.disconnect();
         }
         serverSocket.close();
@@ -100,7 +100,7 @@ public class Server {
         for (int i = 0; i < map.size(); i++) {
             int unit = map.get(i).getUnit() + 1;
             map.get(i).setUnit(unit);
-         }
+        }
     }
 
 
@@ -233,15 +233,13 @@ public class Server {
         ArrayList<Behavior> attackList = new ArrayList<>();
         ArrayList<Behavior> moveList = new ArrayList<>();
         for (PlayerInfo playerInfo : playerInfoList) {
-            playerInfo.getOut().writeObject("Turn Start");
+            playerInfo.getOut().println("Turn Start");
             sendPlayerStatus(playerInfo);
-            GlobalMap current = new GlobalMap(map);
-            playerInfo.getOut().writeObject(current);
-            playerInfo.getOut().writeObject(getOwnIDList());
-            playerInfo.getOut().writeObject(getUnitsList());
-//            current.sendList(playerInfo.getOut());
-            BehaviorList behaviorList = new BehaviorList(playerInfo.getPlayerID(), 1);
-            behaviorList.receiveList(playerInfo.getIn());
+            ObjectMapper objectMapper = new ObjectMapper();
+            String mapInfo = objectMapper.writeValueAsString(map);
+            playerInfo.getOut().println(mapInfo);
+            String behaviorListInfo = playerInfo.getIn().readLine();
+            BehaviorList behaviorList = objectMapper.readValue(behaviorListInfo, BehaviorList.class);
             if(behaviorList.status==-1){
                 playerInfo.disconnect();
                 playerInfoList.remove(playerInfo);
@@ -347,6 +345,9 @@ public class Server {
                 moveUnitCuzAttack(b);
             } else {
                 behaviorArrayList.remove(b);
+                if(behaviorArrayList.isEmpty()){
+                    break;
+                }
             }
         }
         for (Behavior b : behaviorArrayList) {
@@ -362,7 +363,7 @@ public class Server {
                 break;
             }
         }
-        playerInfo.getOut().writeObject(Integer.toString(count));
+        playerInfo.getOut().println(Integer.toString(count));
     }
 
     public boolean gameOver() {

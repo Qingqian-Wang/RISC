@@ -1,3 +1,6 @@
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -16,10 +19,10 @@ public class Player {
 
     public int totalNumPlayer;
 
-    private ObjectInputStream in;
+    private BufferedReader in;
 
-    private ObjectOutputStream out;
-    public ArrayList<GameInfo> gameList;
+    private PrintWriter out;
+
     private BasicChecker ruleChecker;
 
     public int watchingPattern = 0;
@@ -33,13 +36,13 @@ public class Player {
 
     // receive player status from server
     public void updateStatus() throws IOException, ClassNotFoundException {
-        status = Integer.parseInt(in.readObject().toString());
+        status = Integer.parseInt(in.readLine());
     }
     // create socket to connect with server
     public void connectToServer() throws IOException {
         this.clientSocket = new Socket("localhost", serverPort);
-        this.in = new ObjectInputStream(clientSocket.getInputStream());
-        this.out = new ObjectOutputStream(clientSocket.getOutputStream());
+        this.out = new PrintWriter(clientSocket.getOutputStream(), true);
+        this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         DataInputStream dataIn = new DataInputStream(clientSocket.getInputStream());
         this.playerID = dataIn.readInt();
         this.totalNumPlayer = dataIn.readInt();
@@ -100,13 +103,13 @@ public class Player {
             // continuous receive message from server
             String inputLine;
             while (true) {
-                inputLine = in.readObject().toString();
+                inputLine = in.readLine();
                 System.out.println(inputLine);
                 // handle game start situation
                 if (inputLine.equals("Game Start")) {
 //                    DataInputStream dataIn = new DataInputStream(clientSocket.getInputStream());
 //                    int totalUnit = dataIn.readInt();
-                    int totalUnit = Integer.parseInt(in.readObject().toString());
+                    int totalUnit = Integer.parseInt(in.readLine());
                     String response = null;
                     int[] numbers = null;
                     Scanner scanner = new Scanner(System.in);
@@ -137,16 +140,13 @@ public class Player {
                         }
                     }
                     // send unit information for territory back to server
-                    out.writeObject(response);
+                    out.println(response);
                 } else if (inputLine.equals("Turn Start")) {
                     updateStatus();
                     // get GlobalMap object from server
-                    GlobalMap current = (GlobalMap) in.readObject();
-                    ArrayList<Integer> ownIDInfo = (ArrayList<Integer>) in.readObject();
-                    ArrayList<Integer> UnitInfo = (ArrayList<Integer>) in.readObject();
-                    updateMap(current,ownIDInfo,UnitInfo);
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    ArrayList<Territory> currentMap = objectMapper.readValue(in.readLine(),new TypeReference<ArrayList<Territory>>(){});
 //                    current.receiveList(in);
-                    ArrayList<Territory> currentMap = current.getMapArrayList();
                     // print the current map information
                     StringBuilder sb = new StringBuilder();
                     for (int i = 1; i <= totalNumPlayer; i++) {
@@ -183,13 +183,13 @@ public class Player {
                             watchingPattern = 1;
                         }else{
                             BehaviorList behaviorList = new BehaviorList(playerID, -1);
-                            behaviorList.sendList(out);
+                            out.println(objectMapper.writeValueAsString(behaviorList));
                             break;
                         }
                     }
                     BehaviorList behaviorList = new BehaviorList(playerID, status);
                     if(watchingPattern == 1){   // if the player is in the watching pattern then don't add any order
-                        behaviorList.sendList(out);
+                        out.println(objectMapper.writeValueAsString(behaviorList));
                     }else {
                         // if the player has some territory
                         while (true) {
@@ -240,7 +240,7 @@ public class Player {
                                     behaviorList.addToAttackList(behavior);
                                 }
                             } else if (response.toUpperCase().charAt(0) == 'D') {// end turn
-                                behaviorList.sendList(out);
+                                out.println(objectMapper.writeValueAsString(behaviorList));
                                 break;
                             }
                         }
@@ -269,6 +269,7 @@ public class Player {
             System.out.println("Invalid input");
         } else {
             int serverPort = Integer.parseInt(args[0]);
+
             Player p1 = new Player(serverPort);
             p1.connectToServer();
             p1.playGame();

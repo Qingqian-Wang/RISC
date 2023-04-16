@@ -10,16 +10,16 @@ import java.net.Socket;
 public class PlayerInfo {
     private final Socket playerSocket;
 
-    private ObjectInputStream in;
+    private BufferedReader in;
 
-    private ObjectOutputStream out;
+    private PrintWriter out;
     private final int playerID;
 
     public PlayerInfo(Socket playerSocket, int playerID) throws IOException {
         this.playerSocket = playerSocket;
         this.playerID = playerID;
-        out = new ObjectOutputStream(playerSocket.getOutputStream());
-        in = new ObjectInputStream(playerSocket.getInputStream());
+        out = new PrintWriter(playerSocket.getOutputStream(), true);
+        in = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
 
     }
 
@@ -27,11 +27,11 @@ public class PlayerInfo {
         return playerSocket;
     }
 
-    public ObjectInputStream getIn() {
+    public BufferedReader getIn() {
         return in;
     }
 
-    public ObjectOutputStream getOut() {
+    public PrintWriter getOut() {
         return out;
     }
 
