@@ -1,3 +1,5 @@
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -6,6 +8,7 @@ import java.util.*;
 
 public class Game implements Runnable{
     public ArrayList<PlayerInfo> playerInfoList;
+
     public ArrayList<Territory> map;
     public int port;
     public ServerSocket serverSocket;
@@ -44,6 +47,12 @@ public class Game implements Runnable{
             System.out.println("Added player" + p.getPlayerID() + " to list");
         }
     }
+    /*
+     * Starts the game
+     *
+     * @throws Exception if any error occurs during game execution
+     */
+
     @Override
     public void run() {
         initializeMap();
@@ -59,25 +68,15 @@ public class Game implements Runnable{
         }
         // Send game start message to all players and initialize their units
         for (PlayerInfo playerInfo : playerInfoList) {
-            try {
-                playerInfo.getOut().writeObject("Game Start");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            try {
-                playerInfo.getOut().writeObject("50");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            playerInfo.getOut().println("Game Start");
+            playerInfo.getOut().println("50");
 //            DataOutputStream dataOut = new DataOutputStream(playerInfo.getPlayerSocket().getOutputStream());
 //            int totalUnit = 50;
 //            dataOut.writeInt(totalUnit);
             String unitInfo = null;
             try {
-                unitInfo = playerInfo.getIn().readObject().toString();
+                unitInfo = playerInfo.getIn().readLine();
             } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
             String[] tokens = unitInfo.split(" ");
@@ -97,11 +96,7 @@ public class Game implements Runnable{
         }
         // Send game over message to all players and disconnect them
         for(PlayerInfo playerInfo:playerInfoList){
-            try {
-                playerInfo.getOut().writeObject("Game Over");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            playerInfo.getOut().println("Game Over");
             try {
                 playerInfo.disconnect();
             } catch (IOException e) {
@@ -255,15 +250,13 @@ public class Game implements Runnable{
         ArrayList<Behavior> attackList = new ArrayList<>();
         ArrayList<Behavior> moveList = new ArrayList<>();
         for (PlayerInfo playerInfo : playerInfoList) {
-            playerInfo.getOut().writeObject("Turn Start");
+            playerInfo.getOut().println("Turn Start");
             sendPlayerStatus(playerInfo);
-            GlobalMap current = new GlobalMap(map);
-            playerInfo.getOut().writeObject(current);
-            playerInfo.getOut().writeObject(getOwnIDList());
-            playerInfo.getOut().writeObject(getUnitsList());
-//            current.sendList(playerInfo.getOut());
-            BehaviorList behaviorList = new BehaviorList(playerInfo.getPlayerID(), 1);
-            behaviorList.receiveList(playerInfo.getIn());
+            ObjectMapper objectMapper = new ObjectMapper();
+            String mapInfo = objectMapper.writeValueAsString(map);
+            playerInfo.getOut().println(mapInfo);
+            String behaviorListInfo = playerInfo.getIn().readLine();
+            BehaviorList behaviorList = objectMapper.readValue(behaviorListInfo, BehaviorList.class);
             if(behaviorList.status==-1){
                 playerInfo.disconnect();
                 playerInfoList.remove(playerInfo);
@@ -369,6 +362,9 @@ public class Game implements Runnable{
                 moveUnitCuzAttack(b);
             } else {
                 behaviorArrayList.remove(b);
+                if(behaviorArrayList.isEmpty()){
+                    break;
+                }
             }
         }
         for (Behavior b : behaviorArrayList) {
@@ -384,7 +380,7 @@ public class Game implements Runnable{
                 break;
             }
         }
-        playerInfo.getOut().writeObject(Integer.toString(count));
+        playerInfo.getOut().println(Integer.toString(count));
     }
 
     public boolean gameOver() {
@@ -397,22 +393,5 @@ public class Game implements Runnable{
             }
         }
         return true;
-    }
-
-    public static void main(String[] args) throws Exception {
-        if(args.length!=2){
-            System.out.println("Invalid input");
-        } else {
-            int serverPort = Integer.parseInt(args[0]);
-            Server s = new Server(serverPort);
-            int totalPlayerNum = Integer.parseInt(args[1]);
-            if(totalPlayerNum<2||totalPlayerNum>5){
-                System.out.println("The total number of players should be between 2 and 5, but it is "+args[1]);
-            } else {
-                s.acceptPlayer(totalPlayerNum);
-                s.gameStart();
-            }
-
-        }
     }
 }
