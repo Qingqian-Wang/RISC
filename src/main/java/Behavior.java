@@ -7,15 +7,22 @@ import java.io.Serializable;
 public class Behavior implements Serializable {
     Territory origin;// The origin territory of the behavior
     Territory destination;// The destination territory of the behavior
-    int units;// The number of units involved in the behavior
-    int playerID;// The unique ID of the player performing the behavior
+    int unit;// The number of units involved in the behavior
+    int ownID;// The unique ID of the player performing the behavior
     String type; // The type of behavior being performed
 
-    public Behavior(Territory origin, Territory destination, int units, int playerID, String type) {
+    public Behavior(){
+        this.origin = null;
+        this.destination = null;
+        this.unit = 0;
+        this.ownID = 0;
+        this.type = null;
+    }
+    public Behavior(Territory origin, Territory destination, int unit, int ownID, String type) {
         this.origin = origin;
         this.destination = destination;
-        this.units = units;
-        this.playerID = playerID;
+        this.unit = unit;
+        this.ownID = ownID;
         this.type = type;
     }
 
@@ -29,11 +36,11 @@ public class Behavior implements Serializable {
     }
 
     public int getUnit() {
-        return units;
+        return unit;
     }
 
     public int getOwnID() {
-        return playerID;
+        return ownID;
     }
 
     public String getType() {

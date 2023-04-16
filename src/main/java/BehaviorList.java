@@ -13,7 +13,12 @@ public class BehaviorList implements NetworkObject, Serializable {
     private int playerID;// The ID of the player who performed the behaviors
     public int status; // -1 means disconnect; 0 means dead; 1 means live
 
-
+    public BehaviorList() {
+        this.playerID = 0;
+        moveList = new ArrayList<>();
+        attackList = new ArrayList<>();
+        this.status = 0;
+    }
     public BehaviorList(int playerID, int status) {
         this.playerID = playerID;
         moveList = new ArrayList<>();

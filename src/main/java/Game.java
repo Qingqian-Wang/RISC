@@ -11,6 +11,7 @@ public class Game implements Runnable{
 
     public ArrayList<Territory> map;
     public int port;
+    public int maxPlayerNum;
     public ServerSocket serverSocket;
     private BasicChecker ruleChecker;
     /*
@@ -21,10 +22,11 @@ public class Game implements Runnable{
      *
      * @throws IOException if an I/O error occurs when opening the server socket
      */
-    public Game(int port) throws IOException {
+    public Game(int port, int maxPlayerNum) throws IOException {
         playerInfoList = new ArrayList<>();
         map = new ArrayList<>();
         this.port = port;
+        this.maxPlayerNum = maxPlayerNum;
         serverSocket = new ServerSocket(this.port);
         ruleChecker = new OriginChecker(new DestinationChecker(null));
     }
@@ -35,13 +37,13 @@ public class Game implements Runnable{
      *
      * @throws IOException if an I/O error occurs when waiting for a connection
      */
-    public void acceptPlayer(int playerNum) throws IOException {
-        for (int i = 0; i < playerNum; i++) {
+    public void acceptPlayer() throws IOException {
+        for (int i = 0; i < maxPlayerNum; i++) {
             Socket playerSocket = serverSocket.accept();
             PlayerInfo p = new PlayerInfo(playerSocket, i + 1);
             DataOutputStream dataOut = new DataOutputStream(p.getPlayerSocket().getOutputStream());
             dataOut.writeInt(i + 1);
-            dataOut.writeInt(playerNum);
+            dataOut.writeInt(maxPlayerNum);
             System.out.println("Accept new connection from " + playerSocket.getInetAddress());
             playerInfoList.add(p);
             System.out.println("Added player" + p.getPlayerID() + " to list");
@@ -55,6 +57,11 @@ public class Game implements Runnable{
 
     @Override
     public void run() {
+        try {
+            acceptPlayer();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         initializeMap();
         int[][] territoryOwner;
         if (playerInfoList.size() == 2) {
@@ -75,7 +82,9 @@ public class Game implements Runnable{
 //            dataOut.writeInt(totalUnit);
             String unitInfo = null;
             try {
-                unitInfo = playerInfo.getIn().readLine();
+                while(unitInfo==null){
+                    unitInfo = playerInfo.getIn().readLine();
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
