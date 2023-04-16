@@ -70,4 +70,7 @@ public class Territory implements Serializable {
         tempList.add(t.getName());
         this.neighbor.put(t.getOwnID(),tempList);
     }
+
+
+
 }
