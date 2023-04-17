@@ -15,6 +15,9 @@ public class GameInfo {
     private PrintWriter out;
     private BufferedReader in;
     private Socket clientSocket;
+
+
+    private int techLevel;
     public GameInfo(){
         this.watchingPattern = 0;
         this.status = 1;

@@ -34,6 +34,10 @@ public class Player {
         gameInfoList.get(currentGame).setStatus(Integer.parseInt(gameInfoList.get(currentGame).getIn().readLine()));
     }
 
+    public void updateCost() throws IOException {
+        gameInfoList.get(currentGame).setRestCost(Integer.parseInt(gameInfoList.get(currentGame).getIn().readLine()));
+    }
+
     // create socket to connect with server
     public void connectToServer() throws IOException {
         Socket toServer = new Socket("localhost", serverPort);
@@ -128,6 +132,31 @@ public class Player {
             return false;
         }
         return checkBehaviorInputFormatHelper(tokens[1], map);
+    }
+
+
+    // return -1 if failed, return cost if pass the check
+    private int checkEvolevelBehavior(String s, int cost, int maxTechLevel){
+        int[] totalCost = {0, 0, 50, 75, 125, 200, 300};
+        int sum = 0;
+        try{
+            int number = Integer.parseInt(s);
+            int sumCost = 0;
+            for(int i = 0; i < number; i++){
+                sumCost += totalCost[i];
+            }
+            int sumHelper = 0;
+            for (int i = 0; i < maxTechLevel; i++){
+                sumHelper += totalCost[i];
+            }
+            sum = sumCost - sumHelper;
+            if(number <= maxTechLevel || sum > cost || number > 6 || number < 1){
+                return -1;
+            }
+        }catch (NumberFormatException e){
+            return -1;
+        }
+        return sum;
     }
 
 
@@ -288,6 +317,7 @@ public class Player {
                     }
                     case "Turn Start" -> {
                         updateStatus();
+                        updateCost();
                         // get GlobalMap object from server
                         ObjectMapper objectMapper = new ObjectMapper();
                         ArrayList<Territory> currentMap = objectMapper.readValue(in.readLine(), new TypeReference<>() {
@@ -341,17 +371,19 @@ public class Player {
                                 System.out.println("(M)ove");
                                 System.out.println("(A)ttack");
                                 System.out.println("(U)pgrade");
+                                System.out.println("(E)volve");
                                 System.out.println("(D)one");
                                 InputStreamReader sr = new InputStreamReader(System.in);
                                 BufferedReader bf = new BufferedReader(sr);
                                 String response = bf.readLine();
                                 while (response.length() != 1 || (response.toUpperCase().charAt(0) != 'M'
-                                        && response.toUpperCase().charAt(0) != 'A' && response.toUpperCase().charAt(0) != 'D' && response.toUpperCase().charAt(0) != 'U')) {
+                                        && response.toUpperCase().charAt(0) != 'A' && response.toUpperCase().charAt(0) != 'D' && response.toUpperCase().charAt(0) != 'U' && response.toUpperCase().charAt(0) != 'E')) {
                                     System.out.println("Your input is not in correct format, try again");
                                     System.out.println("You are player " + gameInfoList.get(currentGame).getPlayerID() + ", what would you like to do?");
                                     System.out.println("(M)ove");
                                     System.out.println("(A)ttack");
                                     System.out.println("(U)pgrade");
+                                    System.out.println("(E)volve");
                                     System.out.println("(D)one");
                                     response = bf.readLine();
                                 }
@@ -412,6 +444,23 @@ public class Player {
                                     }
                                     // add to arraylist based on the type of behavior
                                     behaviorList.addToUpgradeList(behavior);
+                                } else if (response.toUpperCase().charAt(0) == 'E') {
+                                    int Evolevel = -1;
+                                    while (Evolevel == -1) {
+                                        System.out.println("Please entry your behavior in this format:Unit Territory currentLevel targetLevel, \nif you already set the evolve level, this command will reset the evolve level");
+                                        String behaviorInfo = bf.readLine();
+                                        int sum = -1;
+                                        while ((sum = checkEvolevelBehavior(behaviorInfo, gameInfoList.get(currentGame).getRestCost(), gameInfoList.get(currentGame).getMaximumTechNum())) == -1) {// check here need more change
+                                            System.out.println("Your input is not in correct format, please " +
+                                                    "check your unit, Territory, currentLevel and TargetLevel and try again");
+                                            System.out.println("Please entry your behavior in this format:Unit Territory currentLevel targetLevel");
+                                            behaviorInfo = bf.readLine();
+                                        }
+                                        Evolevel = Integer.parseInt(behaviorInfo);
+                                        ArrayList<Integer> tempMaxLevel = new ArrayList<>();
+                                        tempMaxLevel.add(Evolevel, sum);
+                                        behaviorList.setUpgradeMaxLevelList(tempMaxLevel);
+                                    }
                                 } else if (response.toUpperCase().charAt(0) == 'D') {// end turn
                                     out.println(objectMapper.writeValueAsString(behaviorList));
                                     break;

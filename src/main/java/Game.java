@@ -15,6 +15,9 @@ public class Game implements Runnable{
     public ServerSocket serverSocket;
     private BasicChecker ruleChecker;
     private UpgradeChecker upgradeChecker;
+
+    // store the rest cost of each player
+    private ArrayList<Integer> restCost;
     /*
      * Constructor to create a Server object
      *
@@ -131,6 +134,13 @@ public class Game implements Runnable{
             map.get(i).getUnits().addUnits(1, 0);
         }
     }
+
+    private void addCost(){
+        for (int i = 0; i < map.size(); i++) {
+            restCost.set(map.get(i).getOwnID(), restCost.get(map.get(i).getOwnID()) + 10);
+        }
+    }
+
     //=======================================upgrade function =====================
     private void checkAndExecuteUpgradeBehavior(ArrayList<upgradeBehavior> behaviorArrayList) {  // checkandupdate
         for (upgradeBehavior b : behaviorArrayList) {
@@ -279,6 +289,7 @@ public class Game implements Runnable{
         for (PlayerInfo playerInfo : playerInfoList) {
             playerInfo.getOut().println("Turn Start");
             sendPlayerStatus(playerInfo);
+            sendPlayerRestCost(playerInfo);
             ObjectMapper objectMapper = new ObjectMapper();
             String mapInfo = objectMapper.writeValueAsString(map);
             playerInfo.getOut().println(mapInfo);
@@ -300,7 +311,9 @@ public class Game implements Runnable{
         checkAndExecuteMoveBehavior(moveList);
         checkAndExecuteAttackBehavior(attackList);
         checkAndExecuteUpgradeBehavior(upgradeList);
+
         addOneUnit();
+        addCost();
     }
 
     private void executeMoveBehavior(Behavior b) {
@@ -422,6 +435,13 @@ public class Game implements Runnable{
         }
         playerInfo.getOut().println(Integer.toString(count));
     }
+
+    public void sendPlayerRestCost(PlayerInfo playerInfo) throws IOException {
+        int cost = restCost.get(playerInfo.getPlayerID() - 1);
+        playerInfo.getOut().println(Integer.toString(cost));
+    }
+
+
 
     public boolean gameOver() {
         int ownID = 0;
