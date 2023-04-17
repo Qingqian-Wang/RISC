@@ -16,7 +16,11 @@ public class Player {
     public ArrayList<Integer> gamePortList;
     public int currentGame;
     public int serverPort;
+
+
+    private BasicChecker checkUpgrade;
     private final BasicChecker ruleChecker;
+
 
     // initialize  player by server port number
     public Player(int serverPort) {
@@ -30,6 +34,7 @@ public class Player {
     public void updateStatus() throws IOException {
         gameInfoList.get(currentGame).setStatus(Integer.parseInt(gameInfoList.get(currentGame).getIn().readLine()));
     }
+
     // create socket to connect with server
     public void connectToServer() throws IOException {
         Socket toServer = new Socket("localhost", serverPort);
@@ -38,12 +43,13 @@ public class Player {
         BufferedReader in = new BufferedReader(new InputStreamReader(toServer.getInputStream()));
         String message = in.readLine();
         System.out.println(message);
-        gamePortList = objectMapper.readValue(in.readLine(), new TypeReference<>() {});
+        gamePortList = objectMapper.readValue(in.readLine(), new TypeReference<>() {
+        });
         ArrayList<Integer> availableList = new ArrayList<>();
-        for(int i = 0; i < gamePortList.size(); i++){
+        for (int i = 0; i < gamePortList.size(); i++) {
             String availableInfo = in.readLine();
             System.out.println(availableInfo);
-            if(availableInfo.charAt(0)=='A'){
+            if (availableInfo.charAt(0) == 'A') {
                 String[] tokens = availableInfo.split(" ");
                 availableList.add(Integer.parseInt(tokens[1]));
             }
@@ -51,49 +57,50 @@ public class Player {
 
         StringBuilder sb = new StringBuilder();
         joinGameList = new ArrayList<>();
-        while(true){
+        while (true) {
             System.out.println("Which game you want to play? Type '0' if you do not want to join game for this time");
             System.out.println("Available game ID: ");
-            for(Integer i:availableList){
+            for (Integer i : availableList) {
                 System.out.println(i);
             }
             InputStreamReader sr = new InputStreamReader(System.in);
             BufferedReader bf = new BufferedReader(sr);
             String response = bf.readLine();
             while (response.length() != 1 || (response.toUpperCase().charAt(0) != '0'
-                    && !availableList.contains(Integer.parseInt(response)))){
+                    && !availableList.contains(Integer.parseInt(response)))) {
                 System.out.println("Your input is invalid, please try again");
                 System.out.println("Which game you want to play? Type '0' if you do not want to join game for this time");
                 System.out.println("Available game ID: ");
-                for(Integer i:availableList){
+                for (Integer i : availableList) {
                     System.out.println(i);
                 }
                 response = bf.readLine();
             }
-            if(response.toUpperCase().charAt(0) == '0'){
+            if (response.toUpperCase().charAt(0) == '0') {
                 break;
             } else {
-                if(!joinGameList.contains(Integer.parseInt(response))){
+                if (!joinGameList.contains(Integer.parseInt(response))) {
                     joinGameList.add(Integer.parseInt(response));
                 } else {
                     System.out.println("You already tell me you want to join to the target game");
                 }
             }
         }
-        for(Integer i : joinGameList){
+        for (Integer i : joinGameList) {
             sb.append(i);
             sb.append(' ');
         }
         out.println(sb);
     }
+
     public void connectToGame() throws IOException {
-        for(Integer i : joinGameList){
-            Socket clientSocket = new Socket("localhost", gamePortList.get(i-1));
+        for (Integer i : joinGameList) {
+            Socket clientSocket = new Socket("localhost", gamePortList.get(i - 1));
             DataInputStream dataIn = new DataInputStream(clientSocket.getInputStream());
             int playerID = dataIn.readInt();
             int totalNumPlayer = dataIn.readInt();
-            GameInfo gameInfo = new GameInfo(clientSocket,totalNumPlayer,playerID,i);
-            gameInfoList.put(i,gameInfo);
+            GameInfo gameInfo = new GameInfo(clientSocket, totalNumPlayer, playerID, i);
+            gameInfoList.put(i, gameInfo);
         }
     }
 
@@ -107,6 +114,24 @@ public class Player {
         return false;
     }
 
+
+    private boolean checkAttackBehavior(String s, ArrayList<Territory> map) {
+        String[] tokens = s.split(" ");
+        if (tokens.length != 4) {
+            return false;
+        }
+        try {
+            int number = Integer.parseInt(tokens[0]);
+            if (number <= 0) {
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return checkBehaviorInputFormatHelper(tokens[1], map);
+    }
+
+
     // check if the format of input for creating behavior is correct
     private boolean checkBehaviorInputFormat(String s, ArrayList<Territory> map) {
         String[] tokens = s.split(" ");
@@ -114,9 +139,12 @@ public class Player {
             return false;
         }
         try {
-            int number = Integer.parseInt(tokens[0]);
-            if (number <= 0) {
-                return false;
+            ArrayList<Integer> unit = new ArrayList<>();
+            for (int i = 0; i < 7; i++) {
+                unit.add(Integer.parseInt(tokens[0].split("\\|")[i]));
+                if (unit.get(i) < 0) {
+                    return false;
+                }
             }
         } catch (NumberFormatException e) {
             return false;
@@ -136,7 +164,6 @@ public class Player {
     }
 
 
-
     // the game play function
     public void playGame() {
         try {
@@ -144,11 +171,11 @@ public class Player {
             String inputLine;
             label:
             while (true) {
-                if(currentGame==-1){
+                if (currentGame == -1) {
                     System.out.println("Please select the game you want to play, type the game ID to select");
                     System.out.println("Game list:");
-                    for(Integer i: joinGameList){
-                        System.out.println("Game"+i);
+                    for (Integer i : joinGameList) {
+                        System.out.println("Game" + i);
                     }
                     InputStreamReader sr = new InputStreamReader(System.in);
                     BufferedReader bf = new BufferedReader(sr);
@@ -162,8 +189,8 @@ public class Player {
                         System.out.println("Your input is invalid");
                         System.out.println("Please select the game you want to play, type the game ID to select");
                         System.out.println("Game list:");
-                        for(Integer i: joinGameList){
-                            System.out.println("Game"+i);
+                        for (Integer i : joinGameList) {
+                            System.out.println("Game" + i);
                         }
                         try {
                             response = bf.readLine();
@@ -172,8 +199,8 @@ public class Player {
                         }
                     }
                     currentGame = Integer.parseInt(response);
-                } else if(joinGameList.size()!=1){
-                    System.out.println("You are currently in Game" +currentGame);
+                } else if ( joinGameList.size() != 1) {
+                    System.out.println("You are currently in Game" + currentGame);
                     System.out.println("Do you want to switch?(yes or no)");
                     InputStreamReader sr = new InputStreamReader(System.in);
                     BufferedReader bf = new BufferedReader(sr);
@@ -183,9 +210,9 @@ public class Player {
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                    while (!response.equals("yes")&&!response.equals("no")) {
+                    while (!response.equals("yes") && !response.equals("no")) {
                         System.out.println("Your input is invalid");
-                        System.out.println("You are currently in Game" +currentGame);
+                        System.out.println("You are currently in Game" + currentGame);
                         System.out.println("Do you want to switch?(yes or no)");
                         try {
                             response = bf.readLine();
@@ -193,11 +220,11 @@ public class Player {
                             throw new RuntimeException(e);
                         }
                     }
-                    if(response.equals("yes")){
+                    if (response.equals("yes")) {
                         System.out.println("Please select the game you want to play, type the game ID to select");
                         System.out.println("Game list:");
-                        for(Integer i: joinGameList){
-                            System.out.println("Game"+i);
+                        for (Integer i : joinGameList) {
+                            System.out.println("Game" + i);
                         }
                         try {
                             response = bf.readLine();
@@ -208,8 +235,8 @@ public class Player {
                             System.out.println("Your input is invalid");
                             System.out.println("Please select the game you want to play, type the game ID to select");
                             System.out.println("Game list:");
-                            for(Integer i: joinGameList){
-                                System.out.println("Game"+i);
+                            for (Integer i : joinGameList) {
+                                System.out.println("Game" + i);
                             }
                             try {
                                 response = bf.readLine();
@@ -227,8 +254,6 @@ public class Player {
                 // handle game start situation
                 switch (inputLine) {
                     case "Game Start" -> {
-//                    DataInputStream dataIn = new DataInputStream(clientSocket.getInputStream());
-//                    int totalUnit = dataIn.readInt();
                         int totalUnit = Integer.parseInt(in.readLine());
                         String response = null;
                         int[] numbers = null;
@@ -266,7 +291,8 @@ public class Player {
                         updateStatus();
                         // get GlobalMap object from server
                         ObjectMapper objectMapper = new ObjectMapper();
-                        ArrayList<Territory> currentMap = objectMapper.readValue(in.readLine(), new TypeReference<>() {});
+                        ArrayList<Territory> currentMap = objectMapper.readValue(in.readLine(), new TypeReference<>() {
+                        });
 //                    current.receiveList(in);
                         // print the current map information
                         StringBuilder sb = new StringBuilder();
@@ -274,18 +300,18 @@ public class Player {
                             sb.append("Player").append(i).append(":").append(System.lineSeparator());
                             for (Territory territory : currentMap) {
                                 if (territory.getOwnID() == i) {
-                                    sb.append(territory.getUnit() + " units in " + territory.getName() +
+                                    sb.append(territory.getUnits().printUnits() + " units in " + territory.getName() +
                                             "(next to:");
                                     ArrayList<String> neighborName = new ArrayList<>();
                                     for (Map.Entry<Integer, ArrayList<String>> e : territory.getNeighbor().entrySet()) {
                                         neighborName.addAll(e.getValue());
-                                    }
-                                    for (int x = 0; x < neighborName.size(); x++) {
-                                        sb.append(" " + neighborName.get(x));
-                                        if (x != neighborName.size() - 1) {
-                                            sb.append(",");
-                                        } else {
-                                            sb.append(")").append(System.lineSeparator());
+                                        for (int x = 0; x < neighborName.size(); x++) {
+                                            sb.append(" " + neighborName.get(x));
+                                            if (x != neighborName.size() - 1) {
+                                                sb.append(",");
+                                            } else {
+                                                sb.append(")").append(System.lineSeparator());
+                                            }
                                         }
                                     }
                                 }
@@ -315,16 +341,18 @@ public class Player {
                                 System.out.println("You are player " + gameInfoList.get(currentGame).getPlayerID() + ", what would you like to do?");
                                 System.out.println("(M)ove");
                                 System.out.println("(A)ttack");
+                                System.out.println("(U)pgrade");
                                 System.out.println("(D)one");
                                 InputStreamReader sr = new InputStreamReader(System.in);
                                 BufferedReader bf = new BufferedReader(sr);
                                 String response = bf.readLine();
                                 while (response.length() != 1 || (response.toUpperCase().charAt(0) != 'M'
-                                        && response.toUpperCase().charAt(0) != 'A' && response.toUpperCase().charAt(0) != 'D')) {
+                                        && response.toUpperCase().charAt(0) != 'A' && response.toUpperCase().charAt(0) != 'D' && response.toUpperCase().charAt(0) != 'U')) {
                                     System.out.println("Your input is not in correct format, try again");
                                     System.out.println("You are player " + gameInfoList.get(currentGame).getPlayerID() + ", what would you like to do?");
                                     System.out.println("(M)ove");
                                     System.out.println("(A)ttack");
+                                    System.out.println("(U)pgrade");
                                     System.out.println("(D)one");
                                     response = bf.readLine();
                                 }
@@ -332,7 +360,7 @@ public class Player {
                                 if (response.toUpperCase().charAt(0) == 'M' || response.toUpperCase().charAt(0) == 'A') {
                                     Behavior behavior = null;
                                     while (behavior == null) {
-                                        System.out.println("Please entry your behavior in this format:Unit SourceTerritory DestinationTerritory");
+                                        System.out.println("Please entry your behavior in this format:Unit(level0|1|2|3|4|5|6 ) SourceTerritory DestinationTerritory");
                                         String behaviorInfo = bf.readLine();
                                         while (!checkBehaviorInputFormat(behaviorInfo, currentMap)) {
                                             System.out.println("Your input is not in correct format, please " +
@@ -340,11 +368,17 @@ public class Player {
                                             System.out.println("Please entry your behavior in this format:Unit SourceTerritory DestinationTerritory");
                                             behaviorInfo = bf.readLine();
                                         }
+
                                         String[] tokens = behaviorInfo.split(" ");
+                                        ArrayList<Integer> unit = new ArrayList<>();
+                                        for (int i = 0; i < 7; i++) {
+                                            unit.add(Integer.parseInt(tokens[0].split("|")[i]));
+                                        }
+
                                         if (response.toUpperCase().charAt(0) == 'M') {// move behavior initialize
-                                            behavior = new Behavior(getTerritoryByName(tokens[1], currentMap), getTerritoryByName(tokens[2], currentMap), Integer.parseInt(tokens[0]), gameInfoList.get(currentGame).getPlayerID(), "Move");
-                                        } else {// attack behavior initialize
-                                            behavior = new Behavior(getTerritoryByName(tokens[1], currentMap), getTerritoryByName(tokens[2], currentMap), Integer.parseInt(tokens[0]), gameInfoList.get(currentGame).getPlayerID(), "Attack");
+                                            behavior = new Behavior(getTerritoryByName(tokens[1], currentMap), getTerritoryByName(tokens[2], currentMap), unit, gameInfoList.get(currentGame).getPlayerID(), "Move");
+                                        } else if (response.toUpperCase().charAt(0) == 'A') {// attack behavior initialize
+                                            behavior = new Behavior(getTerritoryByName(tokens[1], currentMap), getTerritoryByName(tokens[2], currentMap), unit, gameInfoList.get(currentGame).getPlayerID(), "Attack");
                                         }
                                         // check if the unit and source is correct for the behavior
                                         if (ruleChecker.checkBehavior(behavior, currentMap) != null) {
@@ -358,6 +392,27 @@ public class Player {
                                     } else {
                                         behaviorList.addToAttackList(behavior);
                                     }
+                                } else if (response.toUpperCase().charAt(0) == 'U') {
+                                    upgradeBehavior behavior = null;
+                                    while (behavior == null) {
+                                        System.out.println("Please entry your behavior in this format:Unit Territory currentLevel targetLevel");
+                                        String behaviorInfo = bf.readLine();
+                                        while (!checkAttackBehavior(behaviorInfo, currentMap)) {// check here need more change
+                                            System.out.println("Your input is not in correct format, please " +
+                                                    "check your unit, Territory, currentLevel and TargetLevel and try again");
+                                            System.out.println("Please entry your behavior in this format:Unit Territory currentLevel targetLevel");
+                                            behaviorInfo = bf.readLine();
+                                        }
+                                        String[] tokens = behaviorInfo.split(" ");
+                                        behavior = new upgradeBehavior(getTerritoryByName(tokens[1], currentMap), gameInfoList.get(currentGame).getPlayerID(), "Upgrade", Integer.parseInt(tokens[2]), Integer.parseInt(tokens[3]), Integer.parseInt(tokens[0]));
+                                        // check if the unit and source is correct for the behavior
+                                        if (checkUpgrade.checkBehavior(behavior, currentMap) != null) {
+                                            System.out.println(ruleChecker.checkBehavior(behavior, currentMap));
+                                            behavior = null;
+                                        }
+                                    }
+                                    // add to arraylist based on the type of behavior
+                                    behaviorList.addToUpgradeList(behavior);
                                 } else if (response.toUpperCase().charAt(0) == 'D') {// end turn
                                     out.println(objectMapper.writeValueAsString(behaviorList));
                                     break;
@@ -384,7 +439,7 @@ public class Player {
             throw new RuntimeException(e);
         } finally {
             try {
-                for(Map.Entry<Integer,GameInfo> e: gameInfoList.entrySet()){
+                for (Map.Entry<Integer, GameInfo> e : gameInfoList.entrySet()) {
                     e.getValue().disconnect();
                 }
             } catch (IOException e) {
@@ -392,8 +447,9 @@ public class Player {
             }
         }
     }
+
     public static void main(String[] args) throws IOException {
-        if(args.length!=1){
+        if (args.length != 1) {
             System.out.println("Invalid input");
         } else {
             int serverPort = Integer.parseInt(args[0]);
