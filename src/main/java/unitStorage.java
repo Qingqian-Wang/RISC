@@ -144,4 +144,15 @@ public class unitStorage {
         }
         return res;
     }
+
+
+    // check weather the unitStorage contains enough units
+    public boolean checkContainEnoughUnits(unitStorage u){
+        for(int i = 0; i < 7; i++){
+            if(units.get(i) < u.getUnits().get(i)){
+                return false;
+            }
+        }
+        return true;
+    }
 }

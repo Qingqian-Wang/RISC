@@ -177,7 +177,7 @@ public class Player {
                         sb.append("Player").append(i).append(":").append(System.lineSeparator());
                         for (int j = 0; j < currentMap.size(); j++) {
                             if (currentMap.get(j).getOwnID() == i) {
-                                sb.append(currentMap.get(j).getUnit() + " units in " + currentMap.get(j).getName() +
+                                sb.append(currentMap.get(j).getUnits().printUnits() + " units in " + currentMap.get(j).getName() +
                                         "(next to:");
                                 ArrayList<String> neighborName = new ArrayList<>();
                                 for (Map.Entry<Integer, ArrayList<String>> e : currentMap.get(j).getNeighbor().entrySet()) {

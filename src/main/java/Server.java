@@ -98,8 +98,8 @@ public class Server {
      */
     private void addOneUnit(){
         for (int i = 0; i < map.size(); i++) {
-            int unit = map.get(i).getUnit() + 1;
-            map.get(i).setUnit(unit);
+//            int unit = map.get(i).getUnits().addUnits(1, 0);
+            map.get(i).getUnits().addUnits(1, 0);
         }
     }
 
@@ -209,20 +209,20 @@ public class Server {
 
     }
 
-    public ArrayList<Integer> getOwnIDList(){
-        ArrayList<Integer> res = new ArrayList<>();
-        for(Territory t:map){
-            res.add(t.getOwnID());
-        }
-        return res;
-    }
-    public ArrayList<Integer> getUnitsList(){
-        ArrayList<Integer> res = new ArrayList<>();
-        for(Territory t:map){
-            res.add(t.getUnit());
-        }
-        return res;
-    }
+//    public ArrayList<Integer> getOwnIDList(){
+//        ArrayList<Integer> res = new ArrayList<>();
+//        for(Territory t:map){
+//            res.add(t.getOwnID());
+//        }
+//        return res;
+//    }
+//    public ArrayList<Integer> getUnitsList(){
+//        ArrayList<Integer> res = new ArrayList<>();
+//        for(Territory t:map){
+//            res.add(t.getUnit());
+//        }
+//        return res;
+//    }
     public void playTurn() throws Exception {
         List<Integer> orders = new ArrayList<>();
         for (int i = 1; i <= playerInfoList.size(); i++) {
@@ -286,10 +286,10 @@ public class Server {
 
     private void moveUnitCuzAttack(Behavior b) {
         String sourceName = b.getOrigin().getName();
-        int unit = b.getUnit();
+        unitStorage units = b.getUnits();
         for (int i = 0; i < map.size(); i++) {
             if (sourceName.equals(map.get(i).getName())) {
-                map.get(i).setUnit(map.get(i).getUnit() - unit);
+                map.get(i).getUnits().;
                 break;
             }
         }
