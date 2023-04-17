@@ -10,6 +10,8 @@ import java.util.ArrayList;
 public class BehaviorList implements NetworkObject, Serializable {
     private ArrayList<Behavior> moveList;// A list of behaviors related to move
     private ArrayList<Behavior> attackList;// A list of behaviors related to attack
+
+    private ArrayList<Behavior> upgradeList;// A list of behaviors related to upgrade
     private int playerID;// The ID of the player who performed the behaviors
     public int status; // -1 means disconnect; 0 means dead; 1 means live
 
@@ -38,6 +40,14 @@ public class BehaviorList implements NetworkObject, Serializable {
 
     public ArrayList<Behavior> getAttackList() {
         return attackList;
+    }
+
+    public void addToUpgradeList(Behavior b){
+        this.upgradeList.add(b);
+    }
+
+    public ArrayList<Behavior> getUpgradeList() {
+        return upgradeList;
     }
 
     public int getPlayerID() {
