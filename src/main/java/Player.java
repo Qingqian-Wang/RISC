@@ -172,7 +172,7 @@ public class Player {
                         }
                     }
                     currentGame = Integer.parseInt(response);
-                } else if(currentGame!=-1&&joinGameList.size()!=1){
+                } else if(joinGameList.size()!=1){
                     System.out.println("You are currently in Game" +currentGame);
                     System.out.println("Do you want to switch?(yes or no)");
                     InputStreamReader sr = new InputStreamReader(System.in);
