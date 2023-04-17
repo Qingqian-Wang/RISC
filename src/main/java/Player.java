@@ -1,9 +1,7 @@
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.*;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,8 +16,8 @@ public class Player {
     public int serverPort;
 
 
-    private BasicChecker checkUpgrade;
     private final BasicChecker ruleChecker;
+    private UpgradeChecker upgradeChecker;
 
 
     // initialize  player by server port number
@@ -28,6 +26,7 @@ public class Player {
         currentGame = -1;
         gameInfoList = new HashMap<>();
         ruleChecker = new OriginChecker(null);
+        upgradeChecker = new UpgradeChecker();
     }
 
     // receive player status from server
@@ -115,7 +114,7 @@ public class Player {
     }
 
 
-    private boolean checkAttackBehavior(String s, ArrayList<Territory> map) {
+    private boolean checkUpgradeBehavior(String s, ArrayList<Territory> map) {
         String[] tokens = s.split(" ");
         if (tokens.length != 4) {
             return false;
@@ -397,7 +396,7 @@ public class Player {
                                     while (behavior == null) {
                                         System.out.println("Please entry your behavior in this format:Unit Territory currentLevel targetLevel");
                                         String behaviorInfo = bf.readLine();
-                                        while (!checkAttackBehavior(behaviorInfo, currentMap)) {// check here need more change
+                                        while (!checkUpgradeBehavior(behaviorInfo, currentMap)) {// check here need more change
                                             System.out.println("Your input is not in correct format, please " +
                                                     "check your unit, Territory, currentLevel and TargetLevel and try again");
                                             System.out.println("Please entry your behavior in this format:Unit Territory currentLevel targetLevel");
@@ -406,8 +405,8 @@ public class Player {
                                         String[] tokens = behaviorInfo.split(" ");
                                         behavior = new upgradeBehavior(getTerritoryByName(tokens[1], currentMap), gameInfoList.get(currentGame).getPlayerID(), "Upgrade", Integer.parseInt(tokens[2]), Integer.parseInt(tokens[3]), Integer.parseInt(tokens[0]));
                                         // check if the unit and source is correct for the behavior
-                                        if (checkUpgrade.checkBehavior(behavior, currentMap) != null) {
-                                            System.out.println(ruleChecker.checkBehavior(behavior, currentMap));
+                                        if (upgradeChecker.checkMyRule(behavior, currentMap) != null) {
+                                            System.out.println(upgradeChecker.checkMyRule(behavior, currentMap));
                                             behavior = null;
                                         }
                                     }

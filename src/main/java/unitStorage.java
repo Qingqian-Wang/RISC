@@ -8,6 +8,12 @@ public class unitStorage {
 
     public ArrayList<Integer> cost;
 
+    private int remainUnits;
+
+    private int highestLevel;
+
+    private int lowestLevel;
+
     // upgrade will reduce the specified amount of units from the current level and add them to the target level
     public void upgrade(int amount, int currLevel, int targetLevel){
         if (units.get(currLevel) >= amount){
@@ -122,7 +128,8 @@ public class unitStorage {
         for(int i = 0; i < 7; i++){
             res += units.get(i);
         }
-        return res;
+        remainUnits = res;
+        return remainUnits;
     }
 
     public int getHighestLevel(){
@@ -132,7 +139,8 @@ public class unitStorage {
                 res = i;
             }
         }
-        return res;
+        highestLevel = res;
+        return highestLevel;
     }
 
     public int getLowestLevel(){
@@ -142,7 +150,8 @@ public class unitStorage {
                 res = i;
             }
         }
-        return res;
+        lowestLevel = res;
+        return lowestLevel;
     }
 
 

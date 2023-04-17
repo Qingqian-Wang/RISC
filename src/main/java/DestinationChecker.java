@@ -14,6 +14,7 @@ public class DestinationChecker extends BasicChecker {
         super(next);
     }
 
+
     Territory findTerritory(String str, ArrayList<Territory> t) {
         for (Territory territory : t) {
             if (territory.getName().equals(str)) {
