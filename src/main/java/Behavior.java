@@ -13,6 +13,9 @@ public class Behavior implements Serializable {
     int ownID;// The unique ID of the player performing the behavior
     String type; // The type of behavior being performed
 
+
+
+
     public Behavior(Territory origin, Territory destination, ArrayList<Integer> unitsTemp, int ownID, String type) {
         this.origin = origin;
         this.destination = destination;
