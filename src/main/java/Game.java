@@ -18,6 +18,7 @@ public class Game implements Runnable{
 
     // store the rest cost of each player
     private ArrayList<Integer> restCost;
+
     /*
      * Constructor to create a Server object
      *
@@ -34,6 +35,10 @@ public class Game implements Runnable{
         serverSocket = new ServerSocket(this.port);
         ruleChecker = new OriginChecker(new DestinationChecker(null));
         upgradeChecker = new UpgradeChecker();
+        restCost = new ArrayList<>();
+        for(int i = 0; i < maxPlayerNum; i++){
+            restCost.add(50);
+        }
     }
     /*
      * Accepts players to the game
@@ -137,7 +142,7 @@ public class Game implements Runnable{
 
     private void addCost(){
         for (int i = 0; i < map.size(); i++) {
-            restCost.set(map.get(i).getOwnID(), restCost.get(map.get(i).getOwnID()) + 10);
+            restCost.set(map.get(i).getOwnID() - 1, restCost.get(map.get(i).getOwnID() - 1) + 10);
         }
     }
 
@@ -285,6 +290,7 @@ public class Game implements Runnable{
         HashMap<Integer, BehaviorList> orderMap = new HashMap<>();
         ArrayList<Behavior> attackList = new ArrayList<>();
         ArrayList<Behavior> moveList = new ArrayList<>();
+        ArrayList<ArrayList<Integer>> evolveList = new ArrayList<>();
         ArrayList<upgradeBehavior> upgradeList = new ArrayList<>();
         for (PlayerInfo playerInfo : playerInfoList) {
             playerInfo.getOut().println("Turn Start");
@@ -307,7 +313,10 @@ public class Game implements Runnable{
             attackList.addAll(orderMap.get(i).getAttackList());
             moveList.addAll(orderMap.get(i).getMoveList());
             upgradeList.addAll(orderMap.get(i).getUpgradeList());
+            // update restCost
+            restCost.set(orderMap.get(i).getPlayerID() - 1, orderMap.get(i).getRestCost());
         }
+
         checkAndExecuteMoveBehavior(moveList);
         checkAndExecuteAttackBehavior(attackList);
         checkAndExecuteUpgradeBehavior(upgradeList);

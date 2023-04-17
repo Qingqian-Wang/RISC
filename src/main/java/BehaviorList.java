@@ -1,6 +1,8 @@
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /*
  * This class represents a list of behaviors performed by a player during a game.
@@ -13,7 +15,7 @@ public class BehaviorList implements NetworkObject, Serializable {
 
     private ArrayList<upgradeBehavior> upgradeList;// A list of behaviors related to upgrade
 
-    private ArrayList<Integer> upgradeMaxLevelList;// 0 is level , 1 is cost
+    private int restCost;// playerID and rest cost
     private int playerID;// The ID of the player who performed the behaviors
     public int status; // -1 means disconnect; 0 means dead; 1 means live
 
@@ -22,7 +24,7 @@ public class BehaviorList implements NetworkObject, Serializable {
         moveList = new ArrayList<>();
         attackList = new ArrayList<>();
         upgradeList = new ArrayList<>();
-        upgradeMaxLevelList = new ArrayList<>();
+        restCost = -1;
         this.status = 0;
     }
     public BehaviorList(int playerID, int status) {
@@ -30,7 +32,7 @@ public class BehaviorList implements NetworkObject, Serializable {
         moveList = new ArrayList<>();
         attackList = new ArrayList<>();
         upgradeList = new ArrayList<>();
-        upgradeMaxLevelList = new ArrayList<>();
+        restCost = -1;
         this.status = status;
     }
 
@@ -60,14 +62,17 @@ public class BehaviorList implements NetworkObject, Serializable {
         return playerID;
     }
 
-    // getter of upgradeMaxLevelList
-    public ArrayList<Integer> getUpgradeMaxLevelList() {
-    	return upgradeMaxLevelList;
+    // getter of restCost
+    public int getRestCost() {
+        return restCost;
     }
 
-    public void setUpgradeMaxLevelList(ArrayList<Integer> upgradeMaxLevelList) {
-        this.upgradeMaxLevelList = upgradeMaxLevelList;
+
+    // setter of restCost
+    public void setRestCost(int restCost) {
+        this.restCost = restCost;
     }
+
 
     /*
      * Sends the BehaviorList object over an ObjectOutputStream.
