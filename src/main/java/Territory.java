@@ -24,7 +24,7 @@ public class Territory implements Serializable {
         return this.ownID;
     }
 
-    public unitStorage getUnit() {
+    public unitStorage getUnits() {
         return this.units;
     }
 

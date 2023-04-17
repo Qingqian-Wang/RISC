@@ -18,8 +18,12 @@ public class unitStorage {
         }
     }
 
+    // init all level to 0
     public unitStorage(){
         units = new HashMap<>();
+        for(int i = 0; i < 7; i++){
+            units.put(i, 0);
+        }
     }
 
 
@@ -58,9 +62,12 @@ public class unitStorage {
     }
 
 
-    // add specific amount of units to the level 0
+    // add specific amount of units to the level 0, and initialize all other levels to 0
     public void initUnit(int num){
         units.put(0, num);
+        for(int i = 1; i < 7; i++){
+            units.put(i, 0);
+        }
     }
 
     // add specific amount of units to the specified level
@@ -77,9 +84,64 @@ public class unitStorage {
         }
     }
 
+    public void addUnitStorage(unitStorage u){
+        for(int i = 0; i < 7; i++){
+            units.put(i, units.get(i) + u.getUnits().get(i));
+        }
+    }
+
+    public void setUnitsStorage(unitStorage u){
+        for(int i = 0; i < 7; i++){
+            units.put(i, u.getUnits().get(i));
+        }
+    }
+
+    public void removeUnitStorage(unitStorage u){
+        for(int i = 0; i < 7; i++){
+            units.put(i, units.get(i) - u.getUnits().get(i));
+        }
+    }
+
 
     // get units
     public Map<Integer, Integer> getUnits() {
         return units;
+    }
+
+    // print the units in the format as 0|1|2|3|4|5|6
+    public String printUnits(){
+        String res = "";
+        for(int i = 0; i < 7; i++){
+            res += units.get(i) + "|";
+        }
+        return res;
+    }
+
+    public int getRemainUnits(){
+        int res = 0;
+        for(int i = 0; i < 7; i++){
+            res += units.get(i);
+        }
+        return res;
+    }
+
+    public int getHighestLevel(){
+        int res = 0;
+        for(int i = 0; i < 7; i++){
+            if(units.get(i) > 0){
+                res = i;
+            }
+        }
+        return res;
+    }
+
+    public int getLowestLevel(){
+        int res = 6;
+        for(int i = 6; i >= 0; i--){
+            if(units.get(i) > 0){
+                res = i;
+            }
+        }
+        return res;
     }
 }
