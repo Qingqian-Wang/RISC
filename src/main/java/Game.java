@@ -14,7 +14,7 @@ public class Game implements Runnable{
     public int maxPlayerNum;
     public ServerSocket serverSocket;
     private BasicChecker ruleChecker;
-    private BasicChecker upgradeChecker;
+    private UpgradeChecker upgradeChecker;
     /*
      * Constructor to create a Server object
      *
@@ -30,6 +30,7 @@ public class Game implements Runnable{
         this.maxPlayerNum = maxPlayerNum;
         serverSocket = new ServerSocket(this.port);
         ruleChecker = new OriginChecker(new DestinationChecker(null));
+        upgradeChecker = new UpgradeChecker();
     }
     /*
      * Accepts players to the game
@@ -92,7 +93,8 @@ public class Game implements Runnable{
             String[] tokens = unitInfo.split(" ");
             for (int i = 0; i < tokens.length; i++) {
                 Territory temp = map.get(territoryOwner[playerInfo.getPlayerID() - 1][i]);
-                temp.setUnit(Integer.parseInt(tokens[i]));
+                temp.getUnits().initUnit(Integer.parseInt(tokens[i]));
+//                temp.setUnit(Integer.parseInt(tokens[i]));
                 map.set(territoryOwner[playerInfo.getPlayerID() - 1][i], temp);
             }
 //            dataOut.close();
@@ -130,10 +132,10 @@ public class Game implements Runnable{
         }
     }
     //=======================================upgrade function =====================
-    private void checkAndExecuteUpgradeBehavior(ArrayList<Behavior> behaviorArrayList) {  // checkandupdate
-        for (Behavior b : behaviorArrayList) {
-            if (upgradeChecker.checkBehavior(b, map) == null) {
-                executeUpgradeBehavior((upgradeBehavior) b);
+    private void checkAndExecuteUpgradeBehavior(ArrayList<upgradeBehavior> behaviorArrayList) {  // checkandupdate
+        for (upgradeBehavior b : behaviorArrayList) {
+            if (upgradeChecker.checkMyRule(b, map) == null) {
+                executeUpgradeBehavior(b);
             }
         }
     }
@@ -263,20 +265,7 @@ public class Game implements Runnable{
 
     }
 
-    public ArrayList<Integer> getOwnIDList(){
-        ArrayList<Integer> res = new ArrayList<>();
-        for(Territory t:map){
-            res.add(t.getOwnID());
-        }
-        return res;
-    }
-    public ArrayList<Integer> getUnitsList(){
-        ArrayList<Integer> res = new ArrayList<>();
-        for(Territory t:map){
-            res.add(t.getUnit());
-        }
-        return res;
-    }
+
     public void playTurn() throws Exception {
         List<Integer> orders = new ArrayList<>();
         for (int i = 1; i <= playerInfoList.size(); i++) {
@@ -286,6 +275,7 @@ public class Game implements Runnable{
         HashMap<Integer, BehaviorList> orderMap = new HashMap<>();
         ArrayList<Behavior> attackList = new ArrayList<>();
         ArrayList<Behavior> moveList = new ArrayList<>();
+        ArrayList<upgradeBehavior> upgradeList = new ArrayList<>();
         for (PlayerInfo playerInfo : playerInfoList) {
             playerInfo.getOut().println("Turn Start");
             sendPlayerStatus(playerInfo);
@@ -305,9 +295,11 @@ public class Game implements Runnable{
         for (int i = 1; i <= playerInfoList.size(); i++) {
             attackList.addAll(orderMap.get(i).getAttackList());
             moveList.addAll(orderMap.get(i).getMoveList());
+            upgradeList.addAll(orderMap.get(i).getUpgradeList());
         }
         checkAndExecuteMoveBehavior(moveList);
         checkAndExecuteAttackBehavior(attackList);
+        checkAndExecuteUpgradeBehavior(upgradeList);
         addOneUnit();
     }
 
