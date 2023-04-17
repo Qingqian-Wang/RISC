@@ -18,6 +18,20 @@ public class unitStorage {
         }
     }
 
+    public unitStorage(){
+        units = new HashMap<>();
+    }
+
+
+
+    // constructor units by an arraylist
+    public unitStorage(ArrayList<Integer> unitsTemp){
+        units = new HashMap<>();
+        for(int i = 0; i < unitsTemp.size(); i++){
+            units.put(i, unitsTemp.get(i));
+        }
+    }
+
     // cal the cost of upgrading the specified amount of units from the current level to the target level
     // Cost (Total)  Tech Level Required
     //  0 (0)        Units start here

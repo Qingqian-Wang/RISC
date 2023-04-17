@@ -25,6 +25,8 @@ public class Player {
 
     private BasicChecker ruleChecker;
 
+    private BasicChecker checkUpgrade;
+
     public int watchingPattern = 0;
 
     // initialize  player by server port number
@@ -58,6 +60,25 @@ public class Player {
         return false;
     }
 
+
+    private boolean checkAttackBehavior(String s, ArrayList<Territory> map){
+        String[] tokens = s.split(" ");
+        if(tokens.length != 4){
+            return false;
+        }
+        try{
+            int number = Integer.parseInt(tokens[0]);
+            if(number <= 0){
+                return false;
+            }
+        }catch (NumberFormatException e){
+            return false;
+        }
+        return checkBehaviorInputFormatHelper(tokens[1], map);
+    }
+
+
+
     // check if the format of input for creating behavior is correct
     private boolean checkBehaviorInputFormat(String s, ArrayList<Territory> map) {
         String[] tokens = s.split(" ");
@@ -65,9 +86,12 @@ public class Player {
             return false;
         }
         try {
-            int number = Integer.parseInt(tokens[0]);
-            if (number <= 0) {
-                return false;
+            ArrayList<Integer> unit = new ArrayList<>();
+            for (int i = 0; i < 7; i++) {
+                unit.add(Integer.parseInt(tokens[0].split("|")[i]));
+                if(unit.get(i) < 0){
+                    return false;
+                }
             }
         } catch (NumberFormatException e) {
             return false;
@@ -86,14 +110,14 @@ public class Player {
         return null;
     }
 
-    // use the info of OwnID and Unit to update GlobalMap object
-    private void updateMap(GlobalMap gm, ArrayList<Integer> ownID, ArrayList<Integer> UnitInfo){
-
-        for(int i = 0; i < ownID.size(); i++){
-            gm.getMapArrayList().get(i).setOwnID(ownID.get(i));
-            gm.getMapArrayList().get(i).setUnit(UnitInfo.get(i));
-        }
-    }
+//    // use the info of OwnID and Unit to update GlobalMap object
+//    private void updateMap(GlobalMap gm, ArrayList<Integer> ownID, ArrayList<Integer> UnitInfo){
+//
+//        for(int i = 0; i < ownID.size(); i++){
+//            gm.getMapArrayList().get(i).setOwnID(ownID.get(i));
+//            gm.getMapArrayList().get(i).setUnit(UnitInfo.get(i));
+//        }
+//    }
 
 
 
@@ -196,16 +220,18 @@ public class Player {
                             System.out.println("You are player " + playerID + ", what would you like to do?");
                             System.out.println("(M)ove");
                             System.out.println("(A)ttack");
+                            System.out.println("(U)pgrade");
                             System.out.println("(D)one");
                             InputStreamReader sr = new InputStreamReader(System.in);
                             BufferedReader bf = new BufferedReader(sr);
                             String response = bf.readLine();
                             while (response.length() != 1 || (response.toUpperCase().charAt(0) != 'M'
-                                    && response.toUpperCase().charAt(0) != 'A' && response.toUpperCase().charAt(0) != 'D')) {
+                                    && response.toUpperCase().charAt(0) != 'A' && response.toUpperCase().charAt(0) != 'D' && response.toUpperCase().charAt(0) != 'U')) {
                                 System.out.println("Your input is not in correct format, try again");
                                 System.out.println("You are player " + playerID + ", what would you like to do?");
                                 System.out.println("(M)ove");
                                 System.out.println("(A)ttack");
+                                System.out.println("(U)pgrade");
                                 System.out.println("(D)one");
                                 response = bf.readLine();
                             }
@@ -213,7 +239,7 @@ public class Player {
                             if (response.toUpperCase().charAt(0) == 'M' || response.toUpperCase().charAt(0) == 'A') {
                                 Behavior behavior = null;
                                 while (behavior == null) {
-                                    System.out.println("Please entry your behavior in this format:Unit SourceTerritory DestinationTerritory");
+                                    System.out.println("Please entry your behavior in this format:Unit(level0|1|2|3|4|5|6 ) SourceTerritory DestinationTerritory");
                                     String behaviorInfo = bf.readLine();
                                     while (!checkBehaviorInputFormat(behaviorInfo, currentMap)) {
                                         System.out.println("Your input is not in correct format, please " +
@@ -222,11 +248,18 @@ public class Player {
                                         behaviorInfo = bf.readLine();
                                     }
                                     String[] tokens = behaviorInfo.split(" ");
-                                    if (response.toUpperCase().charAt(0) == 'M') {// move behavior initialize
-                                        behavior = new Behavior(getTerritoryByName(tokens[1], currentMap), getTerritoryByName(tokens[2], currentMap), Integer.parseInt(tokens[0]), playerID, "Move");
-                                    } else {// attack behavior initialize
-                                        behavior = new Behavior(getTerritoryByName(tokens[1], currentMap), getTerritoryByName(tokens[2], currentMap), Integer.parseInt(tokens[0]), playerID, "Attack");
+                                    ArrayList<Integer> unit = new ArrayList<>();
+                                    for (int i = 0; i < 7; i++) {
+                                        unit.add(Integer.parseInt(tokens[0].split("|")[i]));
                                     }
+
+                                    if (response.toUpperCase().charAt(0) == 'M') {// move behavior initialize
+                                        behavior = new Behavior(getTerritoryByName(tokens[1], currentMap), getTerritoryByName(tokens[2], currentMap), unit, playerID, "Move");
+                                    } else if(response.toUpperCase().charAt(0) == 'A'){// attack behavior initialize
+                                        behavior = new Behavior(getTerritoryByName(tokens[1], currentMap), getTerritoryByName(tokens[2], currentMap), unit, playerID, "Attack");
+                                    }
+
+
                                     // check if the unit and source is correct for the behavior
                                     if (ruleChecker.checkBehavior(behavior, currentMap) != null) {
                                         System.out.println(ruleChecker.checkBehavior(behavior, currentMap));
@@ -239,6 +272,37 @@ public class Player {
                                 } else {
                                     behaviorList.addToAttackList(behavior);
                                 }
+                            } else if (response.toUpperCase().charAt(0) == 'U') {
+
+
+                                upgradeBehavior behavior = null;
+                                while (behavior == null) {
+                                    System.out.println("Please entry your behavior in this format:Unit Territory currentLevel targetLevel");
+                                    String behaviorInfo = bf.readLine();
+                                    while (!checkAttackBehavior(behaviorInfo, currentMap)) {// check here need more change
+                                        System.out.println("Your input is not in correct format, please " +
+                                                "check your unit, Territory, currentLevel and TargetLevel and try again");
+                                        System.out.println("Please entry your behavior in this format:Unit Territory currentLevel targetLevel");
+                                        behaviorInfo = bf.readLine();
+                                    }
+                                    String[] tokens = behaviorInfo.split(" ");
+
+                                    behavior = new upgradeBehavior(getTerritoryByName(tokens[1], currentMap), playerID,"Upgrade", Integer.parseInt(tokens[2]), Integer.parseInt(tokens[3]), Integer.parseInt(tokens[0]));
+
+
+                                    // check if the unit and source is correct for the behavior
+                                    if (checkUpgrade.checkBehavior(behavior, currentMap) != null) {
+                                        System.out.println(ruleChecker.checkBehavior(behavior, currentMap));
+                                        behavior = null;
+                                    }
+                                }
+                                // add to arraylist based on the type of behavior
+                                behaviorList.addToUpgradeList(behavior);
+
+
+
+
+
                             } else if (response.toUpperCase().charAt(0) == 'D') {// end turn
                                 out.println(objectMapper.writeValueAsString(behaviorList));
                                 break;

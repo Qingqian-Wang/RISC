@@ -6,13 +6,13 @@ import java.util.Map;
 public class Territory implements Serializable {
     private final String name;
     private int ownID;
-    private int units;
+    private unitStorage units;
     private HashMap<Integer, ArrayList<String>> neighbor;
 
     public Territory(String name, int ownID) {
         this.name = name;
         this.ownID = ownID;
-        this.units = 0;
+        this.units = new unitStorage();
         this.neighbor = new HashMap<Integer, ArrayList<String>>();
     }
 
@@ -24,7 +24,7 @@ public class Territory implements Serializable {
         return this.ownID;
     }
 
-    public int getUnit() {
+    public unitStorage getUnit() {
         return this.units;
     }
 
@@ -36,8 +36,12 @@ public class Territory implements Serializable {
         this.ownID = id;
     }
 
-    public void setUnit(int num) {
-        this.units = num;
+    public void addUnit(int num, int level) {
+        this.units.addUnits(num, level);
+    }
+
+    public void removeUnit(int num, int level) {
+        this.units.removeUnits(num, level);
     }
 
     // based on territory id, find its name in hashmap
