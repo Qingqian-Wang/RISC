@@ -136,21 +136,21 @@ public class Player {
 
 
     // return -1 if failed, return cost if pass the check
-    private int checkEvolevelBehavior(String s, int cost, int maxTechLevel){
+    private int checkEvolevelBehavior(String s, int maxTechLevel){
         int[] totalCost = {0, 0, 50, 75, 125, 200, 300};
         int sum = 0;
         try{
             int number = Integer.parseInt(s);
             int sumCost = 0;
-            for(int i = 0; i < number; i++){
+            for(int i = 0; i <= number; i++){
                 sumCost += totalCost[i];
             }
             int sumHelper = 0;
-            for (int i = 0; i < maxTechLevel; i++){
+            for (int i = 0; i <= maxTechLevel; i++){
                 sumHelper += totalCost[i];
             }
             sum = sumCost - sumHelper;
-            if(number <= maxTechLevel || sum > cost || number > 6 || number < 1){
+            if(number <= maxTechLevel || number > 6 || number < 1){
                 return -1;
             }
         }catch (NumberFormatException e){
@@ -318,7 +318,7 @@ public class Player {
                         // print the current map information
                         StringBuilder sb = new StringBuilder();
                         for (int i = 1; i <= gameInfoList.get(currentGame).getTotalPlayerNum(); i++) {
-                            sb.append("Player").append(i).append(":").append(System.lineSeparator());
+                            sb.append("Player").append(i).append(":").append("level"+gameInfoList.get(currentGame).getMaximumTechNum()).append(System.lineSeparator());
                             for (Territory territory : currentMap) {
                                 if (territory.getOwnID() == i) {
                                     sb.append(territory.getUnits().printUnits() + " units in " + territory.getName() +
@@ -365,6 +365,7 @@ public class Player {
                                 System.out.println("(U)pgrade");
                                 System.out.println("(E)volve");
                                 System.out.println("(D)one");
+                                System.out.println("now you have " + gameInfoList.get(currentGame).getRestCost() +" cost left");
                                 InputStreamReader sr = new InputStreamReader(System.in);
                                 BufferedReader bf = new BufferedReader(sr);
                                 String response = bf.readLine();
@@ -377,6 +378,7 @@ public class Player {
                                     System.out.println("(U)pgrade");
                                     System.out.println("(E)volve");
                                     System.out.println("(D)one");
+                                    System.out.println("now you have " + gameInfoList.get(currentGame).getRestCost() +" cost left");
                                     response = bf.readLine();
                                 }
                                 // get behavior type
@@ -443,21 +445,27 @@ public class Player {
                                 } else if (response.toUpperCase().charAt(0) == 'E') {
                                     int Evolevel = -1;
                                     while (Evolevel == -1) {
-                                        System.out.println("Please entry your behavior in this format:Unit Territory currentLevel targetLevel, \nif you already set the evolve level, this command will reset the evolve level");
+                                        System.out.println("now you are at level " + gameInfoList.get(currentGame).getMaximumTechNum());
+                                        System.out.println("you want to evolve to level: ");
                                         String behaviorInfo = bf.readLine();
                                         int sum = -1;
-                                        while ((sum = checkEvolevelBehavior(behaviorInfo, gameInfoList.get(currentGame).getRestCost(), gameInfoList.get(currentGame).getMaximumTechNum())) == -1) {// check here need more change
+                                        while ((sum = checkEvolevelBehavior(behaviorInfo, gameInfoList.get(currentGame).getMaximumTechNum())) == -1) {// check here need more change
                                             System.out.println("Your input is not in correct format, please " +
                                                     "check your unit, Territory, currentLevel and TargetLevel and try again");
                                             System.out.println("Please entry your behavior in this format:Unit Territory currentLevel targetLevel");
                                             behaviorInfo = bf.readLine();
                                         }
+                                        if(sum > gameInfoList.get(currentGame).getRestCost()){
+                                            System.out.println("you don't have enough cost to evolve to this level");
+                                            break;
+                                        }
                                         Evolevel = Integer.parseInt(behaviorInfo);
-                                        ArrayList<Integer> tempMaxLevel = new ArrayList<>();
-                                        tempMaxLevel.add(Evolevel, sum);
-                                        behaviorList.setUpgradeMaxLevelList(tempMaxLevel);
+                                        gameInfoList.get(currentGame).setRestCost(gameInfoList.get(currentGame).getRestCost() - sum);
+                                        gameInfoList.get(currentGame).setMaximumTechNum(Evolevel);
+
                                     }
                                 } else if (response.toUpperCase().charAt(0) == 'D') {// end turn
+                                    behaviorList.setRestCost(gameInfoList.get(currentGame).getRestCost());
                                     out.println(objectMapper.writeValueAsString(behaviorList));
                                     break;
                                 }
