@@ -52,11 +52,9 @@ public class Server {
             out.println("There currently are "+gamePortList.size()+" games run on this server.");
             ObjectMapper objectMapper = new ObjectMapper();
             out.println(objectMapper.writeValueAsString(gamePortList));
-            int count = 0;
             for(int j = 0; j < gameCurrentPlayerNum.size();j++){
                 if(gameCurrentPlayerNum.get(j)<gameMaxPlayerNum.get(j)){
                     out.println("A:Game "+(j+1)+" is available");
-                    count++;
                 } else {
                     out.println("U:Game "+(j+1)+" is unavailable");
                 }
@@ -64,8 +62,8 @@ public class Server {
             String response = in.readLine();
             if(response.length()!=0){
                 String[] tokens = response.split(" ");
-                for(int j = 0; j < tokens.length;j++){
-                    gameCurrentPlayerNum.set(Integer.parseInt(tokens[j])-1,gameCurrentPlayerNum.get(Integer.parseInt(tokens[j])-1)+1);
+                for (String token : tokens) {
+                    gameCurrentPlayerNum.set(Integer.parseInt(token) - 1, gameCurrentPlayerNum.get(Integer.parseInt(token) - 1) + 1);
                 }
             }
             playerRestNum = 0;

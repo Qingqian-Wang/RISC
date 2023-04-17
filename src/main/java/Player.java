@@ -1,7 +1,9 @@
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.*;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,9 +15,7 @@ public class Player {
     public ArrayList<Integer> joinGameList;
     public ArrayList<Integer> gamePortList;
     public int currentGame;
-
     public int serverPort;
-
     private final BasicChecker ruleChecker;
 
     // initialize  player by server port number
