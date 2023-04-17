@@ -14,6 +14,8 @@ public class Server {
     public int port;
     public ServerSocket serverSocket;
     private BasicChecker ruleChecker;
+
+    private BasicChecker upgradeChecker;
     /*
      * Constructor to create a Server object
      *
@@ -232,6 +234,7 @@ public class Server {
         HashMap<Integer, BehaviorList> orderMap = new HashMap<>();
         ArrayList<Behavior> attackList = new ArrayList<>();
         ArrayList<Behavior> moveList = new ArrayList<>();
+        ArrayList<Behavior> upgradeList = new ArrayList<>();
         for (PlayerInfo playerInfo : playerInfoList) {
             playerInfo.getOut().println("Turn Start");
             sendPlayerStatus(playerInfo);
@@ -251,11 +254,41 @@ public class Server {
         for (int i = 1; i <= playerInfoList.size(); i++) {
             attackList.addAll(orderMap.get(i).getAttackList());
             moveList.addAll(orderMap.get(i).getMoveList());
+            upgradeList.addAll(orderMap.get(i).getUpgradeList());
         }
         checkAndExecuteMoveBehavior(moveList);
         checkAndExecuteAttackBehavior(attackList);
+        checkAndExecuteUpgradeBehavior(upgradeList);
         addOneUnit();
     }
+
+    //=======================================upgrade function =====================
+    private void checkAndExecuteUpgradeBehavior(ArrayList<Behavior> behaviorArrayList) {  // checkandupdate
+        for (Behavior b : behaviorArrayList) {
+            if (upgradeChecker.checkBehavior(b, map) == null) {
+                executeUpgradeBehavior((upgradeBehavior) b);
+            }
+        }
+    }
+
+    private void executeUpgradeBehavior(upgradeBehavior b) {
+        String sourceName = b.getOrigin().getName();
+        int unitsNum = b.getUnitsNum();
+        int currLevel = b.getCurrLevel();
+        int targetLevel = b.getTargetLevel();
+        for (int i = 0; i < map.size(); i++) {
+            if (sourceName.equals(map.get(i).getName())) {
+                map.get(i).getUnits().removeUnits(unitsNum, currLevel);
+                map.get(i).getUnits().addUnits(unitsNum, targetLevel);
+                break;
+            }
+        }
+
+        System.out.println("Upgrade "+ b.getUnitsNum()+" soldiers from level"+ b.getCurrLevel() + " to level "+b.getTargetLevel()+" at " +sourceName);
+    }
+
+
+    // ======================================the end of upgrade function================
 
     private void executeMoveBehavior(Behavior b) {
         String sourceName = b.getOrigin().getName();

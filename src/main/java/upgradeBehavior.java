@@ -13,5 +13,19 @@ public class upgradeBehavior extends Behavior{
         this.upgradeCost = units.calCost(currLevel, targetLevel, unitsNum);
     }
 
+    public int getCurrLevel() {
+        return currLevel;
+    }
 
+    public int getTargetLevel() {
+        return targetLevel;
+    }
+
+    public int getUnitsNum() {
+        return unitsNum;
+    }
+
+    public int getUpgradeCost() {
+        return upgradeCost;
+    }
 }
