@@ -89,4 +89,10 @@ public class GameInfo {
     public void setWatchingPattern(int watchingPattern) {
         this.watchingPattern = watchingPattern;
     }
+
+    public void disconnect() throws IOException {
+        in.close();
+        out.close();
+        clientSocket.close();
+    }
 }
