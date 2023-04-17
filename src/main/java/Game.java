@@ -11,8 +11,10 @@ public class Game implements Runnable{
 
     public ArrayList<Territory> map;
     public int port;
+    public int maxPlayerNum;
     public ServerSocket serverSocket;
     private BasicChecker ruleChecker;
+    private BasicChecker upgradeChecker;
     /*
      * Constructor to create a Server object
      *
@@ -21,10 +23,11 @@ public class Game implements Runnable{
      *
      * @throws IOException if an I/O error occurs when opening the server socket
      */
-    public Game(int port) throws IOException {
+    public Game(int port, int maxPlayerNum) throws IOException {
         playerInfoList = new ArrayList<>();
         map = new ArrayList<>();
         this.port = port;
+        this.maxPlayerNum = maxPlayerNum;
         serverSocket = new ServerSocket(this.port);
         ruleChecker = new OriginChecker(new DestinationChecker(null));
     }
@@ -35,13 +38,13 @@ public class Game implements Runnable{
      *
      * @throws IOException if an I/O error occurs when waiting for a connection
      */
-    public void acceptPlayer(int playerNum) throws IOException {
-        for (int i = 0; i < playerNum; i++) {
+    public void acceptPlayer() throws IOException {
+        for (int i = 0; i < maxPlayerNum; i++) {
             Socket playerSocket = serverSocket.accept();
             PlayerInfo p = new PlayerInfo(playerSocket, i + 1);
             DataOutputStream dataOut = new DataOutputStream(p.getPlayerSocket().getOutputStream());
             dataOut.writeInt(i + 1);
-            dataOut.writeInt(playerNum);
+            dataOut.writeInt(maxPlayerNum);
             System.out.println("Accept new connection from " + playerSocket.getInetAddress());
             playerInfoList.add(p);
             System.out.println("Added player" + p.getPlayerID() + " to list");
@@ -55,6 +58,11 @@ public class Game implements Runnable{
 
     @Override
     public void run() {
+        try {
+            acceptPlayer();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         initializeMap();
         int[][] territoryOwner;
         if (playerInfoList.size() == 2) {
@@ -75,7 +83,9 @@ public class Game implements Runnable{
 //            dataOut.writeInt(totalUnit);
             String unitInfo = null;
             try {
-                unitInfo = playerInfo.getIn().readLine();
+                while(unitInfo==null){
+                    unitInfo = playerInfo.getIn().readLine();
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -115,10 +125,37 @@ public class Game implements Runnable{
      */
     private void addOneUnit(){
         for (int i = 0; i < map.size(); i++) {
-            int unit = map.get(i).getUnit() + 1;
-            map.get(i).setUnit(unit);
+//            int unit = map.get(i).getUnits().addUnits(1, 0);
+            map.get(i).getUnits().addUnits(1, 0);
         }
     }
+    //=======================================upgrade function =====================
+    private void checkAndExecuteUpgradeBehavior(ArrayList<Behavior> behaviorArrayList) {  // checkandupdate
+        for (Behavior b : behaviorArrayList) {
+            if (upgradeChecker.checkBehavior(b, map) == null) {
+                executeUpgradeBehavior((upgradeBehavior) b);
+            }
+        }
+    }
+
+    private void executeUpgradeBehavior(upgradeBehavior b) {
+        String sourceName = b.getOrigin().getName();
+        int unitsNum = b.getUnitsNum();
+        int currLevel = b.getCurrLevel();
+        int targetLevel = b.getTargetLevel();
+        for (int i = 0; i < map.size(); i++) {
+            if (sourceName.equals(map.get(i).getName())) {
+                map.get(i).getUnits().removeUnits(unitsNum, currLevel);
+                map.get(i).getUnits().addUnits(unitsNum, targetLevel);
+                break;
+            }
+        }
+
+        System.out.println("Upgrade "+ b.getUnitsNum()+" soldiers from level"+ b.getCurrLevel() + " to level "+b.getTargetLevel()+" at " +sourceName);
+    }
+
+
+    // ======================================the end of upgrade function================
 
 
     /*
@@ -277,23 +314,23 @@ public class Game implements Runnable{
     private void executeMoveBehavior(Behavior b) {
         String sourceName = b.getOrigin().getName();
         String destName = b.getDestination().getName();
-        int unit = b.getUnit();
+        unitStorage units = b.getUnits();
         for (int i = 0; i < map.size(); i++) {
             if (sourceName.equals(map.get(i).getName())) {
-                map.get(i).setUnit(map.get(i).getUnit() - unit);
+                map.get(i).getUnits().removeUnitStorage(units);
                 break;
             }
         }
         for (int i = 0; i < map.size(); i++) {
             if (destName.equals(map.get(i).getName())) {
-                map.get(i).setUnit(map.get(i).getUnit() + unit);
+                map.get(i).getUnits().addUnitStorage(units);
                 break;
             }
         }
-        System.out.println("Move "+unit+" from "+sourceName+" to " +destName);
+        System.out.println("Move "+units.printUnits()+" from "+sourceName+" to " +destName);
     }
 
-    private void checkAndExecuteMoveBehavior(ArrayList<Behavior> behaviorArrayList) {
+    private void checkAndExecuteMoveBehavior(ArrayList<Behavior> behaviorArrayList) {  // checkandupdate
         for (Behavior b : behaviorArrayList) {
             if (ruleChecker.checkBehavior(b, map) == null) {
                 executeMoveBehavior(b);
@@ -303,19 +340,18 @@ public class Game implements Runnable{
 
     private void moveUnitCuzAttack(Behavior b) {
         String sourceName = b.getOrigin().getName();
-        int unit = b.getUnit();
+        unitStorage units = b.getUnits();
         for (int i = 0; i < map.size(); i++) {
             if (sourceName.equals(map.get(i).getName())) {
-                map.get(i).setUnit(map.get(i).getUnit() - unit);
+                map.get(i).getUnits().removeUnitStorage(units);
                 break;
             }
         }
     }
-
-    private boolean getAttackResult() {
+    private boolean getAttackResult(int attackerBonus, int defenderBonus) {
         Random rand = new Random();
-        int attacker = rand.nextInt(20) + 1;
-        int defender = rand.nextInt(20) + 1;
+        int attacker = rand.nextInt(20) + 1 + attackerBonus;
+        int defender = rand.nextInt(20) + 1 + defenderBonus;
         return attacker > defender;
     }
 
@@ -332,24 +368,36 @@ public class Game implements Runnable{
 
     private void executeAttackBehavior(Behavior b) {
         String destName = b.getDestination().getName();
-        int unit = b.getUnit();
-        System.out.println("Attack from "+b.getOrigin().getName()+" to "+ destName+" using "+unit+" units.");
+        unitStorage units = b.getUnits();
+        System.out.println("Attack from "+b.getOrigin().getName()+" to "+ destName+" using "+units.printUnits()+" units.");
         for (int i = 0; i < map.size(); i++) {
             if (destName.equals(map.get(i).getName())) {
-                while (unit != 0 && map.get(i).getUnit() != 0) {
-                    if (getAttackResult()) {
-                        map.get(i).setUnit(map.get(i).getUnit() - 1);
+                int sig = 0;
+                while (units.getRemainUnits() != 0 && map.get(i).getUnits().getRemainUnits() != 0) {
+                    sig++;
+                    int attackerBonus = 0;
+                    int defenderBonus = 0;
+                    if(sig % 2 == 1){
+                        attackerBonus = units.getHighestLevel();
+                        defenderBonus = map.get(i).getUnits().getLowestLevel();
+                    }else {
+                        attackerBonus = units.getLowestLevel();
+                        defenderBonus = map.get(i).getUnits().getHighestLevel();
+                    }
+
+                    if (getAttackResult(attackerBonus, defenderBonus)) {
+                        map.get(i).getUnits().removeUnits(1, defenderBonus);
                     } else {
-                        unit--;
+                        units.removeUnits(1, attackerBonus);
                     }
                 }
-                if (unit != 0) {
-                    System.out.println("Attack Success, remain "+unit+" units");
+                if (units.getRemainUnits() != 0) {
+                    System.out.println("Attack Success, remain "+units.printUnits()+" units");
                     map.get(i).setOwnID(b.getOwnID());
-                    map.get(i).setUnit(unit);
+                    map.get(i).getUnits().setUnitsStorage(units);
                     updateAllNeighbor(map.get(i));
                 } else {
-                    System.out.println("Attack fail, remain "+map.get(i).getUnit()+" units");
+                    System.out.println("Attack fail, remain "+map.get(i).getUnits().printUnits()+" units");
                 }
                 break;
             }

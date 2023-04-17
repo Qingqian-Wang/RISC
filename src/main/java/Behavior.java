@@ -8,24 +8,34 @@ import java.util.ArrayList;
 public class Behavior implements Serializable {
     Territory origin;// The origin territory of the behavior
     Territory destination;// The destination territory of the behavior
+
     unitStorage units;
-    int playerID;// The unique ID of the player performing the behavior
+    int ownID;// The unique ID of the player performing the behavior
     String type; // The type of behavior being performed
 
-    public Behavior(Territory origin, Territory destination, ArrayList<Integer> unitsTemp, int playerID, String type) {
+    public Behavior(Territory origin, Territory destination, ArrayList<Integer> unitsTemp, int ownID, String type) {
         this.origin = origin;
         this.destination = destination;
         this.units = new unitStorage(unitsTemp);
-        this.playerID = playerID;
+        this.ownID = ownID;
         this.type = type;
     }
 
-    public Behavior(Territory origin, Territory destination, int playerID, String type) {
+    public Behavior(Territory origin, Territory destination, int ownID, String type) {
         this.origin = origin;
         this.destination = destination;
         this.units = new unitStorage();
-        this.playerID = playerID;
+        this.ownID = ownID;
         this.type = type;
+    }
+
+    // default constructor
+    public Behavior() {
+        this.origin = null;
+        this.destination = null;
+        this.units = new unitStorage();
+        this.ownID = 0;
+        this.type = null;
     }
 
     // Getter methods for the instance variables
@@ -37,12 +47,14 @@ public class Behavior implements Serializable {
         return destination;
     }
 
+
     public unitStorage getUnits() {
         return units;
+
     }
 
     public int getOwnID() {
-        return playerID;
+        return ownID;
     }
 
     public String getType() {

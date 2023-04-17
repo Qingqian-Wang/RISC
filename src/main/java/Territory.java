@@ -8,7 +8,12 @@ public class Territory implements Serializable {
     private int ownID;
     private unitStorage units;
     private HashMap<Integer, ArrayList<String>> neighbor;
-
+    public Territory(){
+        this.name = "Temp";
+        this.ownID = 0;
+        this.units = new unitStorage();
+        this.neighbor = new HashMap<>();
+    }
     public Territory(String name, int ownID) {
         this.name = name;
         this.ownID = ownID;
