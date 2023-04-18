@@ -462,7 +462,6 @@ public class Player {
                                         Evolevel = Integer.parseInt(behaviorInfo);
                                         gameInfoList.get(currentGame).setRestCost(gameInfoList.get(currentGame).getRestCost() - sum);
                                         gameInfoList.get(currentGame).setMaximumTechNum(Evolevel);
-
                                     }
                                 } else if (response.toUpperCase().charAt(0) == 'D') {// end turn
                                     behaviorList.setRestCost(gameInfoList.get(currentGame).getRestCost());
