@@ -36,6 +36,7 @@ public class Player {
 
     public void updateCost() throws IOException {
         gameInfoList.get(currentGame).setRestCost(Integer.parseInt(gameInfoList.get(currentGame).getIn().readLine()));
+        gameInfoList.get(currentGame).setRestFood(Integer.parseInt(gameInfoList.get(currentGame).getIn().readLine()));
     }
 
     // create socket to connect with server
@@ -326,13 +327,13 @@ public class Player {
                                     ArrayList<String> neighborName = new ArrayList<>();
                                     for (Map.Entry<Integer, ArrayList<String>> e : territory.getNeighbor().entrySet()) {
                                         neighborName.addAll(e.getValue());
-                                        for (int x = 0; x < neighborName.size(); x++) {
-                                            sb.append(" " + neighborName.get(x));
-                                            if (x != neighborName.size() - 1) {
-                                                sb.append(",");
-                                            } else {
-                                                sb.append(")").append(System.lineSeparator());
-                                            }
+                                    }
+                                    for (int x = 0; x < neighborName.size(); x++) {
+                                        sb.append(" " + neighborName.get(x));
+                                        if (x != neighborName.size() - 1) {
+                                            sb.append(",");
+                                        } else {
+                                            sb.append(")").append(System.lineSeparator());
                                         }
                                     }
                                 }
@@ -366,6 +367,7 @@ public class Player {
                                 System.out.println("(E)volve");
                                 System.out.println("(D)one");
                                 System.out.println("now you have " + gameInfoList.get(currentGame).getRestCost() +" cost left");
+                                System.out.println("and you have " + gameInfoList.get(currentGame).getRestFood() +" food left");
                                 InputStreamReader sr = new InputStreamReader(System.in);
                                 BufferedReader bf = new BufferedReader(sr);
                                 String response = bf.readLine();
@@ -379,6 +381,7 @@ public class Player {
                                     System.out.println("(E)volve");
                                     System.out.println("(D)one");
                                     System.out.println("now you have " + gameInfoList.get(currentGame).getRestCost() +" cost left");
+                                    System.out.println("and you have " + gameInfoList.get(currentGame).getRestFood() +" food left");
                                     response = bf.readLine();
                                 }
                                 // get behavior type
@@ -408,11 +411,6 @@ public class Player {
                                             behavior = new Behavior(getTerritoryByName(tokens[2], currentMap), getTerritoryByName(tokens[3], currentMap), unit, gameInfoList.get(currentGame).getPlayerID(), "Move");
                                         } else if (response.toUpperCase().charAt(0) == 'A') {// attack behavior initialize
                                             behavior = new Behavior(getTerritoryByName(tokens[2], currentMap), getTerritoryByName(tokens[3], currentMap), unit, gameInfoList.get(currentGame).getPlayerID(), "Attack");
-                                        }
-                                        // check if the unit and source is correct for the behavior
-                                        if (ruleChecker.checkBehavior(behavior, currentMap) != null) {
-                                            System.out.println(ruleChecker.checkBehavior(behavior, currentMap));
-                                            behavior = null;
                                         }
                                     }
                                     // add to arraylist based on the type of behavior
@@ -462,7 +460,6 @@ public class Player {
                                         Evolevel = Integer.parseInt(behaviorInfo);
                                         gameInfoList.get(currentGame).setRestCost(gameInfoList.get(currentGame).getRestCost() - sum);
                                         gameInfoList.get(currentGame).setMaximumTechNum(Evolevel);
-
                                     }
                                 } else if (response.toUpperCase().charAt(0) == 'D') {// end turn
                                     behaviorList.setRestCost(gameInfoList.get(currentGame).getRestCost());

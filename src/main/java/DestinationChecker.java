@@ -81,7 +81,7 @@ public class DestinationChecker extends BasicChecker {
 
 
     @Override
-    protected String checkMyRule(Behavior my_behavior, ArrayList<Territory> t) {
+    protected String checkMyRule(int currentFood, Behavior my_behavior, ArrayList<Territory> t) {
         // move or attack?
         String type = my_behavior.getType();
         int starterID = my_behavior.getOwnID();

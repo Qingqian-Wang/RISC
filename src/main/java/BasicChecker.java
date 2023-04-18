@@ -16,16 +16,16 @@ public abstract class BasicChecker {
     public BasicChecker(BasicChecker next) {
         this.next = next;
     }
-    protected abstract String checkMyRule(Behavior my_behavior, ArrayList <Territory> t);
-    public String checkBehavior (Behavior my_behavior, ArrayList <Territory> t) {
+    protected abstract String checkMyRule(int currentFood, Behavior my_behavior, ArrayList <Territory> t);
+    public String checkBehavior (int currentFood, Behavior my_behavior, ArrayList <Territory> t) {
         //if we fail our own rule: stop the placement is not legal
-        String error_Msg = checkMyRule(my_behavior, t);
+        String error_Msg = checkMyRule(currentFood, my_behavior, t);
         if (error_Msg != null) {
             return error_Msg;
         }
         //otherwise, ask the rest of the chain.
         if (next != null) {
-            return next.checkBehavior(my_behavior, t);
+            return next.checkBehavior(currentFood, my_behavior, t);
         }
         //if there are no more rules, then the placement is legal
         return null;
