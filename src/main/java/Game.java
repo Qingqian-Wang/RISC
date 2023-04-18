@@ -320,9 +320,47 @@ public class Game implements Runnable{
         checkAndExecuteMoveBehavior(moveList);
         checkAndExecuteAttackBehavior(attackList);
         checkAndExecuteUpgradeBehavior(upgradeList);
-
         addOneUnit();
         addCost();
+    }
+
+    private Territory getTerritoryByName(String name, ArrayList<Territory> map){
+        for(Territory t: map){
+            if(name.equals(t.getName())){
+                return t;
+            }
+        }
+        return null;
+    }
+
+    private int findShortestPath(Territory A, String destination, ArrayList<Territory> t, ArrayList<String> visited, int currentPathLength){
+        if(A.getName().equals(destination)){
+            return currentPathLength;
+        }
+        visited.add(A.getName());
+        ArrayList<Integer> nextShortestPath = new ArrayList<>();
+        for(Map.Entry<Integer, ArrayList<String>> e : A.getNeighbor().entrySet()){
+            if(e.getKey()==A.getOwnID()){
+                for(String s: e.getValue()){
+                    if(visited.contains(s)){
+                        continue;
+                    }
+                    Territory next = getTerritoryByName(s,t);
+                    nextShortestPath.add(findShortestPath(next,destination,t,visited,currentPathLength+next.getSize()));
+                }
+            }
+        }
+        int res = -1;
+        for(Integer i:nextShortestPath){
+            if(res==-1){
+                res = i;
+            } else {
+                if(i<res){
+                    res = i;
+                }
+            }
+        }
+        return res;
     }
 
     private void executeMoveBehavior(Behavior b) {
@@ -341,6 +379,7 @@ public class Game implements Runnable{
                 break;
             }
         }
+        restCost.set(b.getOwnID()-1,restCost.get(b.getOwnID()-1)-(findShortestPath(b.getOrigin(),destName,map,new ArrayList<String>(),0)*b.getUnits().getRemainUnits()));
         System.out.println("Move "+units.printUnits()+" from "+sourceName+" to " +destName);
     }
 
@@ -383,6 +422,7 @@ public class Game implements Runnable{
     private void executeAttackBehavior(Behavior b) {
         String destName = b.getDestination().getName();
         unitStorage units = b.getUnits();
+        restCost.set(b.getOwnID()-1,restCost.get(b.getOwnID()-1)-units.getRemainUnits());
         System.out.println("Attack from "+b.getOrigin().getName()+" to "+ destName+" using "+units.printUnits()+" units.");
         for (int i = 0; i < map.size(); i++) {
             if (destName.equals(map.get(i).getName())) {
