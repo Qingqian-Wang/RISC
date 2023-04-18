@@ -2,6 +2,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.Inet4Address;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
@@ -290,7 +291,6 @@ public class Game implements Runnable{
         HashMap<Integer, BehaviorList> orderMap = new HashMap<>();
         ArrayList<Behavior> attackList = new ArrayList<>();
         ArrayList<Behavior> moveList = new ArrayList<>();
-        ArrayList<ArrayList<Integer>> evolveList = new ArrayList<>();
         ArrayList<upgradeBehavior> upgradeList = new ArrayList<>();
         for (PlayerInfo playerInfo : playerInfoList) {
             playerInfo.getOut().println("Turn Start");
@@ -394,6 +394,7 @@ public class Game implements Runnable{
     private void moveUnitCuzAttack(Behavior b) {
         String sourceName = b.getOrigin().getName();
         unitStorage units = b.getUnits();
+        restCost.set(b.getOwnID()-1,restCost.get(b.getOwnID()-1)-units.getRemainUnits());
         for (int i = 0; i < map.size(); i++) {
             if (sourceName.equals(map.get(i).getName())) {
                 map.get(i).getUnits().removeUnitStorage(units);
@@ -422,8 +423,7 @@ public class Game implements Runnable{
     private void executeAttackBehavior(Behavior b) {
         String destName = b.getDestination().getName();
         unitStorage units = b.getUnits();
-        restCost.set(b.getOwnID()-1,restCost.get(b.getOwnID()-1)-units.getRemainUnits());
-        System.out.println("Attack from "+b.getOrigin().getName()+" to "+ destName+" using "+units.printUnits()+" units.");
+        System.out.println("Attack "+ destName+" using "+units.printUnits()+" units.");
         for (int i = 0; i < map.size(); i++) {
             if (destName.equals(map.get(i).getName())) {
                 int sig = 0;
@@ -459,9 +459,14 @@ public class Game implements Runnable{
     }
 
     private void checkAndExecuteAttackBehavior(ArrayList<Behavior> behaviorArrayList) {
+        Random rand = new Random();
+        ArrayList<Integer> playerIDs = new ArrayList<>();
         for (Behavior b : behaviorArrayList) {
             if (ruleChecker.checkBehavior(b, map) == null) {
                 moveUnitCuzAttack(b);
+                if(!playerIDs.contains(b.getOwnID())){
+                    playerIDs.add(b.getOwnID());
+                }
             } else {
                 behaviorArrayList.remove(b);
                 if(behaviorArrayList.isEmpty()){
@@ -469,7 +474,39 @@ public class Game implements Runnable{
                 }
             }
         }
-        for (Behavior b : behaviorArrayList) {
+        List<Integer> orders = new ArrayList<>();
+        for (int i = 1; i <= playerIDs.size(); i++) {
+            orders.add(i);
+        }
+        Map<Integer,Map<String, unitStorage>> unitMap = new HashMap<>();//playerID, destname, units
+        for(Behavior b: behaviorArrayList){
+            if(unitMap.containsKey(b.getOwnID())){
+                if(unitMap.get(b.getOwnID()).containsKey(b.getDestination().getName())){
+                    unitMap.get(b.getOwnID()).get(b.getDestination().getName()).addUnitStorage(b.getUnits());
+                } else {
+                    unitMap.get(b.getOwnID()).put(b.getDestination().getName(),b.getUnits());
+                }
+            } else {
+                unitMap.put(b.getOwnID(),new HashMap<>());
+                unitMap.get(b.getOwnID()).put(b.getDestination().getName(),b.getUnits());
+            }
+        }
+        ArrayList<Behavior> mergedBehaviorList = new ArrayList<>();
+        Map<Integer, Integer> givenOrder = new HashMap<>();//order, playerID
+        for(Integer i: playerIDs){
+            int index = rand.nextInt(orders.size());
+            givenOrder.put(orders.get(index),i);
+            orders.remove(index);
+        }
+        for(int i = 1; i <= playerIDs.size(); i++){
+            Map<String, unitStorage> curr = unitMap.get(givenOrder.get(i));
+            for(Map.Entry<String, unitStorage> e:curr.entrySet()){
+                Behavior addedBehavior = new Behavior(null,getTerritoryByName(e.getKey(),map),givenOrder.get(i),"Attack");
+                addedBehavior.getUnits().addUnitStorage(e.getValue());
+                mergedBehaviorList.add(addedBehavior);
+            }
+        }
+        for (Behavior b : mergedBehaviorList) {
             executeAttackBehavior(b);
         }
     }

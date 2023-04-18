@@ -326,13 +326,13 @@ public class Player {
                                     ArrayList<String> neighborName = new ArrayList<>();
                                     for (Map.Entry<Integer, ArrayList<String>> e : territory.getNeighbor().entrySet()) {
                                         neighborName.addAll(e.getValue());
-                                        for (int x = 0; x < neighborName.size(); x++) {
-                                            sb.append(" " + neighborName.get(x));
-                                            if (x != neighborName.size() - 1) {
-                                                sb.append(",");
-                                            } else {
-                                                sb.append(")").append(System.lineSeparator());
-                                            }
+                                    }
+                                    for (int x = 0; x < neighborName.size(); x++) {
+                                        sb.append(" " + neighborName.get(x));
+                                        if (x != neighborName.size() - 1) {
+                                            sb.append(",");
+                                        } else {
+                                            sb.append(")").append(System.lineSeparator());
                                         }
                                     }
                                 }
