@@ -36,6 +36,7 @@ public class Player {
 
     public void updateCost() throws IOException {
         gameInfoList.get(currentGame).setRestCost(Integer.parseInt(gameInfoList.get(currentGame).getIn().readLine()));
+        gameInfoList.get(currentGame).setRestFood(Integer.parseInt(gameInfoList.get(currentGame).getIn().readLine()));
     }
 
     // create socket to connect with server
@@ -366,6 +367,7 @@ public class Player {
                                 System.out.println("(E)volve");
                                 System.out.println("(D)one");
                                 System.out.println("now you have " + gameInfoList.get(currentGame).getRestCost() +" cost left");
+                                System.out.println("and you have " + gameInfoList.get(currentGame).getRestFood() +" food left");
                                 InputStreamReader sr = new InputStreamReader(System.in);
                                 BufferedReader bf = new BufferedReader(sr);
                                 String response = bf.readLine();
@@ -379,6 +381,7 @@ public class Player {
                                     System.out.println("(E)volve");
                                     System.out.println("(D)one");
                                     System.out.println("now you have " + gameInfoList.get(currentGame).getRestCost() +" cost left");
+                                    System.out.println("and you have " + gameInfoList.get(currentGame).getRestFood() +" food left");
                                     response = bf.readLine();
                                 }
                                 // get behavior type
@@ -408,11 +411,6 @@ public class Player {
                                             behavior = new Behavior(getTerritoryByName(tokens[2], currentMap), getTerritoryByName(tokens[3], currentMap), unit, gameInfoList.get(currentGame).getPlayerID(), "Move");
                                         } else if (response.toUpperCase().charAt(0) == 'A') {// attack behavior initialize
                                             behavior = new Behavior(getTerritoryByName(tokens[2], currentMap), getTerritoryByName(tokens[3], currentMap), unit, gameInfoList.get(currentGame).getPlayerID(), "Attack");
-                                        }
-                                        // check if the unit and source is correct for the behavior
-                                        if (ruleChecker.checkBehavior(behavior, currentMap) != null) {
-                                            System.out.println(ruleChecker.checkBehavior(behavior, currentMap));
-                                            behavior = null;
                                         }
                                     }
                                     // add to arraylist based on the type of behavior

@@ -10,6 +10,7 @@ public class GameInfo {
     private int status;
     private int maximumTechNum;
     private int restCost;
+    private int restFood;
     private int totalPlayerNum;
     private int watchingPattern;
     private PrintWriter out;
@@ -23,6 +24,7 @@ public class GameInfo {
         this.status = 1;
         this.maximumTechNum = 1;
         this.restCost = 50;
+        this.restFood = 50;
     }
     public GameInfo(Socket clientSocket, int totalPlayerNum, int playerID, int gameID) throws IOException {
         this.clientSocket = clientSocket;
@@ -35,6 +37,7 @@ public class GameInfo {
         this.status = 1;
         this.maximumTechNum = 1;
         this.restCost = 50;
+        this.restFood = 50;
     }
 
     public int getPlayerID() {
@@ -55,6 +58,10 @@ public class GameInfo {
 
     public int getRestCost() {
         return restCost;
+    }
+
+    public int getRestFood() {
+        return restFood;
     }
 
     public int getTotalPlayerNum() {
@@ -87,6 +94,9 @@ public class GameInfo {
 
     public void setRestCost(int restCost) {
         this.restCost = restCost;
+    }
+    public void setRestFood(int restFood){
+        this.restFood = restFood;
     }
 
     public void setWatchingPattern(int watchingPattern) {

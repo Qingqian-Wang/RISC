@@ -13,7 +13,7 @@ public class OriginChecker extends BasicChecker {
     // carry out the behavior
 
     @Override
-    protected String checkMyRule(Behavior my_behavior, ArrayList<Territory> t) {
+    protected String checkMyRule(int currentFood, Behavior my_behavior, ArrayList<Territory> t) {
         int starterID = my_behavior.getOwnID();
         int behavior_OriginID =  my_behavior.getOrigin().getOwnID();
 //        int behavior_DestinationID = my_behavior.getDestination().getOwnID();
@@ -26,6 +26,7 @@ public class OriginChecker extends BasicChecker {
         if (exist_Unit.checkContainEnoughUnits(use_Unit) == false){
             return "use Unit larger than it has! it has " + exist_Unit.printUnits() + " but use " + use_Unit.printUnits();
         }
+
         return null;
     }
 }
