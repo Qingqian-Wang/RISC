@@ -2,6 +2,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Inet4Address;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -16,10 +17,10 @@ public class Game implements Runnable {
     public ServerSocket serverSocket;
     private BasicChecker ruleChecker;
     private UpgradeChecker upgradeChecker;
-
     // store the rest cost of each player
     private ArrayList<Integer> restCost;
     private ArrayList<Integer> restFood;
+    private ArrayList<Integer> techLevelList;
 
     /*
      * Constructor to create a Server object
@@ -39,9 +40,11 @@ public class Game implements Runnable {
         upgradeChecker = new UpgradeChecker();
         restCost = new ArrayList<>();
         restFood = new ArrayList<>();
+        techLevelList = new ArrayList<>();
         for (int i = 0; i < maxPlayerNum; i++) {
             restCost.add(50);
             restFood.add(500);
+            techLevelList.add(1);
         }
     }
 
@@ -183,6 +186,47 @@ public class Game implements Runnable {
     // ======================================the end of upgrade function================
 
 
+    //evolve function
+    private int checkEvolevelBehavior(ArrayList<Integer> totalCost,int playerID){
+        int currentTechLevel = techLevelList.get(playerID-1);
+        if(currentTechLevel==6){
+            return -1;
+        }
+        int currentRestCost = restCost.get(playerID-1);
+        if(currentRestCost<(totalCost.get(currentTechLevel+1))){
+            return -1;
+        }
+        return totalCost.get(currentTechLevel+1);
+    }
+
+    private void checkAndExecuteEvolveHelper(int playerID, int count){
+        if(count==0){
+            return;
+        }
+        ArrayList<Integer> totalCost = new ArrayList<>();
+        totalCost.add(0);
+        totalCost.add(0);
+        totalCost.add(50);
+        totalCost.add(75);
+        totalCost.add(125);
+        totalCost.add(200);
+        totalCost.add(300);
+        int expectedCost = checkEvolevelBehavior(totalCost,playerID);
+        if(expectedCost!=-1){
+            System.out.println("Player "+playerID+" evolve succeed");
+            techLevelList.set(playerID-1,techLevelList.get(playerID-1)+1);
+            restCost.set(playerID-1,restCost.get(playerID-1)-expectedCost);
+            checkAndExecuteEvolveHelper(playerID,count-1);
+        }
+    }
+
+    private void checkAndExecuteEvolve(Map<Integer, Integer> evolveList){
+        for(Map.Entry<Integer,Integer> e: evolveList.entrySet()){
+            checkAndExecuteEvolveHelper(e.getKey(),e.getValue());
+        }
+    }
+    //end evolve function
+
     /*
      * Starts the game by initializing the map and territory ownership, and then
      * begins the game loop of player turns until the game is over.
@@ -299,6 +343,7 @@ public class Game implements Runnable {
         ArrayList<Behavior> attackList = new ArrayList<>();
         ArrayList<Behavior> moveList = new ArrayList<>();
         ArrayList<upgradeBehavior> upgradeList = new ArrayList<>();
+        Map<Integer,Integer> evolveList = new HashMap<>();
         for (PlayerInfo playerInfo : playerInfoList) {
             playerInfo.getOut().println("Turn Start");
             sendPlayerStatus(playerInfo);
@@ -315,15 +360,16 @@ public class Game implements Runnable {
             int index = rand.nextInt(orders.size());
             orderMap.put(orders.get(index), behaviorList);
             orders.remove(index);
+            evolveList.put(playerInfo.getPlayerID(),behaviorList.getEvloveNum());
         }
         for (int i = 1; i <= playerInfoList.size(); i++) {
             attackList.addAll(orderMap.get(i).getAttackList());
             moveList.addAll(orderMap.get(i).getMoveList());
             upgradeList.addAll(orderMap.get(i).getUpgradeList());
             // update restCost
-            restCost.set(orderMap.get(i).getPlayerID() - 1, orderMap.get(i).getRestCost());
+//            restCost.set(orderMap.get(i).getPlayerID() - 1, orderMap.get(i).getRestCost());
         }
-
+        checkAndExecuteEvolve(evolveList);
         checkAndExecuteMoveBehavior(moveList);
         checkAndExecuteAttackBehavior(attackList);
         checkAndExecuteUpgradeBehavior(upgradeList);
@@ -530,8 +576,10 @@ public class Game implements Runnable {
     public void sendPlayerRestCost(PlayerInfo playerInfo) throws IOException {
         int cost = restCost.get(playerInfo.getPlayerID() - 1);
         int food = restFood.get(playerInfo.getPlayerID() - 1);
-        playerInfo.getOut().println(Integer.toString(cost));
-        playerInfo.getOut().println(Integer.toString(food));
+        int techLevel = techLevelList.get(playerInfo.getPlayerID() - 1);
+        playerInfo.getOut().println(cost);
+        playerInfo.getOut().println(food);
+        playerInfo.getOut().println(techLevel);
     }
 
 
