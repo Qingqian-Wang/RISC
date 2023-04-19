@@ -14,8 +14,8 @@ public class BehaviorList implements NetworkObject, Serializable {
     private ArrayList<Behavior> attackList;// A list of behaviors related to attack
 
     private ArrayList<upgradeBehavior> upgradeList;// A list of behaviors related to upgrade
+    private int evloveNum;
 
-    private int restCost;// playerID and rest cost
     private int playerID;// The ID of the player who performed the behaviors
     public int status; // -1 means disconnect; 0 means dead; 1 means live
 
@@ -24,16 +24,23 @@ public class BehaviorList implements NetworkObject, Serializable {
         moveList = new ArrayList<>();
         attackList = new ArrayList<>();
         upgradeList = new ArrayList<>();
-        restCost = -1;
         this.status = 0;
+        evloveNum = 0;
     }
     public BehaviorList(int playerID, int status) {
         this.playerID = playerID;
         moveList = new ArrayList<>();
         attackList = new ArrayList<>();
         upgradeList = new ArrayList<>();
-        restCost = -1;
         this.status = status;
+        evloveNum = 0;
+    }
+
+    public int getEvloveNum() {
+        return evloveNum;
+    }
+    public void addEvloveNum(){
+        this.evloveNum+=1;
     }
 
     public ArrayList<Behavior> getMoveList() {
@@ -61,18 +68,6 @@ public class BehaviorList implements NetworkObject, Serializable {
     public int getPlayerID() {
         return playerID;
     }
-
-    // getter of restCost
-    public int getRestCost() {
-        return restCost;
-    }
-
-
-    // setter of restCost
-    public void setRestCost(int restCost) {
-        this.restCost = restCost;
-    }
-
 
     /*
      * Sends the BehaviorList object over an ObjectOutputStream.
