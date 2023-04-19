@@ -624,6 +624,7 @@ public class Player {
                 if (!joinGameList.isEmpty()) {
                     currentGame = joinGameList.get(0);
                     System.out.println("Now move you to the next game you joined in.");
+                    return "Reconnect";
                 }
                 return "Disconnect";
             } else if (gameInfoList.get(currentGame).getWatchingPattern() == 1) {
@@ -642,9 +643,9 @@ public class Player {
             temp.getUnits().addUnits(Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
             listForOneTurn.addToMoveList(temp);
         } else if (tokens[0].toUpperCase().charAt(0) == 'A') {
-            Behavior temp = new Behavior(getTerritoryByName(tokens[3], globalMap), getTerritoryByName(tokens[4], globalMap), gameInfoList.get(currentGame).getPlayerID(), "Move");
+            Behavior temp = new Behavior(getTerritoryByName(tokens[3], globalMap), getTerritoryByName(tokens[4], globalMap), gameInfoList.get(currentGame).getPlayerID(), "Attack");
             temp.getUnits().addUnits(Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
-            listForOneTurn.addToMoveList(temp);
+            listForOneTurn.addToAttackList(temp);
         }
     }
 
