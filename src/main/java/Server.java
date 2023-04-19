@@ -13,6 +13,7 @@ public class Server {
     public ArrayList<Integer> gameCurrentPlayerNum;
     public int port;
     public ServerSocket serverSocket;
+
     /*
      * Constructor to create a Server object
      *
@@ -26,12 +27,13 @@ public class Server {
         this.gamePortList = gamePortList;
         this.gameMaxPlayerNum = gameMaxPlayerNum;
         this.gameCurrentPlayerNum = new ArrayList<>();
-        for(int i = 0; i < gameMaxPlayerNum.size();i++){
+        for (int i = 0; i < gameMaxPlayerNum.size(); i++) {
             gameCurrentPlayerNum.add(0);
         }
         this.port = port;
         serverSocket = new ServerSocket(this.port);
     }
+
     /*
      * Accepts players to the server
      *
@@ -41,68 +43,64 @@ public class Server {
      */
     public void acceptPlayer() throws IOException {
         int playerRestNum = 0;
-        for(Integer i: gameMaxPlayerNum){
-            playerRestNum+=i;
+        for (Integer i : gameMaxPlayerNum) {
+            playerRestNum += i;
         }
-        while(playerRestNum!=0) {
+        while (playerRestNum != 0) {
             Socket playerSocket = serverSocket.accept();
             System.out.println("Accept new connection from " + playerSocket.getInetAddress());
             BufferedReader in = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
             PrintWriter out = new PrintWriter(playerSocket.getOutputStream(), true);
-            out.println("There currently are "+gamePortList.size()+" games run on this server.");
+            out.println("There currently are " + gamePortList.size() + " games run on this server.");
             ObjectMapper objectMapper = new ObjectMapper();
             out.println(objectMapper.writeValueAsString(gamePortList));
-            for(int j = 0; j < gameCurrentPlayerNum.size();j++){
-                if(gameCurrentPlayerNum.get(j)<gameMaxPlayerNum.get(j)){
-                    out.println("A:Game "+(j+1)+" is available");
+            for (int j = 0; j < gameCurrentPlayerNum.size(); j++) {
+                if (gameCurrentPlayerNum.get(j) < gameMaxPlayerNum.get(j)) {
+                    out.println("A:Game " + (j + 1) + " is available");
                 } else {
-                    out.println("U:Game "+(j+1)+" is unavailable");
+                    out.println("U:Game " + (j + 1) + " is unavailable");
                 }
             }
             String response = in.readLine();
-            if(response.length()!=0){
+            if (response.length() != 0) {
                 String[] tokens = response.split(" ");
                 for (String token : tokens) {
                     gameCurrentPlayerNum.set(Integer.parseInt(token) - 1, gameCurrentPlayerNum.get(Integer.parseInt(token) - 1) + 1);
                 }
             }
             playerRestNum = 0;
-            for(int i = 0; i < gameMaxPlayerNum.size(); i++){
-                playerRestNum += (gameMaxPlayerNum.get(i)-gameCurrentPlayerNum.get(i));
+            for (int i = 0; i < gameMaxPlayerNum.size(); i++) {
+                playerRestNum += (gameMaxPlayerNum.get(i) - gameCurrentPlayerNum.get(i));
             }
             playerSocketList.add(playerSocket);
         }
     }
 
     public void initGames() throws IOException {
-        Game game1 = new Game(gamePortList.get(0),gameMaxPlayerNum.get(0));
+        Game game1 = new Game(gamePortList.get(0), gameMaxPlayerNum.get(0));
         Game game2 = new Game(gamePortList.get(1), gameMaxPlayerNum.get(1));
         new Thread(game1).start();
         new Thread(game2).start();
     }
-    // args: server port, game port1, game port2, game1 max player number, game2 max player number
+
     public static void main(String[] args) throws Exception {
-        if(args.length!=5){
-            System.out.println("Invalid input");
+        int serverPort = 9999;
+        int gamePort1 = 9000;
+        int gamePort2 = 8000;
+        int totalPlayerNum1 = 2;
+        int totalPlayerNum2 = 2;
+        if (totalPlayerNum1 < 2 || totalPlayerNum1 > 5 || totalPlayerNum2 < 2 || totalPlayerNum2 > 5) {
+            System.out.println("The total number of players should be between 2 and 5");
         } else {
-            int serverPort = Integer.parseInt(args[0]);
-            int gamePort1 = Integer.parseInt(args[1]);
-            int gamePort2 = Integer.parseInt(args[2]);
-            int totalPlayerNum1 = Integer.parseInt(args[3]);
-            int totalPlayerNum2 = Integer.parseInt(args[4]);
-            if(totalPlayerNum1<2||totalPlayerNum1>5||totalPlayerNum2<2||totalPlayerNum2>5){
-                System.out.println("The total number of players should be between 2 and 5");
-            } else {
-                ArrayList<Integer> gamePortList = new ArrayList<>();
-                gamePortList.add(gamePort1);
-                gamePortList.add(gamePort2);
-                ArrayList<Integer> totalPlayerNumList = new ArrayList<>();
-                totalPlayerNumList.add(totalPlayerNum1);
-                totalPlayerNumList.add(totalPlayerNum2);
-                Server s = new Server(serverPort, gamePortList, totalPlayerNumList);
-                s.initGames();
-                s.acceptPlayer();
-            }
+            ArrayList<Integer> gamePortList = new ArrayList<>();
+            gamePortList.add(gamePort1);
+            gamePortList.add(gamePort2);
+            ArrayList<Integer> totalPlayerNumList = new ArrayList<>();
+            totalPlayerNumList.add(totalPlayerNum1);
+            totalPlayerNumList.add(totalPlayerNum2);
+            Server s = new Server(serverPort, gamePortList, totalPlayerNumList);
+            s.initGames();
+            s.acceptPlayer();
         }
     }
 }

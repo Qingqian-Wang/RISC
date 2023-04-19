@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Map;
 
 public class GameInfo {
     private int playerID;
@@ -37,6 +38,7 @@ public class GameInfo {
         this.restCost = 50;
         this.restFood = 50;
     }
+
 
     public int getPlayerID() {
         return playerID;
