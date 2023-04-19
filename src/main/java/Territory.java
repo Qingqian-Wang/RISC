@@ -12,13 +12,14 @@ public class Territory implements Serializable {
     private int size;
 
 
-    public Territory(){
+    public Territory() {
         this.name = "Temp";
         this.ownID = 0;
         this.units = new unitStorage();
         this.neighbor = new HashMap<>();
         this.size = 10;
     }
+
     public Territory(String name, int ownID) {
         this.name = name;
         this.ownID = ownID;
@@ -56,9 +57,9 @@ public class Territory implements Serializable {
     }
 
     // based on territory id, find its name in hashmap
-    private int getIDByName(Territory t){
-        for(Map.Entry<Integer,ArrayList<String>> e: neighbor.entrySet()){
-            if(e.getValue().contains(t.getName())){
+    private int getIDByName(Territory t) {
+        for (Map.Entry<Integer, ArrayList<String>> e : neighbor.entrySet()) {
+            if (e.getValue().contains(t.getName())) {
                 return e.getKey();
             }
         }
@@ -69,27 +70,24 @@ public class Territory implements Serializable {
         return size;
     }
 
-    public void updateNeighbor(Territory t){
+    public void updateNeighbor(Territory t) {
         // check the reason of update: if exist a key that contains it, that means this territory's own is changed
         // else: initializing the map
         int existKey = getIDByName(t);
-        if(existKey != -1){
+        if (existKey != -1) {
             ArrayList<String> modifiedList = this.neighbor.get(existKey);
             modifiedList.remove(t.getName());
-            this.neighbor.put(existKey,modifiedList);
+            this.neighbor.put(existKey, modifiedList);
         }
 
         // add the name to the hashmap
         ArrayList<String> tempList;
-        if(this.neighbor.containsKey(t.getOwnID())){
+        if (this.neighbor.containsKey(t.getOwnID())) {
             tempList = this.neighbor.get(t.getOwnID());
         } else {
             tempList = new ArrayList<>();
         }
         tempList.add(t.getName());
-        this.neighbor.put(t.getOwnID(),tempList);
+        this.neighbor.put(t.getOwnID(), tempList);
     }
-
-
-
 }
