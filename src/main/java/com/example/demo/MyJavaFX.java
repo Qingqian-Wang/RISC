@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -7,16 +8,13 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import javafx.util.Pair;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import static java.lang.Thread.sleep;
@@ -460,7 +458,7 @@ public class MyJavaFX extends Application {
         playerRank.setFont(new Font("Cambria", 22));
         Label techPoints = new Label(" Tech Points: " + player.getCost());
         Button upgrade = new Button("↑");
-        rowBow.getChildren().addAll(gameId, playerRank, upgrade, techPoints);
+        rowBow.getChildren().addAll(gameId, food, playerRank, upgrade, techPoints);
         rowBow.setAlignment(Pos.CENTER);
         root.setTop(rowBow);
 
@@ -468,12 +466,9 @@ public class MyJavaFX extends Application {
         HBox rowBow2 = new HBox(0);
         rowBow2.setPadding(new Insets(10, 10, 10, 10));
 //
-        Label numberOfPlayer = new Label("#Player: " + (id + 1));
-        numberOfPlayer.setFont(new Font("Cambria", 19));
-        rowBow2.getChildren().add(numberOfPlayer);
-        Label color = new Label(" Your territories are blue. ");
-        color.setFont(new Font("Cambria", 19));
-        rowBow2.getChildren().add(color);
+        Label playerId = new Label("You are Player: " + player.getPlayerID());
+        playerId.setFont(new Font("Cambria", 19));
+        rowBow2.getChildren().add(playerId);
         rowBow2.setAlignment(Pos.CENTER);
         colBox.getChildren().add(rowBow2);
         root.setTop(colBox);
@@ -504,13 +499,46 @@ public class MyJavaFX extends Application {
         Button doneButton = new Button("Done");
         doneButton.setFont(new Font("Cambria", 25));
 
+        Button refreshButton = new Button("Refresh");
+        refreshButton.setFont(new Font("Cambria", 25));
+
+
         lastRowBox.setAlignment(Pos.CENTER);
         lastRowBox.getChildren().add(doneButton);
+        lastRowBox.getChildren().add(refreshButton);
         lastRowBox.getChildren().add(switchButton);
         root.setBottom(lastRowBox);
         root.setLeft(leftBox);
         root.setCenter(statusLabel);
         root.setRight(rightBox);
+        refreshButton.setDisable(true);
+        doneButton.setOnAction(event -> {
+            try {
+                player.endTurn();
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+            doneButton.setDisable(true);
+            refreshButton.setDisable(false);
+        });
+        refreshButton.setOnAction(event -> {
+            try {
+                player.getGameStatueMessage();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                player.turnStartHandler();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            set2Pane(player, switchButton, root, id);
+            doneButton.setDisable(false);
+            refreshButton.setDisable(true);
+        });
+        upgrade.setOnAction(event -> {
+            player.evloveTech();
+        });
 
 // 左侧按钮事件处理程序
         for (int i = 0; i < buttons.length; i++) {
@@ -622,7 +650,6 @@ public class MyJavaFX extends Application {
         });
 
         moveButton.setOnAction(event -> {
-            statusLabel.setText("Move！");
 // create a dialog box
             Dialog<String> dialog = new Dialog<>();
             dialog.setTitle("Move");
@@ -635,7 +662,7 @@ public class MyJavaFX extends Application {
             Label originLabel = new Label("From:");
             TextField originTextField = new TextField();
             Label destLabel = new Label("To:");
-            TextField destTestField = new TextField();
+            TextField destTextField = new TextField();
             Label unitLevel = new Label("Level:");
             TextField unitLevelField = new TextField();
             Label unitLabel = new Label("Units:");
@@ -645,7 +672,7 @@ public class MyJavaFX extends Application {
             gridPaneDialog.add(originLabel, 1, 1);
             gridPaneDialog.add(originTextField, 2, 1);
             gridPaneDialog.add(destLabel, 1, 2);
-            gridPaneDialog.add(destTestField, 2, 2);
+            gridPaneDialog.add(destTextField, 2, 2);
             gridPaneDialog.add(unitLevel, 1, 3);
             gridPaneDialog.add(unitLevelField, 2, 3);
             gridPaneDialog.add(unitLabel, 1, 4);
@@ -660,9 +687,9 @@ public class MyJavaFX extends Application {
 
 // 当文本框中有输入时，启用确定按钮
             originTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-                okButton.setDisable(newValue.trim().isEmpty() || destTestField.getText().isEmpty());
+                okButton.setDisable(newValue.trim().isEmpty() || destTextField.getText().isEmpty());
             });
-            destTestField.textProperty().addListener((observable, oldValue, newValue) -> {
+            destTextField.textProperty().addListener((observable, oldValue, newValue) -> {
                 okButton.setDisable(newValue.trim().isEmpty() || originTextField.getText().isEmpty());
             });
 
@@ -670,7 +697,7 @@ public class MyJavaFX extends Application {
             dialog.setResultConverter(dialogButton -> {
                 if (dialogButton == DoneButtonType) {
                     return "M " + unitLevelField.getText() + " " + unitTestField.getText() + " " +
-                            originTextField.getText() + " " + destTestField.getText();
+                            originTextField.getText() + " " + destTextField.getText();
                 }
                 return null;
             });
@@ -678,17 +705,16 @@ public class MyJavaFX extends Application {
 // 显示对话框并等待用户响应
             dialog.showAndWait().ifPresent(result -> {
                 player.createAndAddMoveOrAttack("M "+ unitLevelField.getText() + " " + unitTestField.getText() + " "
-                        + originTextField.getText() + " " + destTestField.getText());
+                        + originTextField.getText() + " " + destTextField.getText());
                 System.out.println(result);
             });
         });
 
         upgradeButton.setOnAction(event -> {
-            statusLabel.setText("Upgrade！");
 // create a dialog box
-            Dialog<Pair<String, String>> dialog = new Dialog<>();
-            dialog.setTitle("Attack");
-            dialog.setHeaderText("Please enter origin/destination/units");
+            Dialog<String> dialog = new Dialog<>();
+            dialog.setTitle("Upgrade");
+            dialog.setHeaderText("Please enter origin/level/units");
 //add button
             ButtonType DoneButtonType = new ButtonType("Done", ButtonBar.ButtonData.OK_DONE);
             dialog.getDialogPane().getButtonTypes().addAll(DoneButtonType, ButtonType.CANCEL);
@@ -720,25 +746,28 @@ public class MyJavaFX extends Application {
             Node okButton = dialog.getDialogPane().lookupButton(DoneButtonType);
             okButton.setDisable(true);
 
-// 当文本框中有输入时，启用确定按钮
-// originTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-// okButton.setDisable(newValue.trim().isEmpty() || destTestField.getText().isEmpty());
-// });
-// destTestField.textProperty().addListener((observable, oldValue, newValue) -> {
-// okButton.setDisable(newValue.trim().isEmpty() || originTextField.getText().isEmpty());
-// });
+            // 当文本框中有输入时，启用确定按钮
+            originTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+                okButton.setDisable(newValue.trim().isEmpty() || originTextField.getText().isEmpty());
+            });
+            originTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+                okButton.setDisable(newValue.trim().isEmpty() || originTextField.getText().isEmpty());
+            });
 
 // 获取用户输入
+            // 获取用户输入
             dialog.setResultConverter(dialogButton -> {
                 if (dialogButton == DoneButtonType) {
-                    return new Pair<>(originTextField.getText(), oldlevelTextField.getText());
-                }
-                return null;
+                    return unitTestField.getText() + " " + originTextField.getText() + " "
+                            + oldlevelTextField.getText() + " " + newlevelTestField.getText() ;
+                }return null;
             });
 
 // 显示对话框并等待用户响应
             dialog.showAndWait().ifPresent(result -> {
-                System.out.println(": " + result.getKey() + ", : " + result.getValue());
+                player.createAndAddUpgrade(unitTestField.getText() + " " + originTextField.getText() + " "
+                        + oldlevelTextField.getText() + " " + newlevelTestField.getText());
+                System.out.println(result);
             });
         });
     }//id is used to check how many map in this game, reserved
