@@ -356,7 +356,15 @@ public class Player {
                             } else {
                                 listForOneTurn = new BehaviorList(gameInfoList.get(currentGame).getPlayerID(), -1);
                                 out.println(objectMapper.writeValueAsString(listForOneTurn));
-                                break label;
+                                joinGameList.remove(currentGame);
+                                gameInfoList.get(currentGame).disconnect();
+                                gameInfoList.remove(currentGame);
+                                if (!joinGameList.isEmpty()) {
+                                    currentGame = joinGameList.get(0);
+                                    System.out.println("Now move you to the next game you joined in.");
+                                } else {
+                                    break label;
+                                }
                             }
                         }
                         listForOneTurn = new BehaviorList(gameInfoList.get(currentGame).getPlayerID(), gameInfoList.get(currentGame).getStatus());
@@ -549,243 +557,12 @@ public class Player {
         this.currentGame = i;
     }
 
-    public void playOneTurn() throws IOException {
+    public String getGameStatueMessage() throws IOException {
         BufferedReader in = gameInfoList.get(currentGame).getIn();
-        PrintWriter out = gameInfoList.get(currentGame).getOut();
         inputLine = in.readLine();
-        System.out.println(inputLine);
-
-        // handle game start situation
-        label:
-        switch (inputLine) {
-            case "Game Start" -> {
-                int totalUnit = Integer.parseInt(in.readLine());
-                String response = null;
-                int[] numbers = null;
-                Scanner scanner = new Scanner(System.in);
-                // make sure the input has correct format, if not, let user retry
-                while (numbers == null) {
-                    System.out.println("The total number of unit you can use in your territory is " + totalUnit);
-                    System.out.println("Enter a string of space-separated numbers where the sum of them is " + totalUnit);
-                    response = scanner.nextLine();
-                    String[] tokens = response.split(" ");
-                    numbers = new int[tokens.length];
-                    try {
-                        for (int i = 0; i < tokens.length; i++) {
-                            numbers[i] = Integer.parseInt(tokens[i]);
-                        }
-                    } catch (NumberFormatException e) {
-                        System.out.println("Invalid input(format).");
-                        numbers = null;
-                    }
-                    if (numbers != null) {
-                        int sum = 0;
-                        for (String token : tokens) {
-                            if(Integer.parseInt(token)<0){
-                                System.out.println("Your input number includes negative number "+Integer.parseInt(token));
-                                numbers = null;
-                                sum = -1;
-                                break;
-                            }
-                            sum += Integer.parseInt(token);
-                        }
-                        if (sum != totalUnit && sum !=-1) {
-                            System.out.println("Total number of unit is not equal to " + totalUnit + ".");
-                            numbers = null;
-                        }
-                    }
-                }
-                // send unit information for territory back to server
-                out.println(response);
-            }
-            case "Turn Start" -> {
-                updateStatus();
-                updateCost();
-                // get GlobalMap object from server
-                ObjectMapper objectMapper = new ObjectMapper();
-                globalMap = objectMapper.readValue(in.readLine(), new TypeReference<>() {
-                });
-//                    current.receiveList(in);
-                // print the current map information
-                StringBuilder sb = new StringBuilder();
-                sb.append("You are Player " + gameInfoList.get(currentGame).getPlayerID() + ", your technology level is " + gameInfoList.get(currentGame).getMaximumTechNum() + System.lineSeparator());
-                for (int i = 1; i <= gameInfoList.get(currentGame).getTotalPlayerNum(); i++) {
-                    sb.append("Player").append(i).append(":").append(System.lineSeparator());
-                    for (Territory territory : globalMap) {
-                        if (territory.getOwnID() == i) {
-                            sb.append(territory.getUnits().printUnits() + " units in " + territory.getName() +
-                                    "(next to:");
-                            ArrayList<String> neighborName = new ArrayList<>();
-                            for (Map.Entry<Integer, ArrayList<String>> e : territory.getNeighbor().entrySet()) {
-                                neighborName.addAll(e.getValue());
-                            }
-                            for (int x = 0; x < neighborName.size(); x++) {
-                                sb.append(" " + neighborName.get(x));
-                                if (x != neighborName.size() - 1) {
-                                    sb.append(",");
-                                } else {
-                                    sb.append(")").append(System.lineSeparator());
-                                }
-                            }
-                        }
-                    }
-                }
-                System.out.println(sb);
-                // if the player has no territory, ask if the user want to stay
-                if (gameInfoList.get(currentGame).getStatus() == 0 && gameInfoList.get(currentGame).getWatchingPattern() == 0) {
-                    System.out.println("you lose the game, do you want to watch the rest of the game? enter yes to watch");
-                    InputStreamReader sr = new InputStreamReader(System.in);
-                    BufferedReader bf = new BufferedReader(sr);
-                    String response = bf.readLine();
-                    if (response.equals("yes")) {
-                        gameInfoList.get(currentGame).setWatchingPattern(1);
-                    } else {
-                        listForOneTurn = new BehaviorList(gameInfoList.get(currentGame).getPlayerID(), -1);
-                        out.println(objectMapper.writeValueAsString(listForOneTurn));
-                        joinGameList.remove(currentGame);
-                        if(!joinGameList.isEmpty()){
-                            currentGame = joinGameList.get(0);
-                            System.out.println("Now move you to the next game you joined in.");
-                        } else {
-                            break;
-                        }
-                    }
-                }
-                listForOneTurn = new BehaviorList(gameInfoList.get(currentGame).getPlayerID(), gameInfoList.get(currentGame).getStatus());
-                if (gameInfoList.get(currentGame).getWatchingPattern() == 1) {   // if the player is in the watching pattern then don't add any order
-                    out.println(objectMapper.writeValueAsString(listForOneTurn));
-                } else {
-                    // if the player has some territory
-                    while (true) {
-                        System.out.println("You are player " + gameInfoList.get(currentGame).getPlayerID() + ", what would you like to do?");
-                        System.out.println("(M)ove");
-                        System.out.println("(A)ttack");
-                        System.out.println("(U)pgrade");
-                        System.out.println("(E)volve");
-                        System.out.println("(D)one");
-                        System.out.println("now you have " + gameInfoList.get(currentGame).getRestCost() + " cost left");
-                        System.out.println("and you have " + gameInfoList.get(currentGame).getRestFood() + " food left");
-                        InputStreamReader sr = new InputStreamReader(System.in);
-                        BufferedReader bf = new BufferedReader(sr);
-                        String response = bf.readLine();
-                        while (response.length() != 1 || (response.toUpperCase().charAt(0) != 'M'
-                                && response.toUpperCase().charAt(0) != 'A' && response.toUpperCase().charAt(0) != 'D' && response.toUpperCase().charAt(0) != 'U' && response.toUpperCase().charAt(0) != 'E')) {
-                            System.out.println("Your input is not in correct format, try again");
-                            System.out.println("You are player " + gameInfoList.get(currentGame).getPlayerID() + ", what would you like to do?");
-                            System.out.println("(M)ove");
-                            System.out.println("(A)ttack");
-                            System.out.println("(U)pgrade");
-                            System.out.println("(E)volve");
-                            System.out.println("(D)one");
-                            System.out.println("now you have " + gameInfoList.get(currentGame).getRestCost() + " cost left");
-                            System.out.println("and you have " + gameInfoList.get(currentGame).getRestFood() + " food left");
-                            response = bf.readLine();
-                        }
-                        // get behavior type
-                        if (response.toUpperCase().charAt(0) == 'M' || response.toUpperCase().charAt(0) == 'A') {
-                            Behavior behavior = null;
-                            while (behavior == null) {
-                                System.out.println("Please entry your behavior in this format:UnitLevel Unit SourceTerritory DestinationTerritory");
-                                String behaviorInfo = bf.readLine();
-                                while (!checkBehaviorInputFormat(behaviorInfo, globalMap)) {
-                                    System.out.println("Your input is not in correct format, please " +
-                                            "check your unit level, unit, SourceTerritory, and DestinationTerritory and try again");
-                                    System.out.println("Please entry your behavior in this format:UnitLevel Unit SourceTerritory DestinationTerritory");
-                                    behaviorInfo = bf.readLine();
-                                }
-
-                                String[] tokens = behaviorInfo.split(" ");
-                                ArrayList<Integer> unit = new ArrayList<>();
-                                for (int i = 0; i < 7; i++) {
-                                    if (i == Integer.parseInt(tokens[0])) {
-                                        unit.add(Integer.parseInt(tokens[1]));
-                                    } else {
-                                        unit.add(0);
-                                    }
-                                }
-
-                                if (response.toUpperCase().charAt(0) == 'M') {// move behavior initialize
-                                    behavior = new Behavior(getTerritoryByName(tokens[2], globalMap), getTerritoryByName(tokens[3], globalMap), unit, gameInfoList.get(currentGame).getPlayerID(), "Move");
-                                } else if (response.toUpperCase().charAt(0) == 'A') {// attack behavior initialize
-                                    behavior = new Behavior(getTerritoryByName(tokens[2], globalMap), getTerritoryByName(tokens[3], globalMap), unit, gameInfoList.get(currentGame).getPlayerID(), "Attack");
-                                }
-                            }
-                            // add to arraylist based on the type of behavior
-                            if (response.toUpperCase().charAt(0) == 'M') {
-                                listForOneTurn.addToMoveList(behavior);
-                            } else {
-                                listForOneTurn.addToAttackList(behavior);
-                            }
-                        } else if (response.toUpperCase().charAt(0) == 'U') {
-                            upgradeBehavior behavior = null;
-                            while (behavior == null) {
-                                System.out.println("Please entry your behavior in this format:Unit Territory currentLevel targetLevel");
-                                String behaviorInfo = bf.readLine();
-                                while (!checkUpgradeBehavior(behaviorInfo, globalMap)) {// check here need more change
-                                    System.out.println("Your input is not in correct format, please " +
-                                            "check your unit, Territory, currentLevel and TargetLevel and try again");
-                                    System.out.println("Please entry your behavior in this format:Unit Territory currentLevel targetLevel");
-                                    behaviorInfo = bf.readLine();
-                                }
-                                String[] tokens = behaviorInfo.split(" ");
-                                behavior = new upgradeBehavior(getTerritoryByName(tokens[1], globalMap), gameInfoList.get(currentGame).getPlayerID(), "Upgrade", Integer.parseInt(tokens[2]), Integer.parseInt(tokens[3]), Integer.parseInt(tokens[0]));
-                                // check if the unit and source is correct for the behavior
-                                if (upgradeChecker.checkMyRule(behavior, globalMap) != null) {
-                                    System.out.println(upgradeChecker.checkMyRule(behavior, globalMap));
-                                    behavior = null;
-                                }
-                            }
-                            // add to arraylist based on the type of behavior
-                            listForOneTurn.addToUpgradeList(behavior);
-                        } else if (response.toUpperCase().charAt(0) == 'E') {
-                            System.out.println("Evolve behavior is added to the list");
-                            listForOneTurn.addEvloveNum();
-//                                    int Evolevel = -1;
-//                                    while (Evolevel == -1) {
-//                                        System.out.println("now you are at level " + gameInfoList.get(currentGame).getMaximumTechNum());
-//                                        System.out.println("you want to evolve to level: ");
-//                                        String behaviorInfo = bf.readLine();
-//                                        int sum = -1;
-//                                        while ((sum = checkEvolevelBehavior(behaviorInfo, gameInfoList.get(currentGame).getMaximumTechNum())) == -1) {// check here need more change
-//                                            System.out.println("Your input is not in correct format, please try again");
-//                                            System.out.println("you want to evolve to level: ");
-//                                            behaviorInfo = bf.readLine();
-//                                        }
-//                                        if(sum > gameInfoList.get(currentGame).getRestCost()){
-//                                            System.out.println("you don't have enough cost to evolve to this level");
-//                                            break;
-//                                        }
-//                                        Evolevel = Integer.parseInt(behaviorInfo);
-//                                        gameInfoList.get(currentGame).setRestCost(gameInfoList.get(currentGame).getRestCost() - sum);
-//                                        gameInfoList.get(currentGame).setMaximumTechNum(Evolevel);
-//                                    }
-                        } else if (response.toUpperCase().charAt(0) == 'D') {// end turn
-                            out.println(objectMapper.writeValueAsString(listForOneTurn));
-                            listForOneTurn = null;
-                            break;
-                        }
-                    }
-                }
-            }
-            case "Game Over" -> { // if game is over, quit
-                in.close();
-                out.close();
-                gameInfoList.get(currentGame).disconnect();
-                gameInfoList.remove(currentGame);
-                currentGame = -1;
-                if (gameInfoList.isEmpty()) {
-                    break label;
-                }
-            }
-        }
-    }
-
-    public String getInputLine(){
         return inputLine;
     }
-    public ArrayList<Territory> getGlobalMap(){
-        return this.globalMap;
-    }
+
     public String gameStartHandler(String s) throws IOException {
         int totalUnit = Integer.parseInt(gameInfoList.get(currentGame).getIn().readLine());
         String[] tokens = s.split(" ");
@@ -799,8 +576,8 @@ public class Player {
         }
         int sum = 0;
         for (String token : tokens) {
-            if(Integer.parseInt(token)<0){
-                return "Your input number includes negative number "+Integer.parseInt(token);
+            if (Integer.parseInt(token) < 0) {
+                return "Your input number includes negative number " + Integer.parseInt(token);
             }
             sum += Integer.parseInt(token);
         }
@@ -819,9 +596,45 @@ public class Player {
         });
     }
 
-    public int getCurrentStatus(){
+    public ArrayList<Territory> getGlobalMap() {
+        return this.globalMap;
+    }
+
+    public int getCurrentStatus() {
         return gameInfoList.get(currentGame).getStatus();
     }
+
+    public int getCurrentWatchingPattern() {
+        return gameInfoList.get(currentGame).getWatchingPattern();
+    }
+
+    public void setCurrentWatchingPattern() {
+        gameInfoList.get(currentGame).setWatchingPattern(1);
+    }
+
+    public String turnStartHandlerHelper() throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        if (gameInfoList.get(currentGame).getStatus() == 0) {
+            if (gameInfoList.get(currentGame).getWatchingPattern() == 0) {
+                listForOneTurn = new BehaviorList(gameInfoList.get(currentGame).getPlayerID(), -1);
+                gameInfoList.get(currentGame).getOut().println(objectMapper.writeValueAsString(listForOneTurn));
+                joinGameList.remove(currentGame);
+                gameInfoList.get(currentGame).disconnect();
+                gameInfoList.remove(currentGame);
+                if (!joinGameList.isEmpty()) {
+                    currentGame = joinGameList.get(0);
+                    System.out.println("Now move you to the next game you joined in.");
+                }
+                return "Disconnect";
+            } else if (gameInfoList.get(currentGame).getWatchingPattern() == 1) {
+                listForOneTurn = new BehaviorList(gameInfoList.get(currentGame).getPlayerID(), gameInfoList.get(currentGame).getStatus());
+                gameInfoList.get(currentGame).getOut().println(objectMapper.writeValueAsString(listForOneTurn));
+                return "Watching";
+            }
+        }
+        return "Playing";
+    }
+
     public void createAndAddMoveOrAttack(String s) {
         String[] tokens = s.split(" ");
         if (tokens[0].toUpperCase().charAt(0) == 'M') {
@@ -850,6 +663,17 @@ public class Player {
         gameInfoList.get(currentGame).getOut().println(objectMapper.writeValueAsString(listForOneTurn));
         listForOneTurn = null;
         return "end";
+    }
+
+    public String gameOverHandler() throws IOException {
+        gameInfoList.get(currentGame).disconnect();
+        gameInfoList.remove(gameInfoList.get(currentGame));
+        joinGameList.remove(currentGame);
+        if (joinGameList.isEmpty()) {
+            return null;
+        }
+        currentGame = joinGameList.get(0);
+        return "Continue";
     }
 
     public static void main(String[] args) throws IOException {
