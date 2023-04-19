@@ -1,9 +1,9 @@
+package com.example.demo;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.Inet4Address;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
@@ -15,12 +15,12 @@ public class Game implements Runnable {
     public int port;
     public int maxPlayerNum;
     public ServerSocket serverSocket;
-    private BasicChecker ruleChecker;
-    private UpgradeChecker upgradeChecker;
+    public BasicChecker ruleChecker;
+    public UpgradeChecker upgradeChecker;
     // store the rest cost of each player
-    private ArrayList<Integer> restCost;
-    private ArrayList<Integer> restFood;
-    private ArrayList<Integer> techLevelList;
+    public ArrayList<Integer> restCost;
+    public ArrayList<Integer> restFood;
+    public ArrayList<Integer> techLevelList;
 
     /*
      * Constructor to create a Server object
@@ -142,14 +142,14 @@ public class Game implements Runnable {
      *
      * Increases the unit count of each territory by one.
      */
-    private void addOneUnit() {
+    public void addOneUnit() {
         for (int i = 0; i < map.size(); i++) {
 //            int unit = map.get(i).getUnits().addUnits(1, 0);
             map.get(i).getUnits().addUnits(1, 0);
         }
     }
 
-    private void addCost() {
+    public void addCost() {
         for (int i = 0; i < map.size(); i++) {
             restCost.set(map.get(i).getOwnID() - 1, restCost.get(map.get(i).getOwnID() - 1) + 10);
             restFood.set(map.get(i).getOwnID() - 1, restFood.get(map.get(i).getOwnID() - 1) + 100);
@@ -157,7 +157,7 @@ public class Game implements Runnable {
     }
 
     //=======================================upgrade function =====================
-    private void checkAndExecuteUpgradeBehavior(ArrayList<upgradeBehavior> behaviorArrayList) {  // checkandupdate
+    public void checkAndExecuteUpgradeBehavior(ArrayList<upgradeBehavior> behaviorArrayList) {  // checkandupdate
         for (upgradeBehavior b : behaviorArrayList) {
             if (upgradeChecker.checkMyRule(restCost.get(b.getOwnID() - 1), b, map) == null) {
                 executeUpgradeBehavior(b);
@@ -165,7 +165,7 @@ public class Game implements Runnable {
         }
     }
 
-    private void executeUpgradeBehavior(upgradeBehavior b) {
+    public void executeUpgradeBehavior(upgradeBehavior b) {
         String sourceName = b.getOrigin().getName();
         int unitsNum = b.getUnitsNum();
         int currLevel = b.getCurrLevel();
@@ -187,7 +187,7 @@ public class Game implements Runnable {
 
 
     //evolve function
-    private int checkEvolevelBehavior(ArrayList<Integer> totalCost,int playerID){
+    public int checkEvolevelBehavior(ArrayList<Integer> totalCost,int playerID){
         int currentTechLevel = techLevelList.get(playerID-1);
         if(currentTechLevel==6){
             return -1;
@@ -199,7 +199,7 @@ public class Game implements Runnable {
         return totalCost.get(currentTechLevel+1);
     }
 
-    private void checkAndExecuteEvolveHelper(int playerID, int count){
+    public void checkAndExecuteEvolveHelper(int playerID, int count){
         if(count==0){
             return;
         }
@@ -220,7 +220,7 @@ public class Game implements Runnable {
         }
     }
 
-    private void checkAndExecuteEvolve(Map<Integer, Integer> evolveList){
+    public void checkAndExecuteEvolve(Map<Integer, Integer> evolveList){
         for(Map.Entry<Integer,Integer> e: evolveList.entrySet()){
             checkAndExecuteEvolveHelper(e.getKey(),e.getValue());
         }
@@ -377,7 +377,7 @@ public class Game implements Runnable {
         addCost();
     }
 
-    private Territory getTerritoryByName(String name, ArrayList<Territory> map) {
+    public Territory getTerritoryByName(String name, ArrayList<Territory> map) {
         for (Territory t : map) {
             if (name.equals(t.getName())) {
                 return t;
@@ -386,7 +386,7 @@ public class Game implements Runnable {
         return null;
     }
 
-    private int findShortestPath(Territory A, String destination, ArrayList<Territory> t, ArrayList<String> visited, int currentPathLength) {
+    public int findShortestPath(Territory A, String destination, ArrayList<Territory> t, ArrayList<String> visited, int currentPathLength) {
         if (A.getName().equals(destination)) {
             return currentPathLength;
         }
@@ -412,7 +412,7 @@ public class Game implements Runnable {
         return res;
     }
 
-    private void executeMoveBehavior(Behavior b) {
+    public void executeMoveBehavior(Behavior b) {
         String sourceName = b.getOrigin().getName();
         String destName = b.getDestination().getName();
         unitStorage units = b.getUnits();
@@ -432,7 +432,7 @@ public class Game implements Runnable {
         System.out.println("Move " + units.printUnits() + " from " + sourceName + " to " + destName);
     }
 
-    private void checkAndExecuteMoveBehavior(ArrayList<Behavior> behaviorArrayList) {  // checkandupdate
+    public void checkAndExecuteMoveBehavior(ArrayList<Behavior> behaviorArrayList) {  // checkandupdate
         for (Behavior b : behaviorArrayList) {
             if (ruleChecker.checkBehavior(restFood.get(b.getOwnID() - 1), b, map) == null) {
                 executeMoveBehavior(b);
@@ -440,7 +440,7 @@ public class Game implements Runnable {
         }
     }
 
-    private void moveUnitCuzAttack(Behavior b) {
+    public void moveUnitCuzAttack(Behavior b) {
         String sourceName = b.getOrigin().getName();
         unitStorage units = b.getUnits();
         restFood.set(b.getOwnID() - 1, restFood.get(b.getOwnID() - 1) - units.getRemainUnits());
@@ -453,14 +453,14 @@ public class Game implements Runnable {
         }
     }
 
-    private boolean getAttackResult(int attackerBonus, int defenderBonus) {
+    public boolean getAttackResult(int attackerBonus, int defenderBonus) {
         Random rand = new Random();
         int attacker = rand.nextInt(20) + 1 + attackerBonus;
         int defender = rand.nextInt(20) + 1 + defenderBonus;
         return attacker > defender;
     }
 
-    private void updateAllNeighbor(Territory t) {
+    public void updateAllNeighbor(Territory t) {
         for (int i = 0; i < map.size(); i++) {
             for (Map.Entry<Integer, ArrayList<String>> e : map.get(i).getNeighbor().entrySet()) {
                 if (e.getValue().contains(t.getName())) {
@@ -471,7 +471,7 @@ public class Game implements Runnable {
         }
     }
 
-    private void executeAttackBehavior(Behavior b) {
+    public void executeAttackBehavior(Behavior b) {
         String destName = b.getDestination().getName();
         unitStorage units = b.getUnits();
         System.out.println("Attack " + destName + " using " + units.printUnits() + " units.");
@@ -509,7 +509,7 @@ public class Game implements Runnable {
         }
     }
 
-    private void checkAndExecuteAttackBehavior(ArrayList<Behavior> behaviorArrayList) {
+    public void checkAndExecuteAttackBehavior(ArrayList<Behavior> behaviorArrayList) {
         Random rand = new Random();
         ArrayList<Integer> playerIDs = new ArrayList<>();
         for (Behavior b : behaviorArrayList) {

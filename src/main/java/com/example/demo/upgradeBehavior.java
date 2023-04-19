@@ -1,3 +1,5 @@
+package com.example.demo;
+
 public class upgradeBehavior{
     Territory origin;// The origin territory of the behavior
     Territory destination;// The destination territory of the behavior

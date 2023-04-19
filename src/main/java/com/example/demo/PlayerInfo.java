@@ -1,3 +1,5 @@
+package com.example.demo;
+
 import java.io.*;
 import java.net.Socket;
 
@@ -8,12 +10,12 @@ import java.net.Socket;
  */
 
 public class PlayerInfo {
-    private final Socket playerSocket;
+    public final Socket playerSocket;
 
-    private BufferedReader in;
+    public BufferedReader in;
 
-    private PrintWriter out;
-    private final int playerID;
+    public PrintWriter out;
+    public final int playerID;
 
 
 

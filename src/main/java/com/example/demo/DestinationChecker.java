@@ -1,3 +1,5 @@
+package com.example.demo;
+
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
@@ -81,7 +83,7 @@ public class DestinationChecker extends BasicChecker {
 
 
     @Override
-    protected String checkMyRule(int currentFood, Behavior my_behavior, ArrayList<Territory> t) {
+    public String checkMyRule(int currentFood, Behavior my_behavior, ArrayList<Territory> t) {
         // move or attack?
         String type = my_behavior.getType();
         int starterID = my_behavior.getOwnID();

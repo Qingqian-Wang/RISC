@@ -1,3 +1,5 @@
+package com.example.demo;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,11 +10,11 @@ public class unitStorage {
 
     public ArrayList<Integer> cost;
 
-    private int remainUnits;
+    public int remainUnits;
 
-    private int highestLevel;
+    public int highestLevel;
 
-    private int lowestLevel;
+    public int lowestLevel;
 
     // upgrade will reduce the specified amount of units from the current level and add them to the target level
     public void upgrade(int amount, int currLevel, int targetLevel){

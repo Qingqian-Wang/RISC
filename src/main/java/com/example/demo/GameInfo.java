@@ -1,3 +1,5 @@
+package com.example.demo;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -6,17 +8,17 @@ import java.net.Socket;
 import java.util.Map;
 
 public class GameInfo {
-    private int playerID;
-    private int gameID;
-    private int status;
-    private int maximumTechNum;
-    private int restCost;
-    private int restFood;
-    private int totalPlayerNum;
-    private int watchingPattern;
-    private PrintWriter out;
-    private BufferedReader in;
-    private Socket clientSocket;
+    public int playerID;
+    public int gameID;
+    public int status;
+    public int maximumTechNum;
+    public int restCost;
+    public int restFood;
+    public int totalPlayerNum;
+    public int watchingPattern;
+    public PrintWriter out;
+    public BufferedReader in;
+    public Socket clientSocket;
 
     public GameInfo(){
         this.watchingPattern = 0;

@@ -1,8 +1,7 @@
+package com.example.demo;
+
 import java.io.*;
-import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /*
  * This class represents a list of behaviors performed by a player during a game.
@@ -10,13 +9,13 @@ import java.util.Map;
  * for network communication and object serialization.
  * */
 public class BehaviorList implements NetworkObject, Serializable {
-    private ArrayList<Behavior> moveList;// A list of behaviors related to move
-    private ArrayList<Behavior> attackList;// A list of behaviors related to attack
+    public ArrayList<Behavior> moveList;// A list of behaviors related to move
+    public ArrayList<Behavior> attackList;// A list of behaviors related to attack
 
-    private ArrayList<upgradeBehavior> upgradeList;// A list of behaviors related to upgrade
-    private int evloveNum;
+    public ArrayList<upgradeBehavior> upgradeList;// A list of behaviors related to upgrade
+    public int evloveNum;
 
-    private int playerID;// The ID of the player who performed the behaviors
+    public int playerID;// The ID of the player who performed the behaviors
     public int status; // -1 means disconnect; 0 means dead; 1 means live
 
     public BehaviorList() {

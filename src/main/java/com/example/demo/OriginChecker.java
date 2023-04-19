@@ -1,3 +1,5 @@
+package com.example.demo;
+
 import java.util.ArrayList;
 /*
 This class is used to check whether Origin place is right. First, it will check the Origin place is
@@ -13,7 +15,7 @@ public class OriginChecker extends BasicChecker {
     // carry out the behavior
 
     @Override
-    protected String checkMyRule(int currentFood, Behavior my_behavior, ArrayList<Territory> t) {
+    public String checkMyRule(int currentFood, Behavior my_behavior, ArrayList<Territory> t) {
         int starterID = my_behavior.getOwnID();
         int behavior_OriginID =  my_behavior.getOrigin().getOwnID();
 //        int behavior_DestinationID = my_behavior.getDestination().getOwnID();

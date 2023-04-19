@@ -1,3 +1,5 @@
+package com.example.demo;
+
 import java.util.ArrayList;
 
 /*
@@ -16,7 +18,7 @@ public abstract class BasicChecker {
     public BasicChecker(BasicChecker next) {
         this.next = next;
     }
-    protected abstract String checkMyRule(int currentFood, Behavior my_behavior, ArrayList <Territory> t);
+    public abstract String checkMyRule(int currentFood, Behavior my_behavior, ArrayList <Territory> t);
     public String checkBehavior (int currentFood, Behavior my_behavior, ArrayList <Territory> t) {
         //if we fail our own rule: stop the placement is not legal
         String error_Msg = checkMyRule(currentFood, my_behavior, t);

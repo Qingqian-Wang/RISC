@@ -1,15 +1,17 @@
+package com.example.demo;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Territory implements Serializable {
-    private final String name;
-    private int ownID;
-    private unitStorage units;
-    private HashMap<Integer, ArrayList<String>> neighbor;
+    public String name;
+    public int ownID;
+    public unitStorage units;
+    public HashMap<Integer, ArrayList<String>> neighbor;
 
-    private int size;
+    public int size;
 
 
     public Territory() {
@@ -57,7 +59,7 @@ public class Territory implements Serializable {
     }
 
     // based on territory id, find its name in hashmap
-    private int getIDByName(Territory t) {
+    public int getIDByName(Territory t) {
         for (Map.Entry<Integer, ArrayList<String>> e : neighbor.entrySet()) {
             if (e.getValue().contains(t.getName())) {
                 return e.getKey();

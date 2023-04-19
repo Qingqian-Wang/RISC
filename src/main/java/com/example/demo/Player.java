@@ -1,3 +1,5 @@
+package com.example.demo;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,14 +17,14 @@ public class Player {
     public ArrayList<Integer> gamePortList;
     public int currentGame;
     public int serverPort;
-    private Socket toServer;
-    private BehaviorList listForOneTurn;
-    private ArrayList<Territory> globalMap;
-    private String inputLine;
-    //    private final BasicChecker ruleChecker;
-    private UpgradeChecker upgradeChecker;
+    public Socket toServer;
+    public BehaviorList listForOneTurn;
+    public ArrayList<Territory> globalMap;
+    public String inputLine;
+    //    public final BasicChecker ruleChecker;
+    public UpgradeChecker upgradeChecker;
 
-    private ArrayList<Integer> availableList;
+    public ArrayList<Integer> availableList;
 
     // initialize  player by server port number
     public Player(int serverPort) {
@@ -33,6 +35,7 @@ public class Player {
         joinGameList = new ArrayList<>();
         upgradeChecker = new UpgradeChecker();
         availableList = new ArrayList<>();
+        listForOneTurn = new BehaviorList();
     }
 
     // receive player status from server
@@ -114,7 +117,7 @@ public class Player {
     }
 
     // check if the name exist in the map
-    private boolean checkBehaviorInputFormatHelper(String name, ArrayList<Territory> map) {
+    public boolean checkBehaviorInputFormatHelper(String name, ArrayList<Territory> map) {
         for (Territory t : map) {
             if (t.getName().equals(name)) {
                 return true;
@@ -124,7 +127,7 @@ public class Player {
     }
 
 
-    private boolean checkUpgradeBehavior(String s, ArrayList<Territory> map) {
+    public boolean checkUpgradeBehavior(String s, ArrayList<Territory> map) {
         String[] tokens = s.split(" ");
         if (tokens.length != 4) {
             return false;
@@ -142,7 +145,7 @@ public class Player {
 
 
     // return -1 if failed, return cost if pass the check
-    private int checkEvolevelBehavior(String s, int maxTechLevel) {
+    public int checkEvolevelBehavior(String s, int maxTechLevel) {
         int[] totalCost = {0, 0, 50, 75, 125, 200, 300};
         int sum = 0;
         try {
@@ -167,7 +170,7 @@ public class Player {
 
 
     // check if the format of input for creating behavior is correct
-    private boolean checkBehaviorInputFormat(String s, ArrayList<Territory> map) {
+    public boolean checkBehaviorInputFormat(String s, ArrayList<Territory> map) {
         String[] tokens = s.split(" ");
         if (tokens.length != 4) {
             return false;
@@ -180,7 +183,7 @@ public class Player {
     }
 
     // get Territory object based on name
-    private Territory getTerritoryByName(String s, ArrayList<Territory> map) {
+    public Territory getTerritoryByName(String s, ArrayList<Territory> map) {
         for (Territory t : map) {
             if (t.getName().equals(s)) {
                 return t;
@@ -537,6 +540,7 @@ public class Player {
     public void connectToGameForFront(String s) throws IOException {
         if (s.length() == 1) {
             joinGameList.add(Integer.parseInt(s));
+            this.currentGame = Integer.parseInt(s);
         } else {
             String[] tokens = s.split(" ");
             for (String str : tokens) {
@@ -592,8 +596,9 @@ public class Player {
         updateStatus();
         updateCost();
         ObjectMapper objectMapper = new ObjectMapper();
-        globalMap = objectMapper.readValue(gameInfoList.get(currentGame).getIn().readLine(), new TypeReference<>() {
-        });
+        globalMap = new ArrayList<>();
+        globalMap.addAll(objectMapper.readValue(gameInfoList.get(currentGame).getIn().readLine(), new TypeReference<>() {
+        }));
     }
     public int getGameID(){
         return this.currentGame;
@@ -602,12 +607,21 @@ public class Player {
         return gameInfoList.get(currentGame).getPlayerID();
     }
     public int getFood(){
+        if(gameInfoList.get(currentGame)==null){
+            return -5;
+        }
         return gameInfoList.get(currentGame).getRestFood();
     }
     public int getCost(){
+        if(gameInfoList.get(currentGame)==null){
+            return -5;
+        }
         return gameInfoList.get(currentGame).getRestCost();
     }
     public int getTechLevel(){
+        if(gameInfoList.get(currentGame)==null){
+            return -5;
+        }
         return gameInfoList.get(currentGame).getMaximumTechNum();
     }
     public ArrayList<Territory> getGlobalMap() {
@@ -642,30 +656,33 @@ public class Player {
                 }
                 return "Disconnect";
             } else if (gameInfoList.get(currentGame).getWatchingPattern() == 1) {
-                listForOneTurn = new BehaviorList(gameInfoList.get(currentGame).getPlayerID(), gameInfoList.get(currentGame).getStatus());
-                gameInfoList.get(currentGame).getOut().println(objectMapper.writeValueAsString(listForOneTurn));
                 return "Watching";
             }
         }
         return "Playing";
+    }
+    public void watchingPatternTurn() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        listForOneTurn = new BehaviorList(gameInfoList.get(currentGame).getPlayerID(), gameInfoList.get(currentGame).getStatus());
+        gameInfoList.get(currentGame).getOut().println(objectMapper.writeValueAsString(listForOneTurn));
     }
 
     public void createAndAddMoveOrAttack(String s) {
         String[] tokens = s.split(" ");
         if (tokens[0].toUpperCase().charAt(0) == 'M') {
             Behavior temp = new Behavior(getTerritoryByName(tokens[3], globalMap), getTerritoryByName(tokens[4], globalMap), gameInfoList.get(currentGame).getPlayerID(), "Move");
-            temp.getUnits().addUnits(Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
+            temp.getUnits().addUnits(Integer.parseInt(tokens[2]), Integer.parseInt(tokens[1]));
             listForOneTurn.addToMoveList(temp);
         } else if (tokens[0].toUpperCase().charAt(0) == 'A') {
             Behavior temp = new Behavior(getTerritoryByName(tokens[3], globalMap), getTerritoryByName(tokens[4], globalMap), gameInfoList.get(currentGame).getPlayerID(), "Attack");
-            temp.getUnits().addUnits(Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
+            temp.getUnits().addUnits(Integer.parseInt(tokens[2]), Integer.parseInt(tokens[1]));
             listForOneTurn.addToAttackList(temp);
         }
     }
 
     public void createAndAddUpgrade(String s) {
         String[] tokens = s.split(" ");
-        upgradeBehavior temp = new upgradeBehavior(getTerritoryByName(tokens[2], globalMap), gameInfoList.get(currentGame).getPlayerID(), "Upgrade", Integer.parseInt(tokens[3]), Integer.parseInt(tokens[4]), Integer.parseInt(tokens[0]));
+        upgradeBehavior temp = new upgradeBehavior(getTerritoryByName(tokens[1], globalMap), gameInfoList.get(currentGame).getPlayerID(), "Upgrade", Integer.parseInt(tokens[2]), Integer.parseInt(tokens[3]), Integer.parseInt(tokens[0]));
         listForOneTurn.addToUpgradeList(temp);
     }
 
@@ -691,13 +708,13 @@ public class Player {
         return "Continue";
     }
 
-    public static void main(String[] args) throws IOException {
-        int serverPort = 9999;
-        Player p1 = new Player(serverPort);
-        p1.connectToServer();
-        p1.connectToGame();
-//        p1.connectToGameForFront("1 2");
-        p1.playGame();
-
-    }
+//    public static void main(String[] args) throws IOException {
+//        int serverPort = 9999;
+//        Player p1 = new Player(serverPort);
+//        p1.connectToServer();
+//        p1.connectToGame();
+////        p1.connectToGameForFront("1 2");
+//        p1.playGame();
+//
+//    }
 }
