@@ -604,6 +604,9 @@ public class Player {
         return this.currentGame;
     }
     public int getPlayerID(){
+        if(gameInfoList.get(currentGame)==null){
+            return -5;
+        }
         return gameInfoList.get(currentGame).getPlayerID();
     }
     public int getFood(){
@@ -693,7 +696,7 @@ public class Player {
     public String endTurn() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         gameInfoList.get(currentGame).getOut().println(objectMapper.writeValueAsString(listForOneTurn));
-        listForOneTurn = null;
+        listForOneTurn = new BehaviorList();
         return "end";
     }
 
