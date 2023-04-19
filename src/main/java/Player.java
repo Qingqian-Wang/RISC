@@ -596,6 +596,15 @@ public class Player {
         });
     }
 
+    public int getFood(){
+        return gameInfoList.get(currentGame).getRestFood();
+    }
+    public int getCost(){
+        return gameInfoList.get(currentGame).getRestCost();
+    }
+    public int getTechLevel(){
+        return gameInfoList.get(currentGame).getMaximumTechNum();
+    }
     public ArrayList<Territory> getGlobalMap() {
         return this.globalMap;
     }
