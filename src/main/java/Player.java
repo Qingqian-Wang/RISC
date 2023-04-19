@@ -595,7 +595,12 @@ public class Player {
         globalMap = objectMapper.readValue(gameInfoList.get(currentGame).getIn().readLine(), new TypeReference<>() {
         });
     }
-
+    public int getGameID(){
+        return this.currentGame;
+    }
+    public int getPlayerID(){
+        return gameInfoList.get(currentGame).getPlayerID();
+    }
     public int getFood(){
         return gameInfoList.get(currentGame).getRestFood();
     }
