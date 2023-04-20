@@ -90,7 +90,7 @@ public class Server {
         int gamePort1 = 9000;
         int gamePort2 = 8000;
         int totalPlayerNum1 = 2;
-        int totalPlayerNum2 = 2;
+        int totalPlayerNum2 = 3;
         if (totalPlayerNum1 < 2 || totalPlayerNum1 > 5 || totalPlayerNum2 < 2 || totalPlayerNum2 > 5) {
             System.out.println("The total number of players should be between 2 and 5");
         } else {

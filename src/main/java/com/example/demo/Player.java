@@ -546,6 +546,7 @@ public class Player {
             for (String str : tokens) {
                 joinGameList.add(Integer.parseInt(str));
             }
+            this.currentGame = Integer.parseInt(tokens[0]);
         }
         PrintWriter out = new PrintWriter(toServer.getOutputStream(), true);
         StringBuilder sb = new StringBuilder();

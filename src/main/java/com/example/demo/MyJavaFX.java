@@ -21,8 +21,9 @@ import static java.lang.Thread.sleep;
 
 public class MyJavaFX extends Application {
 
-    private static final String USERNAME = "";
-    private static final String PASSWORD = "";
+    private static final String USERNAME = "123";
+    private static final String PASSWORD = "123";
+    boolean multiple = false;
     private String systemMessage = "The total number of unites is 50, please assign the units to the territories.\n";
 
 
@@ -286,7 +287,8 @@ public class MyJavaFX extends Application {
                 throw new RuntimeException(e);
             }
             if (isStart.equalsIgnoreCase("game start")) {
-                primaryStage.setScene(new Scene(assignGridPaneGame1_2));
+                multiple = true;
+                primaryStage.setScene(assignGame1_2Scene);
             }
         });
 
@@ -360,13 +362,7 @@ public class MyJavaFX extends Application {
             String area1 = areaGame2_1.getText();
             String area2 = areaGame2_2.getText();
             String area3 = areaGame2_3.getText();
-            if (area1.equals("") || area2.equals("") || area3.equals("")) {
-// 显示错误消息
-                messageGame2.setText("Please assign all territories!");
-            } else {
-// 显示错误消息
-                messageGame2.setText("Assign successfully!");
-            }
+
             joinGameMessage = area1 + " " + area2 + " " + area3;
             try {
                 result = player.gameStartHandler(joinGameMessage);
@@ -377,7 +373,17 @@ public class MyJavaFX extends Application {
                 messageGame2.setText("Assign failure! Please re-enter units");
                 primaryStage.setScene(assignErrorScene2);
             } else {
-                switchButton2.setDisable(true);
+                try {
+                    if (player.getGameStatueMessage().equalsIgnoreCase("turn start")) {
+                        player.turnStartHandler();
+                        set2Pane(player, switchButton2, root2, 2);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                if(!multiple){
+                    switchButton2.setDisable(true);
+                }
                 primaryStage.setScene(scene2);
             }
         });
@@ -388,18 +394,30 @@ public class MyJavaFX extends Application {
             String area3 = areaGame1_2_3.getText();
             String area4 = areaGame1_2_4.getText();
             String area5 = areaGame1_2_5.getText();
-            if (area1.equals("") || area2.equals("") || area3.equals("") || area4.equals("") || area5.equals("")) {
-// 显示错误消息
-                messageGame1_2.setText("Please assign all territories!");
-            } else {
-// 显示错误消息
-                messageGame1_2.setText("Assign successfully!");
-            }
-            joinGameMessage = area1 + " " + area1 + " " + area2 + " " + area3 + " " + area4 + " " + area5;
+            joinGameMessage = area1 + " " + area2 + " " + area3 + " " + area4 + " " + area5;
             switchButton1.setDisable(false);
             switchButton2.setDisable(false);
+            String result = "";
 
-            primaryStage.setScene(scene1);
+            try {
+                result = player.gameStartHandler(joinGameMessage);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            if (result != null) {
+                messageGame1.setText("Assign failure! Please re-enter units");
+                primaryStage.setScene(assignErrorScene);
+            } else {
+                try {
+                    if (player.getGameStatueMessage().equalsIgnoreCase("turn start")) {
+                        player.turnStartHandler();
+                        set2Pane(player, switchButton1, root1, 1);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                primaryStage.setScene(scene1);
+            }
 
         });
 
@@ -418,12 +436,6 @@ public class MyJavaFX extends Application {
         });
 
         switchButton2.setOnAction(event -> {
-// if(firstInGame == 0) {
-// switchButton1.setDisable(false);
-// primaryStage.setScene(new Scene(assignGridPaneGame1));
-// firstInGame = 1;
-//
-// }else {
             switchButton2.setDisable(false);
             primaryStage.setScene(scene1);
 // }
@@ -520,6 +532,9 @@ public class MyJavaFX extends Application {
             }
             doneButton.setDisable(true);
             refreshButton.setDisable(false);
+            attackButton.setDisable(true);
+            moveButton.setDisable(true);
+            upgradeButton.setDisable(true);
         });
         refreshButton.setOnAction(event -> {
             try {
@@ -535,23 +550,31 @@ public class MyJavaFX extends Application {
             set2Pane(player, switchButton, root, id);
             doneButton.setDisable(false);
             refreshButton.setDisable(true);
+            attackButton.setDisable(false);
+            moveButton.setDisable(false);
+            upgradeButton.setDisable(false);
         });
         upgrade.setOnAction(event -> {
             player.evloveTech();
         });
-
+        int limit;
+        if (id == 1) {
+            limit = 10;
+        } else {
+            limit = 9;
+        }
 // 左侧按钮事件处理程序
-        for (int i = 0; i < buttons.length; i++) {
+        for (int i = 0; i < limit; i++) {
             Button button = buttons[i];
-            int ownId,l0,l1,l2,l3,l4,l5,l6;
+            int ownId, l0, l1, l2, l3, l4, l5, l6;
             String name;
-            if(player.getGlobalMap()==null){
+            if (player.getGlobalMap() == null) {
                 ownId = -1;
                 name = "Name";
                 l0 = -1;
-                l1 =-1;
+                l1 = -1;
                 l2 = -1;
-                l3 =-1;
+                l3 = -1;
                 l4 = -1;
                 l5 = -1;
                 l6 = -1;
@@ -704,7 +727,7 @@ public class MyJavaFX extends Application {
 
 // 显示对话框并等待用户响应
             dialog.showAndWait().ifPresent(result -> {
-                player.createAndAddMoveOrAttack("M "+ unitLevelField.getText() + " " + unitTestField.getText() + " "
+                player.createAndAddMoveOrAttack("M " + unitLevelField.getText() + " " + unitTestField.getText() + " "
                         + originTextField.getText() + " " + destTextField.getText());
                 System.out.println(result);
             });
@@ -759,8 +782,9 @@ public class MyJavaFX extends Application {
             dialog.setResultConverter(dialogButton -> {
                 if (dialogButton == DoneButtonType) {
                     return unitTestField.getText() + " " + originTextField.getText() + " "
-                            + oldlevelTextField.getText() + " " + newlevelTestField.getText() ;
-                }return null;
+                            + oldlevelTextField.getText() + " " + newlevelTestField.getText();
+                }
+                return null;
             });
 
 // 显示对话框并等待用户响应
