@@ -10,36 +10,41 @@ public class unitStorage {
 
     public ArrayList<Integer> cost;
 
-    public int remainUnits;
+    private int remainUnits;
 
-    public int highestLevel;
+    private int highestLevel;
 
-    public int lowestLevel;
+    private int lowestLevel;
 
     // upgrade will reduce the specified amount of units from the current level and add them to the target level
-    public void upgrade(int amount, int currLevel, int targetLevel){
-        if (units.get(currLevel) >= amount){
+    public void upgrade(int amount, int currLevel, int targetLevel) {
+        if (units.get(currLevel) >= amount) {
             units.put(currLevel, units.get(currLevel) - amount);
             units.put(targetLevel, units.get(targetLevel) + amount);
-        }else{
+        } else {
             System.out.println("Not enough units to upgrade");
         }
     }
 
     // init all level to 0
-    public unitStorage(){
+    public unitStorage() {// i = 7: spy
         units = new HashMap<>();
-        for(int i = 0; i < 7; i++){
+        for (int i = 0; i < 8; i++) {
             units.put(i, 0);
         }
     }
 
-
+    public unitStorage(int x) {
+        units = new HashMap<>();
+        for (int i = 0; i < 8; i++) {
+            units.put(i, x);
+        }
+    }
 
     // constructor units by an arraylist
-    public unitStorage(ArrayList<Integer> unitsTemp){
+    public unitStorage(ArrayList<Integer> unitsTemp) {
         units = new HashMap<>();
-        for(int i = 0; i < unitsTemp.size(); i++){
+        for (int i = 0; i < unitsTemp.size(); i++) {
             units.put(i, unitsTemp.get(i));
         }
     }
@@ -53,9 +58,9 @@ public class unitStorage {
     //  25 (55)         4
     //  35 (90)         5
     //  50 (140)        6
-    public int calCost(int amount, int currLevel, int targetLevel){
+    public int calCost(int amount, int currLevel, int targetLevel) {
         int res = 0;
-        if(cost == null){
+        if (cost == null) {
             cost = new ArrayList<>();
             cost.add(0);
             cost.add(3);
@@ -65,47 +70,51 @@ public class unitStorage {
             cost.add(35);
             cost.add(50);
         }
-        res += amount * (cost.get(targetLevel) - cost.get(currLevel));
+        if (targetLevel == 7) {
+            res = amount * 20;
+        } else {
+            res += amount * (cost.get(targetLevel) - cost.get(currLevel));
+        }
         return res;
     }
 
 
     // add specific amount of units to the level 0, and initialize all other levels to 0
-    public void initUnit(int num){
+    public void initUnit(int num) {
         units.put(0, num);
-        for(int i = 1; i < 7; i++){
+        for (int i = 1; i < 8; i++) {
             units.put(i, 0);
         }
     }
 
     // add specific amount of units to the specified level
-    public void addUnits(int num, int level){
+    public void addUnits(int num, int level) {
         units.put(level, units.get(level) + num);
     }
 
     // remove specific amount of units from the specified level
-    public void removeUnits(int num, int level){
-        if (units.get(level) >= num){
+    public void removeUnits(int num, int level) {
+        if (units.get(level) >= num) {
             units.put(level, units.get(level) - num);
-        }else{
+        } else {
             System.out.println("Not enough units to remove");
         }
     }
 
-    public void addUnitStorage(unitStorage u){
-        for(int i = 0; i < 7; i++){
+    public void addUnitStorage(unitStorage u) {
+        for (int i = 0; i < 8; i++) {
             units.put(i, units.get(i) + u.getUnits().get(i));
         }
     }
 
-    public void setUnitsStorage(unitStorage u){
-        for(int i = 0; i < 7; i++){
+    public void setUnitsStorage(unitStorage u) {
+        for (int i = 0; i < 8; i++) {
             units.put(i, u.getUnits().get(i));
         }
     }
 
-    public void removeUnitStorage(unitStorage u){
-        for(int i = 0; i < 7; i++){
+    public void removeUnitStorage(unitStorage u) {
+        for (int i = 0; i < 8; i++) {
             units.put(i, units.get(i) - u.getUnits().get(i));
         }
     }
@@ -117,27 +126,31 @@ public class unitStorage {
     }
 
     // print the units in the format as 0|1|2|3|4|5|6
-    public String printUnits(){
+    public String printUnits() {
         String res = "";
-        for(int i = 0; i < 7; i++){
-            res += units.get(i) + "|";
+        for (int i = 0; i < 8; i++) {
+            if(units.get(i)==-1){
+                res += "?|";
+            } else {
+                res += units.get(i) + "|";
+            }
         }
         return res;
     }
 
-    public int getRemainUnits(){
+    public int getRemainUnits() {
         int res = 0;
-        for(int i = 0; i < 7; i++){
+        for (int i = 0; i < 8; i++) {
             res += units.get(i);
         }
         remainUnits = res;
         return remainUnits;
     }
 
-    public int getHighestLevel(){
+    public int getHighestLevel() {
         int res = 0;
-        for(int i = 0; i < 7; i++){
-            if(units.get(i) > 0){
+        for (int i = 0; i < 8; i++) {
+            if (units.get(i) > 0) {
                 res = i;
             }
         }
@@ -145,10 +158,10 @@ public class unitStorage {
         return highestLevel;
     }
 
-    public int getLowestLevel(){
-        int res = 6;
-        for(int i = 6; i >= 0; i--){
-            if(units.get(i) > 0){
+    public int getLowestLevel() {
+        int res = 7;
+        for (int i = 7; i >= 0; i--) {
+            if (units.get(i) > 0) {
                 res = i;
             }
         }
@@ -158,9 +171,9 @@ public class unitStorage {
 
 
     // check weather the unitStorage contains enough units
-    public boolean checkContainEnoughUnits(unitStorage u){
-        for(int i = 0; i < 7; i++){
-            if(units.get(i) < u.getUnits().get(i)){
+    public boolean checkContainEnoughUnits(unitStorage u) {
+        for (int i = 0; i < 8; i++) {
+            if (units.get(i) < u.getUnits().get(i)) {
                 return false;
             }
         }

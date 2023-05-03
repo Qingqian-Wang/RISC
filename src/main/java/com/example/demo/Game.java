@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.Inet4Address;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
@@ -12,6 +13,7 @@ public class Game implements Runnable {
     public ArrayList<PlayerInfo> playerInfoList;
 
     public ArrayList<Territory> map;
+    public Map<Integer, ArrayList<Territory>> viewMap;
     public int port;
     public int maxPlayerNum;
     public ServerSocket serverSocket;
@@ -41,6 +43,7 @@ public class Game implements Runnable {
         restCost = new ArrayList<>();
         restFood = new ArrayList<>();
         techLevelList = new ArrayList<>();
+        viewMap = new HashMap<>();
         for (int i = 0; i < maxPlayerNum; i++) {
             restCost.add(50);
             restFood.add(500);
@@ -115,6 +118,7 @@ public class Game implements Runnable {
             }
 //            dataOut.close();
         }
+        initViewMap();
         while (!gameOver()) {
             try {
                 playTurn();
@@ -187,20 +191,20 @@ public class Game implements Runnable {
 
 
     //evolve function
-    public int checkEvolevelBehavior(ArrayList<Integer> totalCost,int playerID){
-        int currentTechLevel = techLevelList.get(playerID-1);
-        if(currentTechLevel==6){
+    public int checkEvolevelBehavior(ArrayList<Integer> totalCost, int playerID) {
+        int currentTechLevel = techLevelList.get(playerID - 1);
+        if (currentTechLevel == 6) {
             return -1;
         }
-        int currentRestCost = restCost.get(playerID-1);
-        if(currentRestCost<(totalCost.get(currentTechLevel+1))){
+        int currentRestCost = restCost.get(playerID - 1);
+        if (currentRestCost < (totalCost.get(currentTechLevel + 1))) {
             return -1;
         }
-        return totalCost.get(currentTechLevel+1);
+        return totalCost.get(currentTechLevel + 1);
     }
 
-    public void checkAndExecuteEvolveHelper(int playerID, int count){
-        if(count==0){
+    public void checkAndExecuteEvolveHelper(int playerID, int count) {
+        if (count == 0) {
             return;
         }
         ArrayList<Integer> totalCost = new ArrayList<>();
@@ -211,18 +215,18 @@ public class Game implements Runnable {
         totalCost.add(125);
         totalCost.add(200);
         totalCost.add(300);
-        int expectedCost = checkEvolevelBehavior(totalCost,playerID);
-        if(expectedCost!=-1){
-            System.out.println("Player "+playerID+" evolve succeed");
-            techLevelList.set(playerID-1,techLevelList.get(playerID-1)+1);
-            restCost.set(playerID-1,restCost.get(playerID-1)-expectedCost);
-            checkAndExecuteEvolveHelper(playerID,count-1);
+        int expectedCost = checkEvolevelBehavior(totalCost, playerID);
+        if (expectedCost != -1) {
+            System.out.println("Player " + playerID + " evolve succeed");
+            techLevelList.set(playerID - 1, techLevelList.get(playerID - 1) + 1);
+            restCost.set(playerID - 1, restCost.get(playerID - 1) - expectedCost);
+            checkAndExecuteEvolveHelper(playerID, count - 1);
         }
     }
 
-    public void checkAndExecuteEvolve(Map<Integer, Integer> evolveList){
-        for(Map.Entry<Integer,Integer> e: evolveList.entrySet()){
-            checkAndExecuteEvolveHelper(e.getKey(),e.getValue());
+    public void checkAndExecuteEvolve(Map<Integer, Integer> evolveList) {
+        for (Map.Entry<Integer, Integer> e : evolveList.entrySet()) {
+            checkAndExecuteEvolveHelper(e.getKey(), e.getValue());
         }
     }
     //end evolve function
@@ -332,6 +336,28 @@ public class Game implements Runnable {
 
     }
 
+    public void initViewMap() {
+        for (int i = 1; i <= maxPlayerNum; i++) {
+            ArrayList<Territory> tempViewMap = new ArrayList<>();
+            for (Territory t : map) {
+                if (i == t.getOwnID() || (t.getSpiesCollection().containsKey(i) && t.getSpiesCollection().get(i) > 0)) {// if this has spy or you are the owner
+                    Territory tempView = new Territory(t);
+                    tempView.setAbleToSee(true);
+                    tempViewMap.add(tempView);
+                } else if (t.getNeighbor().containsKey(i) && !t.getNeighbor().get(i).isEmpty()) {// if this is just adjusted
+                    Territory tempView = new Territory(t);
+                    tempView.setAbleToSee(true);
+                    tempViewMap.add(tempView);
+                } else {// if the player never see the territory
+                    Territory tempView = new Territory(t, -1);
+                    tempView.setAbleToSee(false);
+                    tempViewMap.add(tempView);
+                }
+            }
+            viewMap.put(i, tempViewMap);
+        }
+    }
+
 
     public void playTurn() throws Exception {
         List<Integer> orders = new ArrayList<>();
@@ -343,13 +369,13 @@ public class Game implements Runnable {
         ArrayList<Behavior> attackList = new ArrayList<>();
         ArrayList<Behavior> moveList = new ArrayList<>();
         ArrayList<upgradeBehavior> upgradeList = new ArrayList<>();
-        Map<Integer,Integer> evolveList = new HashMap<>();
+        Map<Integer, Integer> evolveList = new HashMap<>();
         for (PlayerInfo playerInfo : playerInfoList) {
             playerInfo.getOut().println("Turn Start");
             sendPlayerStatus(playerInfo);
             sendPlayerRestCost(playerInfo);
             ObjectMapper objectMapper = new ObjectMapper();
-            String mapInfo = objectMapper.writeValueAsString(map);
+            String mapInfo = objectMapper.writeValueAsString(viewMap.get(playerInfo.getPlayerID()));
             playerInfo.getOut().println(mapInfo);
             String behaviorListInfo = playerInfo.getIn().readLine();
             BehaviorList behaviorList = objectMapper.readValue(behaviorListInfo, BehaviorList.class);
@@ -360,7 +386,7 @@ public class Game implements Runnable {
             int index = rand.nextInt(orders.size());
             orderMap.put(orders.get(index), behaviorList);
             orders.remove(index);
-            evolveList.put(playerInfo.getPlayerID(),behaviorList.getEvloveNum());
+            evolveList.put(playerInfo.getPlayerID(), behaviorList.getEvloveNum());
         }
         for (int i = 1; i <= playerInfoList.size(); i++) {
             attackList.addAll(orderMap.get(i).getAttackList());
@@ -375,6 +401,7 @@ public class Game implements Runnable {
         checkAndExecuteUpgradeBehavior(upgradeList);
         addOneUnit();
         addCost();
+        updateViewMap();
     }
 
     public Territory getTerritoryByName(String name, ArrayList<Territory> map) {
@@ -434,9 +461,122 @@ public class Game implements Runnable {
 
     public void checkAndExecuteMoveBehavior(ArrayList<Behavior> behaviorArrayList) {  // checkandupdate
         for (Behavior b : behaviorArrayList) {
-            if (ruleChecker.checkBehavior(restFood.get(b.getOwnID() - 1), b, map) == null) {
+            if (b.getUnits().getUnits().get(7) != 0) {
+                if (checkSpyMove(b)) {
+                    executeSpyMoveBehavior(b);
+                }
+            } else if (ruleChecker.checkBehavior(restFood.get(b.getOwnID() - 1), b, map) == null) {
                 executeMoveBehavior(b);
             }
+        }
+    }
+
+    public void executeSpyMoveBehavior(Behavior b) {
+        String sourceName = b.getOrigin().getName();
+        String destName = b.getDestination().getName();
+        unitStorage units = b.getUnits();
+        for (int i = 0; i < map.size(); i++) {
+            if (sourceName.equals(map.get(i).getName())) {
+                if (map.get(i).getOwnID() == b.getOwnID()) {
+                    map.get(i).getUnits().removeUnitStorage(units);
+                } else {
+                    map.get(i).removeSpy(b.getOwnID(), units.getUnits().get(7));
+                }
+                break;
+            }
+        }
+        for (int i = 0; i < map.size(); i++) {
+            if (destName.equals(map.get(i).getName())) {
+                if (map.get(i).getOwnID() == b.getOwnID()) {
+                    map.get(i).getUnits().addUnitStorage(units);
+                } else {
+                    map.get(i).addSpy(b.getOwnID(), units.getUnits().get(7));
+                }
+                break;
+            }
+        }
+        System.out.println("Move " + units.printUnits() + " from " + sourceName + " to " + destName);
+    }
+
+    public ArrayList<String> getFrontierAndTerritory(int playerID) {
+        ArrayList<String> res = new ArrayList<>();
+        for (Territory t : map) {
+            if (t.getOwnID() == playerID) {
+                if (!res.contains(t.getName())) {
+                    res.add(t.getName());
+                }
+                for (Map.Entry<Integer, ArrayList<String>> e : t.getNeighbor().entrySet()) {
+                    for (String s : e.getValue()) {
+                        if (!res.contains(s)) {
+                            res.add(s);
+                        }
+                    }
+                }
+            }
+        }
+        return res;
+    }
+
+    public boolean checkSpyMove(Behavior b) {
+        if (b.getOrigin().getOwnID() == b.getOwnID()) {
+            BasicChecker tempChecker = new OriginChecker(null);
+            if (tempChecker.checkBehavior(restFood.get(b.getOwnID() - 1), b, map) == null) {
+                return getFrontierAndTerritory(b.getOwnID()).contains(b.getDestination().getName());
+            }
+            return false;
+        } else {
+            if (b.getOrigin().getSpiesCollection().get(b.getOwnID()) >= b.getUnits().getUnits().get(7)) {
+                for (Map.Entry<Integer, ArrayList<String>> e : b.getOrigin().getNeighbor().entrySet()) {
+                    if (e.getValue().contains(b.getDestination().getName())) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }
+
+    public Territory getTerritoryByNameInView(int playerID, String s){
+        for(Territory t: viewMap.get(playerID)){
+            if(t.getName().equalsIgnoreCase(s)){
+                return t;
+            }
+        }
+        return null;
+    }
+    public void updateViewMap() {
+        ArrayList<Integer> playerList = new ArrayList<>();
+        for(PlayerInfo p : playerInfoList){
+            playerList.add(p.getPlayerID());
+        }
+        for (int i : playerList) {
+            ArrayList<Territory> tempViewMap = new ArrayList<>();
+            for (Territory t : map) {
+                if (i == t.getOwnID() || (t.getSpiesCollection().containsKey(i) && t.getSpiesCollection().get(i) > 0)) {// if this has spy or you are the owner
+                    Territory tempView = new Territory(t);
+                    tempView.setAbleToSee(true);
+                    tempViewMap.add(tempView);
+                } else if (t.getNeighbor().containsKey(i) && !t.getNeighbor().get(i).isEmpty() && t.getHideTurnCount() == 0) {// if this is just adjusted and it is not hided
+                    Territory tempView = new Territory(t);
+                    tempView.setAbleToSee(true);
+                    tempViewMap.add(tempView);
+                } else if (t.getNeighbor().containsKey(i) && !t.getNeighbor().get(i).isEmpty() && t.getHideTurnCount() != 0) {// if this is adjusted and it is hided
+                    Territory tempView = new Territory(getTerritoryByNameInView(i,t.getName()));
+                    tempView.setAbleToSee(false);
+                    tempViewMap.add(tempView);
+                } else if (!getTerritoryByNameInView(i,t.getName()).getUnits().getUnits().containsValue(-1)) {// if the player had the view of this territory but now lose the view
+                    Territory tempView = new Territory(getTerritoryByNameInView(i,t.getName()));
+                    tempView.setOwnID(t.getOwnID());
+                    tempView.setNeighbor(t.getNeighbor());
+                    tempView.setAbleToSee(false);
+                    tempViewMap.add(tempView);
+                } else {// if the player never see the territory
+                    Territory tempView = new Territory(t, -1);
+                    tempView.setAbleToSee(false);
+                    tempViewMap.add(tempView);
+                }
+            }
+            viewMap.put(i,tempViewMap);
         }
     }
 
