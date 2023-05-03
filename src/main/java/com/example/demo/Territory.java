@@ -1,5 +1,7 @@
 package com.example.demo;
 
+import javafx.util.Pair;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,24 +12,82 @@ public class Territory implements Serializable {
     public int ownID;
     public unitStorage units;
     public HashMap<Integer, ArrayList<String>> neighbor;
-
+    public Map<Integer, Territory> viewMap;
+    public Map<Integer, Integer> spiesCollection;
+    public int hideTurnCount;
     public int size;
-
+    public boolean ableToSee;
 
     public Territory() {
         this.name = "Temp";
         this.ownID = 0;
         this.units = new unitStorage();
         this.neighbor = new HashMap<>();
+        this.viewMap = new HashMap<>();
+        this.spiesCollection = new HashMap<>();
+        this.hideTurnCount = 0;
         this.size = 10;
+        this.ableToSee = true;
+    }
+
+    public Territory(Territory t, int x) {
+        this.name = t.getName();
+        this.ownID = x;
+        this.units = new unitStorage(x);
+        this.neighbor = t.getNeighbor();
+        this.viewMap = t.getViewMap();
+        this.spiesCollection = new HashMap<>();
+        this.hideTurnCount = t.getHideTurnCount();
+        this.size = t.getSize();
+        this.ableToSee = true;
+    }
+    public Territory(Territory t) {
+        this.name = t.getName();
+        this.ownID = t.getOwnID();
+        this.units = new unitStorage();
+        setUnits((t.getUnits()));
+        this.neighbor = t.getNeighbor();
+        this.viewMap = t.getViewMap();
+        this.spiesCollection = t.getSpiesCollection();
+        this.hideTurnCount = t.getHideTurnCount();
+        this.size = t.getSize();
+        this.ableToSee = t.isAbleToSee();
     }
 
     public Territory(String name, int ownID) {
         this.name = name;
         this.ownID = ownID;
         this.units = new unitStorage();
-        this.neighbor = new HashMap<Integer, ArrayList<String>>();
+        this.neighbor = new HashMap<>();
+        this.viewMap = new HashMap<>();
+        this.spiesCollection = new HashMap<>();
+        this.hideTurnCount = 0;
         this.size = 10;
+    }
+
+
+    public Map<Integer, Territory> getViewMap() {
+        return viewMap;
+    }
+
+    public void setViewMap(Map<Integer, Territory> viewMap) {
+        this.viewMap = viewMap;
+    }
+
+    public boolean isAbleToSee() {
+        return ableToSee;
+    }
+
+    public void setAbleToSee(boolean ableToSee) {
+        this.ableToSee = ableToSee;
+    }
+
+    public Map<Integer, Integer> getSpiesCollection() {
+        return spiesCollection;
+    }
+
+    public int getHideTurnCount() {
+        return hideTurnCount;
     }
 
     public String getName() {
@@ -56,6 +116,48 @@ public class Territory implements Serializable {
 
     public void removeUnit(int num, int level) {
         this.units.removeUnits(num, level);
+    }
+
+    public void addSpy(int playerID, int num) {
+        if (spiesCollection.containsKey(playerID)) {
+            spiesCollection.put(playerID, spiesCollection.get(playerID) + num);
+        } else {
+            spiesCollection.put(playerID, num);
+        }
+    }
+
+    public void removeSpy(int playerID, int num) {
+        spiesCollection.put(playerID, spiesCollection.get(playerID) - num);
+    }
+
+
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setUnits(unitStorage units) {
+        if(units!=null){
+            for(int i = 0;i < 8; i++){
+                this.units.addUnits(units.getUnits().get(i),i);
+            }
+        }
+    }
+
+    public void setNeighbor(HashMap<Integer, ArrayList<String>> neighbor) {
+        this.neighbor = neighbor;
+    }
+
+    public void setSpiesCollection(Map<Integer, Integer> spiesCollection) {
+        this.spiesCollection = spiesCollection;
+    }
+
+    public void setHideTurnCount(int hideTurnCount) {
+        this.hideTurnCount = hideTurnCount;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
     }
 
     // based on territory id, find its name in hashmap

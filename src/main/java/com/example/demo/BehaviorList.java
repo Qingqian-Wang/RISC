@@ -15,7 +15,7 @@ public class BehaviorList implements NetworkObject, Serializable {
     public ArrayList<upgradeBehavior> upgradeList;// A list of behaviors related to upgrade
     public int evloveNum;
 
-    public int playerID;// The ID of the player who performed the behaviors
+    private int playerID;// The ID of the player who performed the behaviors
     public int status; // -1 means disconnect; 0 means dead; 1 means live
 
     public BehaviorList() {

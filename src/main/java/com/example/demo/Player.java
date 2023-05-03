@@ -175,7 +175,7 @@ public class Player {
         if (tokens.length != 4) {
             return false;
         }
-        if (Integer.parseInt(tokens[0]) < 0 || Integer.parseInt(tokens[0]) > 6) {
+        if (Integer.parseInt(tokens[0]) < 0 || Integer.parseInt(tokens[0]) > 7) {
             return false;
         }
         return checkBehaviorInputFormatHelper(tokens[2], map) && checkBehaviorInputFormatHelper(tokens[3], map)
@@ -326,6 +326,26 @@ public class Player {
                         // print the current map information
                         StringBuilder sb = new StringBuilder();
                         sb.append("You are Player " + gameInfoList.get(currentGame).getPlayerID() + ", your technology level is " + gameInfoList.get(currentGame).getMaximumTechNum() + System.lineSeparator());
+                        sb.append("Unknown Player(s)' Territory:").append(System.lineSeparator());
+                        for (Territory territory : globalMap) {
+                            if (territory.getOwnID() == -1) {
+                                unitStorage unknownUnit = new unitStorage(-1);
+                                sb.append(unknownUnit.printUnits() + " units in " + territory.getName() +
+                                        "(next to:");
+                                ArrayList<String> neighborName = new ArrayList<>();
+                                for (Map.Entry<Integer, ArrayList<String>> e : territory.getNeighbor().entrySet()) {
+                                    neighborName.addAll(e.getValue());
+                                }
+                                for (int x = 0; x < neighborName.size(); x++) {
+                                    sb.append(" " + neighborName.get(x));
+                                    if (x != neighborName.size() - 1) {
+                                        sb.append(",");
+                                    } else {
+                                        sb.append(")").append(System.lineSeparator());
+                                    }
+                                }
+                            }
+                        }
                         for (int i = 1; i <= gameInfoList.get(currentGame).getTotalPlayerNum(); i++) {
                             sb.append("Player").append(i).append(":").append(System.lineSeparator());
                             for (Territory territory : globalMap) {
@@ -341,9 +361,15 @@ public class Player {
                                         if (x != neighborName.size() - 1) {
                                             sb.append(",");
                                         } else {
-                                            sb.append(")").append(System.lineSeparator());
+                                            sb.append(")");
                                         }
                                     }
+                                    if(!territory.isAbleToSee()){
+                                        sb.append(" Note: this is not the newest information");
+                                    }else if(territory.getSpiesCollection().containsKey(gameInfoList.get(currentGame).getPlayerID())&&territory.getSpiesCollection().get(gameInfoList.get(currentGame).getPlayerID())>0){
+                                        sb.append(" You have "+ territory.getSpiesCollection().get(gameInfoList.get(currentGame).getPlayerID())+" spy(spies) here");
+                                    }
+                                    sb.append(System.lineSeparator());
                                 }
                             }
                         }
@@ -415,7 +441,7 @@ public class Player {
 
                                         String[] tokens = behaviorInfo.split(" ");
                                         ArrayList<Integer> unit = new ArrayList<>();
-                                        for (int i = 0; i < 7; i++) {
+                                        for (int i = 0; i < 8; i++) {
                                             if (i == Integer.parseInt(tokens[0])) {
                                                 unit.add(Integer.parseInt(tokens[1]));
                                             } else {
@@ -447,7 +473,7 @@ public class Player {
                                             behaviorInfo = bf.readLine();
                                         }
                                         String[] tokens = behaviorInfo.split(" ");
-                                        behavior = new upgradeBehavior(getTerritoryByName(tokens[1], globalMap), gameInfoList.get(currentGame).getPlayerID(), "Upgrade", Integer.parseInt(tokens[2]), Integer.parseInt(tokens[3]), Integer.parseInt(tokens[0]));
+                                        behavior = new upgradeBehavior(getTerritoryByName(tokens[1], globalMap), gameInfoList.get(currentGame).getPlayerID(), "Upgrade", Integer.parseInt(tokens[2]), Integer.parseInt(tokens[3]), Integer.parseInt(tokens[0]), gameInfoList.get(currentGame).getMaximumTechNum());
                                         // check if the unit and source is correct for the behavior
                                         if (upgradeChecker.checkMyRule(behavior, globalMap) != null) {
                                             System.out.println(upgradeChecker.checkMyRule(behavior, globalMap));
@@ -686,7 +712,7 @@ public class Player {
 
     public void createAndAddUpgrade(String s) {
         String[] tokens = s.split(" ");
-        upgradeBehavior temp = new upgradeBehavior(getTerritoryByName(tokens[1], globalMap), gameInfoList.get(currentGame).getPlayerID(), "Upgrade", Integer.parseInt(tokens[2]), Integer.parseInt(tokens[3]), Integer.parseInt(tokens[0]));
+        upgradeBehavior temp = new upgradeBehavior(getTerritoryByName(tokens[1], globalMap), gameInfoList.get(currentGame).getPlayerID(), "Upgrade", Integer.parseInt(tokens[2]), Integer.parseInt(tokens[3]), Integer.parseInt(tokens[0]),gameInfoList.get(currentGame).getMaximumTechNum());
         listForOneTurn.addToUpgradeList(temp);
     }
 

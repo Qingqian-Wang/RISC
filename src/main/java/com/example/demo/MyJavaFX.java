@@ -566,9 +566,9 @@ public class MyJavaFX extends Application {
 // 左侧按钮事件处理程序
         for (int i = 0; i < limit; i++) {
             Button button = buttons[i];
-            int ownId, l0, l1, l2, l3, l4, l5, l6;
+            int ownId, l0, l1, l2, l3, l4, l5, l6,l7;
             String name;
-            if (player.getGlobalMap() == null) {
+            if (player.getGlobalMap().isEmpty()) {
                 ownId = -1;
                 name = "Name";
                 l0 = -1;
@@ -578,6 +578,7 @@ public class MyJavaFX extends Application {
                 l4 = -1;
                 l5 = -1;
                 l6 = -1;
+                l7 = -1;
 
             } else {
                 ArrayList<Territory> map = player.getGlobalMap();
@@ -590,13 +591,14 @@ public class MyJavaFX extends Application {
                 l4 = map.get(i).getUnits().units.get(4);
                 l5 = map.get(i).getUnits().units.get(5);
                 l6 = map.get(i).getUnits().units.get(6);
+                l7 = map.get(i).getUnits().units.get(7);
             }
 
 
             button.setOnAction(event -> {
                 statusLabel.setText("Owner: Player" + ownId + "\nName: " + name + "\n" +
                         "Level:\n" + "Ants: " + l0 + "\n" + "Bees: " + l1 + "\n" + "Wasps: " + l2 + "\n" + "Bird: " + l3 + "\n" + "Snake: " +
-                        l4 + "\n" + "Eagle: " + l5 + "\n" + "Human: " + l6);
+                        l4 + "\n" + "Eagle: " + l5 + "\n" + "Human: " + l6 + "\n" + "Spy: " + l7);
                 statusLabel.setFont(new Font("Cambria", 20));
                 statusLabel.setStyle("-fx-font-weight: bold");
             });

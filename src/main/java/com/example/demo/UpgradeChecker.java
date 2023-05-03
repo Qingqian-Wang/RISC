@@ -19,11 +19,14 @@ public class UpgradeChecker {
         if (exist_Unit.checkContainEnoughUnits(use_Unit) == false){
             return "use Unit larger than it has! it has " + exist_Unit.printUnits() + " but use " + use_Unit.printUnits();
         }
-        if(currentLevel<0||currentLevel>6){
+        if(currentLevel<0||currentLevel>7){
             return "currentLevel is out of bound for a upgrade behavior";
         }
-        if(targetLevel<0||targetLevel>6){
+        if(targetLevel<0||targetLevel>7){
             return "targetLevel is out of bound for a upgrade behavior";
+        }
+        if(targetLevel==7&&my_behavior.getTechLevel()<1){
+            return "Your technology level is not reaching 1";
         }
         if(my_behavior.getUpgradeCost()>currentRestCost){
             return "Cost is not enough";
@@ -46,10 +49,10 @@ public class UpgradeChecker {
         if (exist_Unit.checkContainEnoughUnits(use_Unit) == false){
             return "use Unit larger than it has! it has " + exist_Unit.printUnits() + " but use " + use_Unit.printUnits();
         }
-        if(currentLevel<0||currentLevel>6){
+        if(currentLevel<0||currentLevel>7){
             return "currentLevel is out of bound for a upgrade behavior";
         }
-        if(targetLevel<0||targetLevel>6){
+        if(targetLevel<0||targetLevel>7){
             return "targetLevel is out of bound for a upgrade behavior";
         }
         return null;
