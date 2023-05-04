@@ -214,9 +214,8 @@ public class Game implements Runnable {
                     break;
                 }
             }
+            System.out.println("Cloak " + b.getOrigin().getName() + "for three more turns");
         }
-
-        System.out.println("Cloak " + b.getOrigin().getName() + "for three more turns");
     }
 
 
