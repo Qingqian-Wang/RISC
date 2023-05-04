@@ -13,6 +13,8 @@ public class BehaviorList implements NetworkObject, Serializable {
     public ArrayList<Behavior> attackList;// A list of behaviors related to attack
 
     public ArrayList<upgradeBehavior> upgradeList;// A list of behaviors related to upgrade
+
+    public ArrayList<Behavior> cloakList;// A list of behaviors related to cloak
     public int evloveNum;
 
     private int playerID;// The ID of the player who performed the behaviors
@@ -23,6 +25,7 @@ public class BehaviorList implements NetworkObject, Serializable {
         moveList = new ArrayList<>();
         attackList = new ArrayList<>();
         upgradeList = new ArrayList<>();
+        cloakList = new ArrayList<>();
         this.status = 0;
         evloveNum = 0;
     }
@@ -31,6 +34,7 @@ public class BehaviorList implements NetworkObject, Serializable {
         moveList = new ArrayList<>();
         attackList = new ArrayList<>();
         upgradeList = new ArrayList<>();
+        cloakList = new ArrayList<>();
         this.status = status;
         evloveNum = 0;
     }
@@ -66,6 +70,14 @@ public class BehaviorList implements NetworkObject, Serializable {
 
     public int getPlayerID() {
         return playerID;
+    }
+
+    public void addToCloakList(Behavior b){
+        this.cloakList.add(b);
+    }
+
+    public ArrayList<Behavior> getCloakList() {
+        return cloakList;
     }
 
     /*

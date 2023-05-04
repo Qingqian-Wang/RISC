@@ -716,6 +716,17 @@ public class Player {
         listForOneTurn.addToUpgradeList(temp);
     }
 
+
+    // the input is the name of the territory, if the territory does not belong to you, return null
+    public void createAndAddCloak(String s) {
+        Territory tempTerr = getTerritoryByName(s, globalMap);
+        if(tempTerr.getOwnID() != gameInfoList.get(currentGame).getPlayerID()) {
+            return;
+        }
+        Behavior temp = new Behavior(gameInfoList.get(currentGame).getPlayerID(), getTerritoryByName(s, globalMap));
+        listForOneTurn.addToCloakList(temp);
+    }
+
     public void evloveTech() {
         listForOneTurn.addEvloveNum();
     }

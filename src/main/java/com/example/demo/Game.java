@@ -23,6 +23,8 @@ public class Game implements Runnable {
     public ArrayList<Integer> restCost;
     public ArrayList<Integer> restFood;
     public ArrayList<Integer> techLevelList;
+    public ArrayList<Integer> cloakingOpen;
+    // 0 means not open, 1 means open
 
     /*
      * Constructor to create a Server object
@@ -44,10 +46,12 @@ public class Game implements Runnable {
         restFood = new ArrayList<>();
         techLevelList = new ArrayList<>();
         viewMap = new HashMap<>();
+        cloakingOpen = new ArrayList<>();
         for (int i = 0; i < maxPlayerNum; i++) {
             restCost.add(50);
             restFood.add(500);
             techLevelList.add(1);
+            cloakingOpen.add(0);
         }
     }
 
@@ -188,6 +192,35 @@ public class Game implements Runnable {
 
 
     // ======================================the end of upgrade function================
+
+    //========================================cloak function============================
+    public void checkAndExecuteCloakBehavior(ArrayList<Behavior> behaviorArrayList) {
+        for (Behavior b : behaviorArrayList) {
+            if(cloakingOpen.get(b.getOwnID() - 1) == 0){
+                if(restCost.get(b.getOwnID() - 1) < 100) continue;
+                restCost.set(b.getOwnID() - 1, restCost.get(b.getOwnID() - 1) - 100);
+                cloakingOpen.set(b.getOwnID() - 1, 1);
+            }
+            executeCloakBehavior(b);
+        }
+    }
+    public void executeCloakBehavior(Behavior b) {
+        if(restCost.get(b.getOwnID() - 1) > 20){
+            restCost.set(b.getOwnID() - 1, restCost.get(b.getOwnID() - 1) - 20);
+            String terrName = b.getOrigin().getName();
+            for (int i = 0; i < map.size(); i++) {
+                if (terrName.equals(map.get(i).getName())) {
+                    map.get(i).setHideTurnCount(map.get(i).getHideTurnCount() + 3);
+                    break;
+                }
+            }
+        }
+
+        System.out.println("Cloak " + b.getOrigin().getName() + "for three more turns");
+    }
+
+
+    //========================================the end of upgrade function=======================================
 
 
     //evolve function
@@ -370,6 +403,7 @@ public class Game implements Runnable {
         ArrayList<Behavior> moveList = new ArrayList<>();
         ArrayList<upgradeBehavior> upgradeList = new ArrayList<>();
         Map<Integer, Integer> evolveList = new HashMap<>();
+        ArrayList<Behavior> cloakList = new ArrayList<>();
         for (PlayerInfo playerInfo : playerInfoList) {
             playerInfo.getOut().println("Turn Start");
             sendPlayerStatus(playerInfo);
@@ -392,6 +426,7 @@ public class Game implements Runnable {
             attackList.addAll(orderMap.get(i).getAttackList());
             moveList.addAll(orderMap.get(i).getMoveList());
             upgradeList.addAll(orderMap.get(i).getUpgradeList());
+            cloakList.addAll(orderMap.get(i).getCloakList());
             // update restCost
 //            restCost.set(orderMap.get(i).getPlayerID() - 1, orderMap.get(i).getRestCost());
         }
@@ -399,6 +434,7 @@ public class Game implements Runnable {
         checkAndExecuteMoveBehavior(moveList);
         checkAndExecuteAttackBehavior(attackList);
         checkAndExecuteUpgradeBehavior(upgradeList);
+        checkAndExecuteCloakBehavior(cloakList);
         addOneUnit();
         addCost();
         updateViewMap();
@@ -552,6 +588,9 @@ public class Game implements Runnable {
         for (int i : playerList) {
             ArrayList<Territory> tempViewMap = new ArrayList<>();
             for (Territory t : map) {
+                if(t.getHideTurnCount() > 0){
+                    t.setHideTurnCount(t.getHideTurnCount() - 1);
+                }
                 if (i == t.getOwnID() || (t.getSpiesCollection().containsKey(i) && t.getSpiesCollection().get(i) > 0)) {// if this has spy or you are the owner
                     Territory tempView = new Territory(t);
                     tempView.setAbleToSee(true);
