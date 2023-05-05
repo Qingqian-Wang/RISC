@@ -197,7 +197,7 @@ public class Game implements Runnable {
     public void checkAndExecuteCloakBehavior(ArrayList<Behavior> behaviorArrayList) {
         for (Behavior b : behaviorArrayList) {
             if(cloakingOpen.get(b.getOwnID() - 1) == 0){
-                if(restCost.get(b.getOwnID() - 1) < 100) continue;
+                if(restCost.get(b.getOwnID() - 1) < 100||techLevelList.get(b.getOwnID()-1)<3) continue;
                 restCost.set(b.getOwnID() - 1, restCost.get(b.getOwnID() - 1) - 100);
                 cloakingOpen.set(b.getOwnID() - 1, 1);
             }
