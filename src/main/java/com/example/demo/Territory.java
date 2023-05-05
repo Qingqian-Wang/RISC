@@ -12,7 +12,7 @@ public class Territory implements Serializable {
     public int ownID;
     public unitStorage units;
     public HashMap<Integer, ArrayList<String>> neighbor;
-    public Map<Integer, Territory> viewMap;
+//    public Map<Integer, Territory> viewMap;
     public Map<Integer, Integer> spiesCollection;
     public int hideTurnCount;
     public int size;
@@ -23,7 +23,7 @@ public class Territory implements Serializable {
         this.ownID = 0;
         this.units = new unitStorage();
         this.neighbor = new HashMap<>();
-        this.viewMap = new HashMap<>();
+//        this.viewMap = new HashMap<>();
         this.spiesCollection = new HashMap<>();
         this.hideTurnCount = 0;
         this.size = 10;
@@ -35,7 +35,7 @@ public class Territory implements Serializable {
         this.ownID = x;
         this.units = new unitStorage(x);
         this.neighbor = t.getNeighbor();
-        this.viewMap = t.getViewMap();
+//        this.viewMap = t.getViewMap();
         this.spiesCollection = new HashMap<>();
         this.hideTurnCount = t.getHideTurnCount();
         this.size = t.getSize();
@@ -47,7 +47,7 @@ public class Territory implements Serializable {
         this.units = new unitStorage();
         setUnits((t.getUnits()));
         this.neighbor = t.getNeighbor();
-        this.viewMap = t.getViewMap();
+//        this.viewMap = t.getViewMap();
         this.spiesCollection = t.getSpiesCollection();
         this.hideTurnCount = t.getHideTurnCount();
         this.size = t.getSize();
@@ -59,20 +59,20 @@ public class Territory implements Serializable {
         this.ownID = ownID;
         this.units = new unitStorage();
         this.neighbor = new HashMap<>();
-        this.viewMap = new HashMap<>();
+//        this.viewMap = new HashMap<>();
         this.spiesCollection = new HashMap<>();
         this.hideTurnCount = 0;
         this.size = 10;
     }
 
 
-    public Map<Integer, Territory> getViewMap() {
-        return viewMap;
-    }
+//    public Map<Integer, Territory> getViewMap() {
+//        return viewMap;
+//    }
 
-    public void setViewMap(Map<Integer, Territory> viewMap) {
-        this.viewMap = viewMap;
-    }
+//    public void setViewMap(Map<Integer, Territory> viewMap) {
+//        this.viewMap = viewMap;
+//    }
 
     public boolean isAbleToSee() {
         return ableToSee;
