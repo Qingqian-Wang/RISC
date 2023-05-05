@@ -506,8 +506,9 @@ public class Game implements Runnable {
             if (b.getUnits().getUnits().get(7) != 0) {
                 if (checkSpyMove(b)) {
                     executeSpyMoveBehavior(b);
+                } else {
+                    System.out.println("Move spy fail because no enough spy or target is not adjacency");
                 }
-                System.out.println("Move spy fail because no enough spy or target is not adjacency");
             } else if (ruleChecker.checkBehavior(restFood.get(b.getOwnID() - 1), b, map) == null) {
                 executeMoveBehavior(b);
             } else {
