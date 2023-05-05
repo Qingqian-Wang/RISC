@@ -407,6 +407,7 @@ public class Player {
                                 System.out.println("(A)ttack");
                                 System.out.println("(U)pgrade");
                                 System.out.println("(E)volve");
+                                System.out.println("(C)loak");
                                 System.out.println("(D)one");
                                 System.out.println("now you have " + gameInfoList.get(currentGame).getRestCost() + " cost left");
                                 System.out.println("and you have " + gameInfoList.get(currentGame).getRestFood() + " food left");
@@ -414,7 +415,7 @@ public class Player {
                                 BufferedReader bf = new BufferedReader(sr);
                                 String response = bf.readLine();
                                 while (response.length() != 1 || (response.toUpperCase().charAt(0) != 'M'
-                                        && response.toUpperCase().charAt(0) != 'A' && response.toUpperCase().charAt(0) != 'D' && response.toUpperCase().charAt(0) != 'U' && response.toUpperCase().charAt(0) != 'E')) {
+                                        && response.toUpperCase().charAt(0) != 'A' && response.toUpperCase().charAt(0) != 'D' && response.toUpperCase().charAt(0) != 'U' && response.toUpperCase().charAt(0) != 'E'&& response.toUpperCase().charAt(0) != 'C')) {
                                     System.out.println("Your input is not in correct format, try again");
                                     System.out.println("You are player " + gameInfoList.get(currentGame).getPlayerID() + ", what would you like to do?");
                                     System.out.println("(M)ove");
@@ -504,6 +505,10 @@ public class Player {
 //                                        gameInfoList.get(currentGame).setRestCost(gameInfoList.get(currentGame).getRestCost() - sum);
 //                                        gameInfoList.get(currentGame).setMaximumTechNum(Evolevel);
 //                                    }
+                                } else if (response.toUpperCase().charAt(0) == 'C') {
+                                    System.out.println("choose the place you want to cloak");
+                                    String behaviorInfo = bf.readLine();
+                                    createAndAddCloak(behaviorInfo);
                                 } else if (response.toUpperCase().charAt(0) == 'D') {// end turn
                                     out.println(objectMapper.writeValueAsString(listForOneTurn));
                                     listForOneTurn = null;

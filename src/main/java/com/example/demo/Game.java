@@ -210,7 +210,7 @@ public class Game implements Runnable {
             String terrName = b.getOrigin().getName();
             for (int i = 0; i < map.size(); i++) {
                 if (terrName.equals(map.get(i).getName())) {
-                    map.get(i).setHideTurnCount(map.get(i).getHideTurnCount() + 3);
+                    map.get(i).setHideTurnCount(map.get(i).getHideTurnCount() + 4);
                     break;
                 }
             }
@@ -581,15 +581,17 @@ public class Game implements Runnable {
     }
     public void updateViewMap() {
         ArrayList<Integer> playerList = new ArrayList<>();
+        for(Territory t : map){
+            if(t.getHideTurnCount() > 0){
+                t.setHideTurnCount(t.getHideTurnCount() - 1);
+            }
+        }
         for(PlayerInfo p : playerInfoList){
             playerList.add(p.getPlayerID());
         }
         for (int i : playerList) {
             ArrayList<Territory> tempViewMap = new ArrayList<>();
             for (Territory t : map) {
-                if(t.getHideTurnCount() > 0){
-                    t.setHideTurnCount(t.getHideTurnCount() - 1);
-                }
                 if (i == t.getOwnID() || (t.getSpiesCollection().containsKey(i) && t.getSpiesCollection().get(i) > 0)) {// if this has spy or you are the owner
                     Territory tempView = new Territory(t);
                     tempView.setAbleToSee(true);
