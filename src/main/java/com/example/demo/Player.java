@@ -422,6 +422,7 @@ public class Player {
                                     System.out.println("(A)ttack");
                                     System.out.println("(U)pgrade");
                                     System.out.println("(E)volve");
+                                    System.out.println("(C)loak");
                                     System.out.println("(D)one");
                                     System.out.println("now you have " + gameInfoList.get(currentGame).getRestCost() + " cost left");
                                     System.out.println("and you have " + gameInfoList.get(currentGame).getRestFood() + " food left");
@@ -508,6 +509,10 @@ public class Player {
                                 } else if (response.toUpperCase().charAt(0) == 'C') {
                                     System.out.println("choose the place you want to cloak");
                                     String behaviorInfo = bf.readLine();
+                                    while(getTerritoryByName(behaviorInfo, globalMap)==null){
+                                        System.out.println("Your input is not existing on the map, try again:");
+                                        behaviorInfo = bf.readLine();
+                                    }
                                     createAndAddCloak(behaviorInfo);
                                 } else if (response.toUpperCase().charAt(0) == 'D') {// end turn
                                     out.println(objectMapper.writeValueAsString(listForOneTurn));
@@ -725,7 +730,10 @@ public class Player {
     // the input is the name of the territory, if the territory does not belong to you, return null
     public void createAndAddCloak(String s) {
         Territory tempTerr = getTerritoryByName(s, globalMap);
-        if(tempTerr.getOwnID() != gameInfoList.get(currentGame).getPlayerID()) {
+        if(tempTerr==null){
+            return;
+        }
+        if(tempTerr.getOwnID() != gameInfoList.get(currentGame).getPlayerID()||gameInfoList.get(currentGame).getMaximumTechNum()<3) {
             return;
         }
         Behavior temp = new Behavior(gameInfoList.get(currentGame).getPlayerID(), getTerritoryByName(s, globalMap));
@@ -754,13 +762,13 @@ public class Player {
         return "Continue";
     }
 
-//    public static void main(String[] args) throws IOException {
-//        int serverPort = 9999;
-//        Player p1 = new Player(serverPort);
-//        p1.connectToServer();
-//        p1.connectToGame();
-////        p1.connectToGameForFront("1 2");
-//        p1.playGame();
-//
-//    }
+    public static void main(String[] args) throws IOException {
+        int serverPort = 9999;
+        Player p1 = new Player(serverPort);
+        p1.connectToServer();
+        p1.connectToGame();
+//        p1.connectToGameForFront("1 2");
+        p1.playGame();
+
+    }
 }
