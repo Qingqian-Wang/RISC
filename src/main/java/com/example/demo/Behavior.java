@@ -34,6 +34,15 @@ public class Behavior implements Serializable {
         this.type = type;
     }
 
+    // constructor only initialize ownid and origin, use for cloak
+    public Behavior(int ownID, Territory origin) {
+        this.origin = origin;
+        this.destination = null;
+        this.units = null;
+        this.ownID = ownID;
+        this.type = null;
+    }
+
     // default constructor
     public Behavior() {
         this.origin = null;

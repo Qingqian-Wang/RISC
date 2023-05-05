@@ -407,6 +407,7 @@ public class Player {
                                 System.out.println("(A)ttack");
                                 System.out.println("(U)pgrade");
                                 System.out.println("(E)volve");
+                                System.out.println("(C)loak");
                                 System.out.println("(D)one");
                                 System.out.println("now you have " + gameInfoList.get(currentGame).getRestCost() + " cost left");
                                 System.out.println("and you have " + gameInfoList.get(currentGame).getRestFood() + " food left");
@@ -414,7 +415,7 @@ public class Player {
                                 BufferedReader bf = new BufferedReader(sr);
                                 String response = bf.readLine();
                                 while (response.length() != 1 || (response.toUpperCase().charAt(0) != 'M'
-                                        && response.toUpperCase().charAt(0) != 'A' && response.toUpperCase().charAt(0) != 'D' && response.toUpperCase().charAt(0) != 'U' && response.toUpperCase().charAt(0) != 'E')) {
+                                        && response.toUpperCase().charAt(0) != 'A' && response.toUpperCase().charAt(0) != 'D' && response.toUpperCase().charAt(0) != 'U' && response.toUpperCase().charAt(0) != 'E'&& response.toUpperCase().charAt(0) != 'C')) {
                                     System.out.println("Your input is not in correct format, try again");
                                     System.out.println("You are player " + gameInfoList.get(currentGame).getPlayerID() + ", what would you like to do?");
                                     System.out.println("(M)ove");
@@ -504,6 +505,10 @@ public class Player {
 //                                        gameInfoList.get(currentGame).setRestCost(gameInfoList.get(currentGame).getRestCost() - sum);
 //                                        gameInfoList.get(currentGame).setMaximumTechNum(Evolevel);
 //                                    }
+                                } else if (response.toUpperCase().charAt(0) == 'C') {
+                                    System.out.println("choose the place you want to cloak");
+                                    String behaviorInfo = bf.readLine();
+                                    createAndAddCloak(behaviorInfo);
                                 } else if (response.toUpperCase().charAt(0) == 'D') {// end turn
                                     out.println(objectMapper.writeValueAsString(listForOneTurn));
                                     listForOneTurn = null;
@@ -714,6 +719,17 @@ public class Player {
         String[] tokens = s.split(" ");
         upgradeBehavior temp = new upgradeBehavior(getTerritoryByName(tokens[1], globalMap), gameInfoList.get(currentGame).getPlayerID(), "Upgrade", Integer.parseInt(tokens[2]), Integer.parseInt(tokens[3]), Integer.parseInt(tokens[0]),gameInfoList.get(currentGame).getMaximumTechNum());
         listForOneTurn.addToUpgradeList(temp);
+    }
+
+
+    // the input is the name of the territory, if the territory does not belong to you, return null
+    public void createAndAddCloak(String s) {
+        Territory tempTerr = getTerritoryByName(s, globalMap);
+        if(tempTerr.getOwnID() != gameInfoList.get(currentGame).getPlayerID()) {
+            return;
+        }
+        Behavior temp = new Behavior(gameInfoList.get(currentGame).getPlayerID(), getTerritoryByName(s, globalMap));
+        listForOneTurn.addToCloakList(temp);
     }
 
     public void evloveTech() {

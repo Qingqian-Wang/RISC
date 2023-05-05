@@ -17,8 +17,6 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static java.lang.Thread.sleep;
-
 public class MyJavaFX extends Application {
 
     private static final String USERNAME = "123";
