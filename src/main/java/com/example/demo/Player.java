@@ -119,7 +119,7 @@ public class Player {
     // check if the name exist in the map
     public boolean checkBehaviorInputFormatHelper(String name, ArrayList<Territory> map) {
         for (Territory t : map) {
-            if (t.getName().equals(name)) {
+            if (t.getName().equalsIgnoreCase(name)) {
                 return true;
             }
         }
@@ -179,13 +179,13 @@ public class Player {
             return false;
         }
         return checkBehaviorInputFormatHelper(tokens[2], map) && checkBehaviorInputFormatHelper(tokens[3], map)
-                && (!tokens[2].equals(tokens[3]));
+                && (!tokens[2].equalsIgnoreCase(tokens[3]));
     }
 
     // get Territory object based on name
     public Territory getTerritoryByName(String s, ArrayList<Territory> map) {
         for (Territory t : map) {
-            if (t.getName().equals(s)) {
+            if (t.getName().equalsIgnoreCase(s)) {
                 return t;
             }
         }
@@ -238,7 +238,7 @@ public class Player {
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                    while (!response.equals("yes") && !response.equals("no")) {
+                    while (!response.equalsIgnoreCase("yes") && !response.equalsIgnoreCase("no")) {
                         System.out.println("Your input is invalid");
                         System.out.println("You are currently in Game" + currentGame);
                         System.out.println("Do you want to switch?(yes or no)");
@@ -248,7 +248,7 @@ public class Player {
                             throw new RuntimeException(e);
                         }
                     }
-                    if (response.equals("yes")) {
+                    if (response.equalsIgnoreCase("yes")) {
                         System.out.println("Please select the game you want to play, type the game ID to select");
                         System.out.println("Game list:");
                         for (Integer i : joinGameList) {
@@ -380,7 +380,7 @@ public class Player {
                             InputStreamReader sr = new InputStreamReader(System.in);
                             BufferedReader bf = new BufferedReader(sr);
                             String response = bf.readLine();
-                            if (response.equals("yes")) {
+                            if (response.equalsIgnoreCase("yes")) {
                                 gameInfoList.get(currentGame).setWatchingPattern(1);
                             } else {
                                 listForOneTurn = new BehaviorList(gameInfoList.get(currentGame).getPlayerID(), -1);

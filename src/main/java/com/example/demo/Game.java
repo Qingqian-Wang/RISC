@@ -169,6 +169,8 @@ public class Game implements Runnable {
         for (upgradeBehavior b : behaviorArrayList) {
             if (upgradeChecker.checkMyRule(restCost.get(b.getOwnID() - 1), b, map) == null) {
                 executeUpgradeBehavior(b);
+            } else {
+                System.out.println("Upgrade denied because "+ upgradeChecker.checkMyRule(restCost.get(b.getOwnID() - 1), b, map));
             }
         }
     }
@@ -197,7 +199,10 @@ public class Game implements Runnable {
     public void checkAndExecuteCloakBehavior(ArrayList<Behavior> behaviorArrayList) {
         for (Behavior b : behaviorArrayList) {
             if(cloakingOpen.get(b.getOwnID() - 1) == 0){
-                if(restCost.get(b.getOwnID() - 1) < 100||techLevelList.get(b.getOwnID()-1)<3) continue;
+                if(restCost.get(b.getOwnID() - 1) < 100||techLevelList.get(b.getOwnID()-1)<3) {
+                    System.out.println("Cloak fail because either Cost is not enough or Tech LeveL is less than 3");
+                    continue;
+                }
                 restCost.set(b.getOwnID() - 1, restCost.get(b.getOwnID() - 1) - 100);
                 cloakingOpen.set(b.getOwnID() - 1, 1);
             }
@@ -253,6 +258,8 @@ public class Game implements Runnable {
             techLevelList.set(playerID - 1, techLevelList.get(playerID - 1) + 1);
             restCost.set(playerID - 1, restCost.get(playerID - 1) - expectedCost);
             checkAndExecuteEvolveHelper(playerID, count - 1);
+        } else{
+            System.out.println("Player "+ playerID +" evolve fail because no enough Cost");
         }
     }
 
@@ -500,8 +507,11 @@ public class Game implements Runnable {
                 if (checkSpyMove(b)) {
                     executeSpyMoveBehavior(b);
                 }
+                System.out.println("Move spy fail because no enough spy or target is not adjacency");
             } else if (ruleChecker.checkBehavior(restFood.get(b.getOwnID() - 1), b, map) == null) {
                 executeMoveBehavior(b);
+            } else {
+                System.out.println("Move fail because "+ ruleChecker.checkBehavior(restFood.get(b.getOwnID() - 1), b, map));
             }
         }
     }
@@ -699,6 +709,7 @@ public class Game implements Runnable {
                     playerIDs.add(b.getOwnID());
                 }
             } else {
+                System.out.println("Attack denied because: "+ruleChecker.checkBehavior(restFood.get(b.getOwnID() - 1), b, map));
                 behaviorArrayList.remove(b);
                 if (behaviorArrayList.isEmpty()) {
                     break;
