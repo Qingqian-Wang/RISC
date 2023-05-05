@@ -366,8 +366,8 @@ public class Player {
                                     }
                                     if(!territory.isAbleToSee()){
                                         sb.append(" Note: this is not the newest information");
-                                    }else if(territory.getSpiesCollection().containsKey(gameInfoList.get(currentGame).getPlayerID())&&territory.getSpiesCollection().get(gameInfoList.get(currentGame).getPlayerID())>0){
-                                        sb.append(" You have "+ territory.getSpiesCollection().get(gameInfoList.get(currentGame).getPlayerID())+" spy(spies) here");
+                                    }else if(getSpyNumOnTerritory(territory)>0){
+                                        sb.append(" You have "+ getSpyNumOnTerritory(territory)+" spy(spies) here");
                                     }
                                     sb.append(System.lineSeparator());
                                 }
@@ -724,6 +724,11 @@ public class Player {
         String[] tokens = s.split(" ");
         upgradeBehavior temp = new upgradeBehavior(getTerritoryByName(tokens[1], globalMap), gameInfoList.get(currentGame).getPlayerID(), "Upgrade", Integer.parseInt(tokens[2]), Integer.parseInt(tokens[3]), Integer.parseInt(tokens[0]),gameInfoList.get(currentGame).getMaximumTechNum());
         listForOneTurn.addToUpgradeList(temp);
+    }
+
+    public int getSpyNumOnTerritory(Territory t){
+        if(t.getSpiesCollection().containsKey(gameInfoList.get(currentGame).getPlayerID())) return t.getSpiesCollection().get(gameInfoList.get(currentGame).getPlayerID());
+        return 0;
     }
 
 
