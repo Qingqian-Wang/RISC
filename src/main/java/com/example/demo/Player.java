@@ -767,13 +767,13 @@ public class Player {
         return "Continue";
     }
 
-    public static void main(String[] args) throws IOException {
-        int serverPort = 9999;
-        Player p1 = new Player(serverPort);
-        p1.connectToServer();
-        p1.connectToGame();
-//        p1.connectToGameForFront("1 2");
-        p1.playGame();
-
-    }
+//    public static void main(String[] args) throws IOException {
+//        int serverPort = 9999;
+//        Player p1 = new Player(serverPort);
+//        p1.connectToServer();
+//        p1.connectToGame();
+////        p1.connectToGameForFront("1 2");
+//        p1.playGame();
+//
+//    }
 }
