@@ -1,4 +1,10 @@
 # RISC
+## technique stack
+
+|frontEnd|JavaFX|
+|backEnd|Java|
+|Database|SQLite|
+
 
 ## Design
 UML
