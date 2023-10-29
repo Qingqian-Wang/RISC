@@ -1,6 +1,9 @@
 # RISC
 
-- Overview: RISC is a real-time online strategy war game where players achieve victory by competing for each other's territories. In this project, we utilized the Jira platform for Scrum Agile development. The project involved designing a territory-conquering game using the MVC (Model-View-Controller) architecture. The front end was implemented using JavaFX, while SQLite was employed for data storage.
+- Overview:
+
+  RISC is a real-time online strategy war game where players achieve victory by competing for each other's territories. In this project, we utilized the Jira platform for Scrum Agile development. The project involved designing a territory-conquering game using the MVC (Model-View-Controller) architecture. The front end was implemented using JavaFX, while SQLite was employed for data storage.
+
 
 
 <div align="center">
@@ -8,10 +11,10 @@
 </div>
 
 
-• In the game, players employed soldiers to attack the territories of other players. The gameplay included basic interactions 
+- In the game, players employed soldiers to attack the territories of other players. The gameplay included basic interactions 
 like soldier movement and upgrades. Additionally, players could engage in optional activities such as upgrading 
 technology, training spies, and forming alliances.
-• After the game concluded, scores were calculated and stored in a database (db) file. Users could log back in using their 
+- After the game concluded, scores were calculated and stored in a database (db) file. Users could log back in using their 
 account credentials
 
 
@@ -19,7 +22,7 @@ account credentials
 
 
 
-## technique stack
+## Technique stack
 
 | frontEnd | backend | Database | 
 | -------- | -------| ---------- |
@@ -38,12 +41,15 @@ In this project, we used MVC to construct our design. Here is the UML diagram:
 server and await the entry of other players.
 
 - login
+
 the user's info will be stored in the database
 <div align="center">
     <img src="/image/login.png" alt="Alt text" width="500"/>
 </div>
 
 - select a room to join
+
+
 The project can have two rooms simultaneously, and players choose one of them to join.
 <div align="center">
 <img src="/image/selectroom.png" alt="Alt text" width="500"/>
