@@ -3,8 +3,9 @@
 - Overview: RISC is a real-time online strategy war game where players achieve victory by competing for each other's territories. In this project, we utilized the Jira platform for Scrum Agile development. The project involved designing a territory-conquering game using the MVC (Model-View-Controller) architecture. The front end was implemented using JavaFX, while SQLite was employed for data storage.
 
 - screenshot
-<img src="/image/screenshot.png" alt="Alt text" width="400"/>
-
+<div align="center">
+<img src="/image/screenshot.png" alt="Alt text" width="500"/>
+</div>
 
 
 • In the game, players employed soldiers to attack the territories of other players. The gameplay included basic interactions 
@@ -38,16 +39,27 @@ server and await the entry of other players.
 
 - login
 the user's info will be stored in the database
-<img src="/image/login.png" alt="Alt text" width="400"/>
-- select room
-<img src="/image/selectroom.png" alt="Alt text" width="400"/>
+<div align="center">
+    <img src="/image/login.png" alt="Alt text" width="500"/>
+</div>
 
-###the user's info will be stored in the database
-![Login](image/login.png)
+- select a room to join
+The project can have two rooms simultaneously, and players choose one of them to join.
+<div align="center">
+<img src="/image/selectroom.png" alt="Alt text" width="500"/>
+</div>
 
-- assign the soldier to the territory
-![strategy](image/assignmentsoldiers.png)
+### Assign your soldiers to the territory
+For each player, he has 50 soldiers in total. The player can assign these soldiers to his initial territory.
+<div align="center">
+<img src="/image/assignmentsoldiers.png" alt="Alt text" width="500"/>
+</div>
 
-- operations during the round
- ![operations](image/operationpage.png) 
+
+### Select an operation
+In a single round, the player can move or upgrade his soldiers. He can also attack the enemy's territory or cloak his territory's recourse from the enemy.
+<div align="center">
+<img src="/image/operationpage.png" alt="Alt text" width="500"/>
+</div>
+
 
