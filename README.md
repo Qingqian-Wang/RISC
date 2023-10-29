@@ -1,7 +1,7 @@
 # RISC
 RISC is a real-time online strategy war game where players achieve victory by competing for each other's territories.
 - screenshot
-<img src="/image/screenshot.png" alt="Alt text" width="200"/>
+<img src="/image/screenshot.png" alt="Alt text" width="100"/>
 ![game](/image/screenshot.png)
 
 
