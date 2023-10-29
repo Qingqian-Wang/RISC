@@ -4,7 +4,11 @@
 
 - screenshot
 <div align="center">
-<img src="/image/screenshot.png" alt="Alt text" width="500"/>
+    <figure>
+  
+      <figcaption>这是图片的标题</figcaption>
+    </figure>
+    <img src="/image/screenshot.png" alt="Alt text" width="500"/>
 </div>
 
 
