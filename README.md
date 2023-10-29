@@ -1,9 +1,9 @@
 # RISC
 ## technique stack
 
-|frontEnd|JavaFX|
-|backEnd|Java|
-|Database|SQLite|
+| frontEnd | JavaFX |
+| backEnd | Java |
+| Database | SQLite |
 
 
 ## Design
