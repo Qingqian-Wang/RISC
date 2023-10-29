@@ -2,13 +2,9 @@
 
 - Overview: RISC is a real-time online strategy war game where players achieve victory by competing for each other's territories. In this project, we utilized the Jira platform for Scrum Agile development. The project involved designing a territory-conquering game using the MVC (Model-View-Controller) architecture. The front end was implemented using JavaFX, while SQLite was employed for data storage.
 
-- screenshot
+
 <div align="center">
-    <figure>
-  
-      <figcaption>这是图片的标题</figcaption>
-    </figure>
-    <img src="/image/screenshot.png" alt="Alt text" width="500"/>
+      <img src="/image/screenshot.png" alt="Alt text" width="500"/>    
 </div>
 
 
