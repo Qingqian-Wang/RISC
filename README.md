@@ -1,7 +1,20 @@
 # RISC
-RISC is a real-time online strategy war game where players achieve victory by competing for each other's territories.
+
+- Overview: RISC is a real-time online strategy war game where players achieve victory by competing for each other's territories. In this project, we utilized the Jira platform for Scrum Agile development. The project involved designing a territory-conquering game using the MVC (Model-View-Controller) architecture. The front end was implemented using JavaFX, while SQLite was employed for data storage.
+
 - screenshot
-<img src="/image/screenshot.png" alt="Alt text" width="200"/>
+<img src="/image/screenshot.png" alt="Alt text" width="400"/>
+
+
+
+• In the game, players employed soldiers to attack the territories of other players. The gameplay included basic interactions 
+like soldier movement and upgrades. Additionally, players could engage in optional activities such as upgrading 
+technology, training spies, and forming alliances.
+• After the game concluded, scores were calculated and stored in a database (db) file. Users could log back in using their 
+account credentials
+
+
+
 
 
 
@@ -14,13 +27,22 @@ RISC is a real-time online strategy war game where players achieve victory by co
 
 ## Design
 UML
-In this project, we used MVC to construct our design.
+In this project, we used MVC to construct our design. Here is the UML diagram:
 ![UML](image/651UML.png)
 
-## UI
+## Game Flow
 
-- Login game
+### Login game and select room
+- Utilized sockets for communication between clients and servers. Players could request game room creation from the 
+server and await the entry of other players.
+
+- login
 the user's info will be stored in the database
+<img src="/image/login.png" alt="Alt text" width="400"/>
+- select room
+<img src="/image/selectroom.png" alt="Alt text" width="400"/>
+
+###the user's info will be stored in the database
 ![Login](image/login.png)
 
 - assign the soldier to the territory
