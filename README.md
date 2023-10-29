@@ -2,6 +2,7 @@
 ## technique stack
 
 | frontEnd | JavaFX |
+| -------- | -------|
 | backEnd | Java |
 | Database | SQLite |
 
