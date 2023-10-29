@@ -1,6 +1,7 @@
 # RISC
 RISC is a real-time online strategy war game where players achieve victory by competing for each other's territories.
-
+- screenshot
+![game](/image/screenshot.png)
 
 
 ## technique stack
@@ -13,6 +14,6 @@ RISC is a real-time online strategy war game where players achieve victory by co
 ## Design
 UML
 In this project, we used MVC to construct our design.
-![UML](651UML.png)
+![UML](image/651UML.png)
 
 ## UI
